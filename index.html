@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  	<base href="http://140.160.114.190/nwac/mobile/">
+	
+	<meta http-equiv="cache-control" content="max-age=0" />
+	<meta http-equiv="cache-control" content="no-cache" />
+	<meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
+	<meta http-equiv="pragma" content="no-cache" />
+	<meta http-equiv="expires" content="-1">
+	
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1.0,minimum-scale=1,user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+	<meta http-equiv="X-UA-Compatible" content="IE=7, IE=9" />
+    
+    <title>NWAC Mobile</title>
+	<link rel="shortcut icon" href="images/favicon.ico">
+	<link rel="stylesheet" type="text/css" href="css/mobile.min.css">
+	<link rel="stylesheet" type="text/css" href="http://serverapi.arcgisonline.com/jsapi/arcgis/3.2/js/esri/css/esri.css" />
+<!--	<link rel="stylesheet" type="text/css" href="http://dev.jtsage.com/cdn/datebox/latest/jqm-datebox.min.css" /> -->
+	<link rel="stylesheet" type="text/css" href="http://140.160.114.190/apis/jqm-datebox.min.css" /> 
+	
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.0.1/jquery.mobile-1.0.1.min.css"/>
+	 
+	<!-- google analytics -->
+	<script type="text/javascript">
+	  var _gaq = _gaq || [];
+	  _gaq.push(['_setAccount', 'UA-28476932-1']);
+	  _gaq.push(['_trackPageview']);
+	  _gaq.push(['_setCustomVar',1,'NWAC', 'mobile site' ,3]);
+      _gaq.push(['_trackPageLoadTime']);
+	
+	  (function() {
+	    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+	    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+	    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	  })();
+	</script>  
+
+    <script type="text/javascript" src="http://serverapi.arcgisonline.com/jsapi/arcgis/?v=3.2compact"></script>
+	<script type="text/javascript" src="http://code.jquery.com/jquery-1.6.4.min.js"></script>	
+	
+	<!--validation  http://docs.jquery.com/Plugins/Validation-->
+	<script type="text/javascript" src="http://140.160.114.190/apis/jquery.validate.js"></script>
+<!--	<script type="text/javascript" src="http://jzaefferer.github.com/jquery-validation/jquery.validate.js"></script> -->
+	
+	<script type="text/javascript">
+			(function(){
+			$(document).bind("mobileinit", function(){
+				// load on start page
+				document.location.hash="";
+//				$.mobile.selectmenu.prototype.options.nativeMenu = false;
+			});
+		})();
+	</script>	
+	<script type="text/javascript">var dojoConfig = {parseOnLoad : true}</script>			
+    <script type="text/javascript" src="http://code.jquery.com/mobile/1.0.1/jquery.mobile-1.0.1.min.js"></script>
+
+	<!-- FormData plugin -->
+<!--    <script type="text/javascript" src="http://malsup.github.com/jquery.form.js"></script>-->
+    <script type="text/javascript" src="http://140.160.114.190/apis/jquery.form.js"></script>
+
+	<!-- mapping -->
+	<script type="text/javascript" src="assets/map.js"></script>
+	
+	<!-- DateBox -->
+<!--	<script type="text/javascript" src="http://dev.jtsage.com/cdn/datebox/latest/jquery.mobile.datebox.min.js"></script>
+	<script type="text/javascript" src="http://dev.jtsage.com/cdn/simpledialog/latest/jquery.mobile.simpledialog.min.js"></script>-->
+	<script type="text/javascript" src="http://140.160.114.190/apis/jquery.mobile.datebox.min.js"></script>
+	<script type="text/javascript" src="http://140.160.114.190/apis/jquery.mobile.simpledialog.min.js"></script>
+
+  </head>
+  
+  <!-- body -->
+  <body id="pageBody" class="claro">
+    <div  data-role="page" id="mapPage" data-prefetch>
+    		
+      <div id="header" style="height:55px;position:fixed;width:100%;/*background-color:#000*/;z-index:2">
+			  		<div id="dateLabel">NWAC Mobile Map<!--<h3 id="dateLabel">NWAC Mobile Map</h3>--></div> 
+					<a id="minusDayBtn" data-role="button" onclick="minusDay();">- day</a>   
+					<a id="plusDayBtn" data-role="button" onclick="plusDay();">+ day</a>  
+      </div>
+		 <div id="footer"> 
+			<fieldset id="footerGroup" data-role="controlgroup" data-type="horizontal">
+				<a class="halfBTN" id="optionsBTN" data-role="button" onclick="$.mobile.changePage('#options');" data-icon="gear" data-inline="false">Options</a>
+				<a class="halfBTN" data-role="button" onclick="$.mobile.changePage('#info',{changeHash: false});" data-icon="info" data-inline="false">Info</a>
+			</fieldset>	
+			<div id="dangerLegend">
+				<table border="0" cellpadding="0" cellspacing="0" width="100%">
+				   <tr height="15">
+				      <td height="15" class="legendCell" colspan="1" style="background-color:#00FF00;">Low</td>
+				      <td height="15" class="legendCell" colspan="2" style="background-color:#FFFF00;">Moderate</td>
+				      <td height="15" class="legendCell" colspan="3" style="background-color:#ff9933;">Considerable</td>
+				      <td height="15" class="legendCell" colspan="4" style="background-color:#cc0000;">High</td>
+				      <td height="15" class="legendCell" colspan="5" style="background-color:#000;">Extreme</td>
+				   </tr>
+				</table>
+			</div>  
+		 </div>	
+				<div id="infoDiv" >	
+				<p>The avalanche danger forecast is a regional forecast only and is not intended for slope-specific use or interpretation.</p>
+				<p>Use the buttons or <i><strong>swipe</strong></i> across the date at the top of the map to change date.</p>
+				<p>Click the options button at the bottom to show the options page where you can show observations or enter an observation, zoom to a region, change basemaps, and hide the danger overlay.</p>
+				<p>Tap or click on an observation point to view it's details.</p>
+				<p>Observations are shown by default for the past two weeks until today.  You can change the date range on the options page.</p>
+			<button id="infoDivOKBtn" onclick="hideInfoDiv()">OK</button>
+	     </div> 
+		  
+    	<div id="map"></div>
+			
+		 <div id="goToAttsDiv">
+		 	<ul data-role="listview" data-inset="true">
+				<li style="text-align:center;">View information for this observation?</li>
+				<li><button id="goToObsAttsButton" data-role="button" data-icon="info" onclick="$.mobile.changePage('#obsAttsPage', {changeHash: false});">View</button></li>
+				<li><button id="hideGoToAttsDivButton" data-role="button">No</button></li>
+	        </ul>
+		 </div>	
+		 
+		 <div id="askObsFormDiv">
+		 	<ul data-role="listview" data-inset="true">
+				<li id="sliderLI" data-role="fieldcontain">
+					<h4>Report type</h4>
+					<select id="changeReportSlider" data-theme="a" data-role="slider" data-native-menu="false" onchange="changeObs(this.value)">
+						<option value="addObByClick">Snow</option>
+						<option value="addAvyObByClick">Avy</option>
+					</select>
+				</li>
+				<li><button id="askObsFormDivButton" data-role="button" data-icon="plus">Add</button></li>
+				<li><button id="hideAskObsFormDivButton" data-role="button" onclick="hideAskFillOutForm()" data-icon="delete">No</button></li>
+	        </ul>
+		 </div>	
+		 
+		 <div id="askAddStabTestDiv">
+		 	<ul data-role="listview" data-inset="true">
+				<li data-role="fieldcontain">
+					<h4 id="stabTestDivLabel">Add stability test with observation?</h4>
+				</li>
+				<li><button id="askAddStabTestDivButton" data-role="button" data-icon="plus" onclick="$.mobile.changePage('#stabTest')" >Yes</button></li>
+				<li><button id="hideAskAddStabTestmDivButton" data-role="button" onclick="hideAskAddStabTestDiv()" data-icon="delete">No</button></li>
+	        </ul>
+		 </div>			
+	</div>
+	
+	<!--Info dialog-->	
+	<div  data-role="page" id="info" data-prefetch data-dom-cache="true">
+      <div data-role="header" data-position="fixed">
+        <h1>Info</h1>
+		<a onclick="$.mobile.changePage('#mapPage',{changeHash: false})" class="backToMapButton">Map</a>
+      </div>
+      <div data-role="content">		
+      	<ul data-role="listview" data-inset="true">
+				<li>Use the buttons or <i>swipe</i> across the date at the top of the map to change date.</li>
+				<li>Click the options button at the bottom to show the options page where you can show observations or enter an observation, zoom to a region, change basemaps, and hide the danger overlay.</li>
+				<li>Tap or click on an observation point to view it's details.</li>
+				<li>Observations are shown by default for the past two weeks until today.  You can change the date range on the options page.</li>
+        </ul>
+		<div><button onclick="$.mobile.changePage('#mapPage');">OK</button></div>
+      </div>
+    </div>
+	
+	<!--bookmarks page-->	
+	<div  data-role="page" id="bookmarksPage" data-prefetch data-dom-cache="true">
+      <div data-role="header" data-position="fixed">
+        <h1>Zoom to:</h1>
+		<a onclick="$.mobile.changePage('#mapPage')" class="backToMapButton">Map</a>
+      </div>
+      <div data-role="content">		
+      	<ul data-role="listview" data-inset="true">
+			<li><a data-role="button" onclick="bookmarkSelect_changeHandler(0);">All regions</a></li>
+			<li><a data-role="button" onclick="bookmarkSelect_changeHandler(1);">Olympics</a></li>
+			<li><a data-role="button" onclick="bookmarkSelect_changeHandler(2);">Mt Hood area</a></li>
+			<li><a data-role="button" onclick="bookmarkSelect_changeHandler(3);">Stevens Pass</a></li>
+			<li><a data-role="button" onclick="bookmarkSelect_changeHandler(4);">Snoqualmie Pass</a></li>
+			<li><a data-role="button" onclick="bookmarkSelect_changeHandler(5);">White Pass</a></li>
+			<li><a data-role="button" onclick="bookmarkSelect_changeHandler(6);">West - north of Stevens Pass</a></li>
+			<li><a data-role="button" onclick="bookmarkSelect_changeHandler(7);">West - between Snoqualmie and White Pass</a></li>
+			<li><a data-role="button" onclick="bookmarkSelect_changeHandler(8);">West - between Stevens and Snoqualmie Pass</a></li>
+			<li><a data-role="button" onclick="bookmarkSelect_changeHandler(9);">West - south of White Pass</a></li>
+			<li><a data-role="button" onclick="bookmarkSelect_changeHandler(10);">East - north of Stevens Pass</a></li>
+			<li><a data-role="button" onclick="bookmarkSelect_changeHandler(11);">East - between Stevens and Snoqualmie Pass</a></li>
+			<li><a data-role="button" onclick="bookmarkSelect_changeHandler(12);">East - between Snoqualmie and White Pass</a></li>
+			<li><a data-role="button" onclick="bookmarkSelect_changeHandler(13);">East - south of White Pass</a></li>
+		</ul>
+	 </div>		
+    </div>		
+	
+	<!--Add obs dialog-->	
+	<div  data-role="page" id="addObsPage" data-prefetch data-dom-cache="true">
+      <div data-role="header" data-position="fixed">
+        <h1>Add observation</h1>
+		<a onclick="$.mobile.changePage('#mapPage')" class="backToMapButton">Map</a>
+      </div>
+      <div data-role="content">		
+      	<ul data-role="listview" data-inset="true">
+			<li><h3>Add Snowpack Report</h3></li>
+			<li><select id="addObSelect" name="addObSelect"  onchange="startAddOb(this.value)">
+					<option value="" >-- Select one --</option>
+					<option value="addObByClick">Tap or click to add</option>
+					<option value="addObByGeoLoc">Add at current location</option>
+				</select>
+			</li>
+      		<li><h3>Add Avalanche Report</h3></li>
+      		<li><select id="addAvyObSelect" name="addAvyObSelect"  onchange="startAddOb(this.value)">
+					<option value="">-- Select one --</option>
+					<option value="addAvyObByClick">Tap or click to add</option>
+					<option value="addAvyObByGeoLoc">Add at current location</option>
+				</select>
+			</li>
+        </ul>
+      </div>
+    </div>
+	
+	<!--Tool options dialog-->	
+	<div  data-role="page" id="options" data-prefetch data-dom-cache="true">
+      <div data-role="header" data-position="fixed">
+        <h1>Options</h1>
+		<a onclick="$.mobile.changePage('#mapPage');" class="backToMapButton">Map</a>
+      </div>
+      <div data-role="content">	
+	  <form action="#">	
+      <!--	<div data-role="controlgroup"> -->
+		
+			<!-- zoom tos -->
+			<div data-role="fieldcontain">
+				<ul data-role="listview" data-inset="true">
+					<li><h3>Zoom to</h3></li>			
+					<li><a data-role="button" onclick="$.mobile.changePage('#bookmarksPage',{changeHash: false});">Select a region</a></li>					
+					<li><a data-role="button" onclick="getLocation(); $.mobile.changePage('#mapPage')">Current location</a></li>
+				</ul>
+			</div>	
+			<!-- observations -->
+			<div data-role="fieldcontain">
+				<ul data-role="listview" data-inset="true">			
+					<li><h3>Observations</h3></li>
+					<li data-role="fieldcontain">
+						<div data-role="fieldcontain">
+							<h4>Snow and Weather</h4>
+							<select id="obsFlip" data-theme="a" data-role="slider" data-native-menu="false" onchange="show_hideObs(this.value)">
+								<option value="hideObs">Show</option>
+								<option value="showObs">Hide</option>
+							</select>
+						</div>	
+					</li>
+					<li>
+						<div data-role="fieldcontain">
+							<h4>Avalanche</h4>
+							<select id="avyObsFlip" data-theme="a" data-role="slider" data-native-menu="false" onchange="show_hideObs(this.value)">
+								<option value="hideAvyObs">Show</option>
+								<option value="showAvyObs">Hide</option>
+							</select>
+						</div>	
+					</li>
+					<!--<li><fieldset id="calButtonGroup" data-role="controlgroup" data-type="horizontal"> -->
+							<li><a class="calButton" id="from" data-role="button" href="#" onclick="showCalendar($(this));">Select date from...</a></li>
+							<li><a class="calButton" id="to" data-role="button" href="#" onclick="showCalendar($(this));">Select date to...</a></li>
+								<input name="fromDate" id="fromDate" type="date" data-role="datebox" data-options='{"mode": "calbox", "pickPageButtonTheme": "c", "pickPageTodayButtonTheme": "e", "pickPageHighButtonTheme": "b", "dateFormat": "%m/%d/%Y", "centerWindow": true, "themeDatePick": "b", "hideInput": true, "beforeToday": true}' onchange="changeDates($(this)); $('#from').html('From:  ' + $(this).val() )"/>
+								<input name="toDate" id="toDate" type="date" data-role="datebox" data-options='{"mode": "calbox", "pickPageButtonTheme": "c", "pickPageTodayButtonTheme": "e", "pickPageHighButtonTheme": "b", "dateFormat": "%m/%d/%Y", "centerWindow": true, "themeDatePick": "b", "hideInput": true, "maxDays": 0}' onchange="changeDates($(this)); $('#to').html('To:  ' + $(this).val() );"/>				
+					<li><a onClick="$.mobile.changePage('#addObsPage',{changeHash: false})" data-role="button">Add an observation</a></li>
+				</ul>
+			</div>	
+			<!-- basemaps -->
+			<div data-role="fieldcontain">
+				<ul data-role="listview" data-inset="true">			
+					<li><h3>Change basemap</h3></li>
+					<li>	
+						<select id="basemapSelect" data-native-menu="true"  onchange="changeBasemap(this.value)">
+							<option value="">-- Select one --</option>
+							<option value="topo">Topo</option>
+							<option value="streets">Streets</option>
+							<option value="imagery">Aerial imagery</option>
+						</select>
+					</li>
+				</ul>	
+	        </div>
+			<!-- transparency -->
+			<div data-role="fieldcontain">
+				<ul data-role="listview" data-inset="true">		
+					<li><h3>Danger overlay</h3></li>
+					<li>
+						<select id="transFlip" data-theme="a" data-role="slider" data-native-menu="false" onchange="changeTransparency(this.value)">
+							<option value="0" >Show</option>
+							<option value="4" selected="selected" >Hide</option>
+						</select>	
+					</li>
+				</ul>	
+			</div>		
+			<a data-role="button" href="http://m.nwac.us/" target="_blank">Go to NWAC mobile for detailed forecasts</a>		
+	 		<a data-role="button" onclick="$.mobile.changePage('#mapPage')">Back to map</a>
+	  </form>
+      </div>
+    </div>
+
+	<!--avyReport dialog-->
+	<div data-role="page" id="avyReport" data-prefetch data-dom-cache="true">
+      <div data-role="header" data-position="fixed">
+        <h1>Avalanche Observation</h1>
+		<a onclick="$.mobile.changePage('#mapPage')" class="backToMapButton">Map</a>
+      </div>
+      <div data-role="content">
+      	<div data-role="controlgroup">
+		<form name="avyObsForm" enctype="multipart/form-data" method="post" data-ajax="false" action="http://www.nwac.us/api/v1/avalancheObservation/create/">
+			  <fieldset data-role="controlgroup">				
+				<ul data-role="listview" data-inset="true">	
+					<li data-role='list-divider'><h2>Observer</h2></li>
+					<li><h4>Datetime</h4></li>
+					<li><a id="avy_" data-role="button" href="#" onclick="showCalendar($(this));">Select date</a></li>
+				  	<input name="datetime" id="avy_Date" type="date" data-role="datebox" data-options='{"mode": "calbox", "pickPageButtonTheme": "c", "pickPageTodayButtonTheme": "e", "pickPageHighButtonTheme": "b", "dateFormat": "%m/%d/%Y", "centerWindow": true, "themeDatePick": "b", "hideInput": true, "maxDays": 0}' onchange="$('#avy_').html($(this).val() )"/>
+					<li><h4>Email</h4><em>*</em><input class="required email" id="id_avyObs_observer-email" type="text" name="observer-email" maxlength="75" /></li>
+					<li><h4>First name</h4><em>*</em><input class="required" id="id_avyObs_observer-first_name" type="text" name="observer-first_name" maxlength="255" /></li>
+					<li><h4>Last name</h4><em>*</em><input class="required" id="id_avyObs_observer-last_name" type="text" name="observer-last_name" maxlength="255" /></li>
+					
+					<li data-role='list-divider'><h2>Location</h2></li>
+					<li><h4>Descriptive Location</h4> <textarea id="id_location-description" rows="10" cols="40" name="location-description"></textarea></li>
+					<li><h4>Latitude</h4> <input type="text" class="required number" name="location-latitude" id="avy_location-latitude" onchange="upDatePoint(this.value,$('#avy_location-longitude').val())"/></li>
+					<li><h4>Longitude</h4> <input type="text" class="required number" name="location-longitude" id="avy_location-longitude" onchange="upDatePoint($('#avy_location-latitude').val(), this.value)"/></li>				
+					<li><h4>Elevation</h4> <input type="text" class="number" name="location-elevation" id="avy_location-elevation" /></li>
+					<li><h4>Elevation units</h4> 
+					<select name="location-elevation_units" id="avy_location-elevation_units"  >
+						<option value="">--Select units--</option>
+						<option selected="selected" value="feet">Feet</option>
+						<option value="meters">Meters</option>
+					</select></li>
+					<li><h4>Slope aspect</h4> 
+					<select name="location-slope_aspect" id="id_location-slope_aspect"  >
+						<option value="" selected="selected">--Select aspect--</option>
+						<option value="northwest">Northwest</option>
+						<option value="north">North</option>
+						<option value="northeast">Northeast</option>
+						<option value="east">East</option>
+						<option value="southeast">Southeast</option>
+						<option value="south">South</option>
+						<option value="southwest">Southwest</option>
+						<option value="west">West</option>
+					</select></li>
+					<li><h4>Slope angle</h4> <input type="text" class="number" name="location-slope_angle" id="id_location-slope_angle" /></li>
+					
+					<li data-role='list-divider'><h2>Observation</h2></li>
+					<li><h4>Cause</h4> 
+						<select name="cause" id="id_cause"  >
+							<option value="" selected="selected">-- Select one --</option>
+							<option value="AS">Skier</option>
+							<option value="AR">Snowboarder</option>
+							<option value="AI">Snowshoer</option>
+							<option value="AM">Snowmobile</option>
+							<option value="AB">An explosive detonated above the snow surface (air blast)</option>
+							<option value="AO">Unclassified artificial trigger (specify in comments)</option>
+							<option value="AU">Unknown artificial trigger</option>
+							<option value="N">Natural trigger</option>
+							<option value="NC">Cornice fall</option>
+							<option value="NE">Earthquake</option>
+							<option value="NI">Ice fall</option>
+							<option value="NL">Avalanche triggered by loose snow avalanche</option>
+							<option value="NS">Avalanche triggered by slab avalanche</option>
+							<option value="NR">Rock fall</option>
+							<option value="NO">Unclassified natural trigger (specify in comments) </option>
+							<option value="AA">Artillery</option>
+							<option value="AE">An explosive thrown or placed on or under the snow surface by hand</option>
+							<option value="AL">Avalauncher</option>
+							<option value="AC">Cornice fall triggered by human or explosive action</option>
+							<option value="AX">Gas exploder</option>
+							<option value="AH">Explosives placed via helicopter</option>
+							<option value="AP">Pre-placed, remotely detonated explosive charge</option>
+							<option value="AW">Wildlife</option>
+							<option value="AK">Snowcat</option>
+							<option value="AV">Vehicle (specify vehicle type in comments)</option>
+							<option value="AF">Foot penetration</option>
+							<option value="AC">Cornice fall produced by human or explosive action</option>
+						</select></li>
+					<li><h4>Slide type</h4> 
+						<select name="slide_type" id="id_slide_type"  >
+							<option value="" selected="selected">-- Select one --</option>
+							<option value="L">Loose-snow avalanche</option>
+							<option value="WL">Wet loose-snow avalanche</option>
+							<option value="SS">Soft slab avalanche</option>
+							<option value="HS">Hard slab avalanche</option>
+							<option value="WS">Wet slab avalanche</option>
+							<option value="I">Ice fal or avalanche</option>
+							<option value="SF">Slush flow</option>
+							<option value="C">Cornice fall (w/o additional avalanche) </option>
+							<option value="R">Roof avalanche</option>
+							<option value="U">Unknown</option>
+						</select></li>
+					<li><h4>Depth of Crown</h4> <input type="text" class="number" name="crown_depth" id="id_crown_depth" /></li>
+					<li><h4>Crown depth units</h4> 
+						<select name="crown_depth_units" id="id_crown_depth_units"  >
+							<option value="" selected="selected">-- Select one --</option>
+							<option value="inches">Inches</option>
+							<option value="centimeters">Centimeters</option>
+						</select></li>
+					<li><h4>Width of Slide</h4> <input type="text" class="number"  name="slide_width" id="id_slide_width" /></li>
+					<li><h4>Slide width units:</h4> 
+						<select name="slide_width_units" id="id_slide_width_units"  >
+							<option value="" selected="selected">-- Select one --</option>
+							<option value="feet">Feet</option>
+							<option value="meters">Meters</option>
+						</select></li>
+					<li><h4>Length of Runout</h4> <input type="text" class="number"  name="runout_length" id="id_runout_length" /></li>
+					<li><h4>Runout length units:</h4>
+						<select name="runout_length_units" id="id_runout_length_units"  >
+							<option value="" selected="selected">-- Select one --</option>
+							<option value="feet">Feet</option>
+							<option value="meters">Meters</option>
+						</select></li>
+					<li><h4>Number caught</h4> <input type="text" class="number"  name="number_caught" id="id_number_caught" /></li>
+					<li><h4>Number carried</h4> <input type="text" class="number"  name="number_carried" id="id_number_carried" /></li>
+					<li><h4>Number partially buried</h4> <input type="text" class="number"  name="number_partially_buried" id="id_number_partially_buried" /></li>
+					<li><h4>Number buried</h4> <input type="text" class="number"  name="number_buried" id="id_number_buried" /></li>
+					<li><h4>Number injured</h4> <input type="text" class="number"  name="number_injured" id="id_number_injured" /></li>
+					<li><h4>Number killed</h4> <input type="text" class="number"  name="number_killed" id="id_number_killed" /></li>
+					<li><h4>Bed surface</h4> 
+						<select name="bed_surface" id="id_bed_surface"  >
+							<option value="" selected="selected">-- Select one --</option>
+							<option value="S">The avalanche released within a layer of recent storm snow.</option>
+							<option value="I">The avalanche released at the new snow/old snow interface.</option>
+							<option value="O">The avalanche released within the old snow.</option>
+							<option value="G">The avalanche released at the ground, glacial ice or firn.</option>
+							<option value="U">Unknown</option>
+						</select></li>
+					<li><h4>Weak layer</h4> 
+						<select name="weak_layer" id="id_weak_layer"  >
+							<option value="" selected="selected">-- Select one --</option>
+							<option value="PP">Precipitation Particles (New Snow)</option>
+							<option value="MM">Machine Made snow</option>
+							<option value="DF">Decomposing and Fragmented Particles</option>
+							<option value="RG">Rounded Grains</option>
+							<option value="FC">Faceted Crystals</option>
+							<option value="DH">Depth Hoar</option>
+							<option value="SH">Surface Hoar</option>
+							<option value="MF">Melt Forms</option>
+							<option value="IF">Ice Formations</option>
+						</select></li>
+					<li><h4>Avalanche Size - Relative to Path:</h4> 
+						<select name="avalanche_size_relative" id="id_avalanche_size_relative"  >
+							<option value="" selected="selected">-- Select one --</option>
+							<option value="R1">(R1) Very small, relative to the path</option>
+							<option value="R2">(R2) Small, relative to the path</option>
+							<option value="R3">(R3) Medium, relative to the path</option>
+							<option value="R4">(R4) Large, relative to the path</option>
+							<option value="R5">(R5) Major or maximum, relative to the path</option>
+						</select></li>
+					<li><h4>Avalanche Size - Destructive Force:</h4> 
+						<select name="avalanche_size_destructive_force" id="id_avalanche_size_destructive_force"  >
+							<option value="" selected="selected">-- Select one --</option>
+							<option value="D1">(D1) Relatively harmless to people</option>
+							<option value="D2">(D2) Could bury, injure, or kill a person.</option>
+							<option value="D3">(D3) Could bury and destroy a car, damage a truck, destroy a wood frame house, or break a few trees.</option>
+							<option value="D4">(D4) Could destroy a railway car, large truck, several buildings, or a substantial amount of forest.</option>
+							<option value="D5">(D5) Could gouge the landscape. Largest snow avalanche known.</option>
+						</select></li>
+					<li class="fileInput"><h4>Media:</h4> <input type="file" name="media" id="id_media" /></li>
+					<li><button type="submit">Submit observation</button></li>
+				</ul>	
+			</fieldset>
+		 </form>
+        </div>
+      </div>
+    </div>
+	
+	<!--Observation form dialog-->
+	<div data-role="page" id="obsReport" data-prefetch data-dom-cache="true">
+      <div data-role="header" data-position="fixed">
+        <h1>Snow/Weather Observation</h1>
+		<a onclick="$.mobile.changePage('#mapPage')" class="backToMapButton">Map</a>
+      </div>
+      <div data-role="content">
+		<form name="obsForm" enctype="multipart/form-data" method="post" data-ajax="false" action="http://www.nwac.us/api/v1/observation/create/">
+			<fieldset data-role="controlgroup">
+				<ul data-role="listview" data-inset="true">	
+					<li data-role='list-divider'><h2>Observer</h2></li>
+					<li><h4>Datetime</h4></li>
+					<li><a id="obs_" data-role="button" href="#" onclick="showCalendar($(this));">* Select date</a></li>
+				  	<input name="datetime" id="obs_Date" type="date" data-role="datebox" data-options='{"mode": "calbox", "pickPageButtonTheme": "c", "pickPageTodayButtonTheme": "e", "pickPageHighButtonTheme": "b", "dateFormat": "%m/%d/%Y", "centerWindow": true, "themeDatePick": "b", "hideInput": true, "maxDays": 0}' onchange="$('#obs_').html($(this).val() )"/>
+
+					<li><h4>Email</h4><em>*</em> <input class="required email" id="id_obs_observer-email" type="text" name="observer-email" maxlength="75" /></li>
+					<li><h4>First name</h4><em>*</em><input class="required" id="id_obs_observer-first_name" type="text" name="observer-first_name" maxlength="255" /></li>
+					<li><h4>Last name</h4><em>*</em><input class="required" id="id_obs_observer-last_name" type="text" name="observer-last_name" maxlength="255" /></li>
+					
+					<li data-role='list-divider'><h2>Location</h2></li>
+					<li><h4>Descriptive Location</h4> <textarea id="id_location-description" rows="10" cols="40" name="location-description"></textarea></li>
+					<li><h4>Latitude</h4> <input type="text" class="required number"  name="location-latitude" id="obs_location-latitude" onchange="upDatePoint(this.value,$('#obs_location-longitude').val())"/></li>
+					<li><h4>Longitude</h4> <input type="text" class="required number"  name="location-longitude" id="obs_location-longitude" onchange="upDatePoint($('#obs_location-latitude').val(),this.value)"/></li>				
+					<li><h4>Elevation</h4> <input type="text" class="number"  name="location-elevation" id="obs_location-elevation" /></li>
+					<li><h4>Elevation units</h4> 
+					<select name="location-elevation_units" id="obs_location-elevation_units"  href="#">
+						<option value="">--Select units--</option>
+						<option selected="selected" value="feet">Feet</option>
+						<option value="meters">Meters</option>
+					</select></li>
+					<li><h4>Slope aspect</h4> 
+					<select name="location-slope_aspect" id="id_location-slope_aspect"  >
+						<option value="" selected="selected">--Select aspect--</option>
+						<option value="northwest">Northwest</option>
+						<option value="north">North</option>
+						<option value="northeast">Northeast</option>
+						<option value="east">East</option>
+						<option value="southeast">Southeast</option>
+						<option value="south">South</option>
+						<option value="southwest">Southwest</option>
+						<option value="west">West</option>
+					</select></li>
+					<li><h4>Slope angle</h4> <input type="text" class="number"  name="location-slope_angle" id="id_location-slope_angle" /></li>
+					
+					<li data-role='list-divider'><h2>Observation</h2></li>
+					<li><h4>Cloud cover</h4> 
+					<select name="cloud_cover" id="id_cloud_cover" >
+						<option value="" selected="selected">--Select one--</option>
+						<option value="clear">Clear</option>
+						<option value="few">Few</option>
+						<option value="scattered">Scattered</option>
+						<option value="broken">Broken</option>
+						<option value="obscured">Obscured</option>
+						<option value="overcast">Overcast</option>
+					</select></li>
+					<li><h4>Air temp</h4> <input type="text" class="number"  name="air_temp" id="id_air_temp" /></li>
+					<li><h4>Air temp units</h4> 
+					<select name="air_temp_units" id="id_air_temp_units" >
+						<option value="" selected="selected">--Select units--</option>
+						<option value="fahrenheit">Fahrenheit</option>
+						<option value="celsius">Celsius</option>
+					</select></li>
+					<li><h4>Precipitation type</h4> 
+					<select name="precipitation_type" id="id_precipitation_type" >
+						<option value="" selected="selected">--Select type--</option>
+						<option value="none">None</option>
+						<option value="snow">Snow</option>
+						<option value="rain">Rain</option>
+						<option value="mixed">Mixed</option>
+						<option value="freezing_rain">Freezing Rain</option>
+					</select></li>
+					<li><h4>Precipitation intensity</h4> 
+					<select name="precipitation_intensity" id="id_precipitation_intensity" >
+						<option value="" selected="selected">--Select one--</option>
+						<option value="light">Light</option>
+						<option value="moderate">Moderate</option>
+						<option value="heavy">Heavy</option>
+					</select></li>
+					<li><h4>Wind speed</h4> 
+					<select name="wind_speed" id="id_wind_speed" >
+						<option value="" selected="selected">--Select one--</option>
+						<option value="calm">Calm</option>
+						<option value="light">Light</option>
+						<option value="moderate">Moderate</option>
+						<option value="strong">Strong</option>
+						<option value="extreme">Extreme</option>
+					</select></li>
+					<li><h4>Wind direction</h4> 
+					<select name="wind_direction" id="id_wind_direction"  >
+						<option value="" selected="selected">--Select one--</option>
+						<option value="northwest">Northwest</option>
+						<option value="north">North</option>
+						<option value="northeast">Northeast</option>
+						<option value="east">East</option>
+						<option value="southeast">Southeast</option>
+						<option value="south">South</option>
+						<option value="southwest">Southwest</option>
+						<option value="west">West</option>
+					</select></li>
+					<label for="id_recent_avalanches">Recent avalanches?</label> <input type="checkbox" name="recent_avalanches" id="id_recent_avalanches" />
+					<label for="id_terrain_traps">Terrain traps?</label> <input type="checkbox" name="terrain_traps" id="id_terrain_traps" />
+					<label for="id_recent_loading">Recent loading?</label> <input type="checkbox" name="recent_loading" id="id_recent_loading" />
+					<label for="id_shooting_cracks">Shooting cracks?</label> <input type="checkbox" name="shooting_cracks" id="id_shooting_cracks" />
+					<label for="id_signs_of_collapse">Signs of collapse?</label> <input type="checkbox" name="signs_of_collapse" id="id_signs_of_collapse" />
+					<label for="id_rapid_warming">Rapid warming?</label> <input type="checkbox" name="rapid_warming" id="id_rapid_warming" />
+					
+					<li><h4>Weather comments</h4> 
+						<textarea id="id_weather_comments" rows="10" cols="40" name="weather_comments"></textarea></li>
+					<li><h4>Snowpack comments</h4> 
+						<textarea id="id_snowpack_comments" rows="10" cols="40" name="snowpack_comments"></textarea></li>
+					<li><h4>Observation comments</h4> 
+						<textarea id="id_observation_comments" rows="10" cols="40" name="observation_comments"></textarea></li>
+					<li class="fileInput"><h4>Snowpit profile image</h4> 
+						<input type="file" name="snowpit_profile_image" id="id_snowpit_profile_image" /></li>
+					<li><h4>Snowpit profile image url</h4> 
+						<input class="url" id="id_snowpit_profile_image_url" type="text" name="snowpit_profile_image_url" maxlength="255" /></li>
+					<li class="fileInput"><h4>Observation photo</h4> 
+						<input type="file" name="media" id="id_media" /></li>
+					
+					<li><button type="submit">Submit observation</button></li>
+				</ul>	
+			</fieldset>
+		</form>
+ 	  </div>
+	</div>
+	
+	<!--stabTest page-->
+	<div data-role="page" id="stabTest" data-prefetch data-dom-cache="true">
+      <div data-role="header" data-position="fixed">
+        <h1>Stability Test</h1>
+		<a onclick="hideAskAddStabTestDiv(); $.mobile.changePage('#mapPage');" class="backToMapButton">Map</a>
+      </div>
+      <div data-role="content">
+      	<div data-role="controlgroup">
+		 <form name="stabTestForm" enctype="application/json" method="post" data-ajax="false" action="http://www.nwac.us/api/v1/stabilityTest/?format=json">
+			  <fieldset data-role="controlgroup">				
+				<ul data-role="listview" data-inset="true">	
+					<li><h4>Test type</h4> 
+					<select id="test_type" name="test_type"  >
+						<option selected="selected" value="">--Select one--</option>
+						<option value="rutschblock">Rutschblock</option>
+						<option value="shovel-shear">Shovel hear</option>
+						<option value="compression">Compression</option>
+						<option value="stuff-block">Stuff block</option>
+						<option value="extended-column">Extended column</option>
+						<option value="other">Other</option>
+					</select></li>
+					<li><h4>Shear depth</h4> <input class="number" id="shear_depth" name="shear_depth" type="text" maxlength="255" /></li>
+					<li><h4>Shear depth units</h4> 
+					<select name="shear_depth_units" id="shear_depth_units"  >
+						<option selected="selected" value="">--Select units--</option>
+						<option value="inches">Inches</option>
+						<option value="centimeters">Centimeters</option>
+					</select></li>
+					<li><h4>Load at failure</h4> <input id="failure_load" type="text" name="failure_load" maxlength="10000" /></li>
+					<li><h4>Shear quality</h4> 
+					<select name="shear_quality" id="shear_quality"  >
+						<option selected="selected" value="">--Select one--</option>
+						<option value="1">Q1</option>
+						<option value="2">Q2</option>
+						<option value="3">Q3</option>
+					</select></li>
+					<li><h4>Failure comments</h4> <input id="observations_comments" type="text" name="observations_comments" maxlength="10000" /></li>
+					<li><button type="submit">Submit</button></li>
+				</ul>
+			  </fieldset>
+		   </form>
+		 </div>
+	  </div>
+	</div>						
+					
+	<!--Zoom alert dialog-->
+	<div data-role="page" id="zoomAlert" style="width:100%;height:100%;" data-prefetch data-dom-cache="true">
+      <div data-role="header" data-position="fixed">
+        <h1>Alert</h1>
+		<a onclick="$.mobile.changePage('#mapPage')" class="backToMapButton">Map</a>
+      </div>
+      <div data-role="content">
+      	<ul data-role="listview" data-inset="true">
+			<li><strong>You have reached the limit of the regional forecast accuracy in this GIS display of Northwest avalanche danger level forecasts.</strong></li>
+			<li><strong>The product you are viewing is not intended for slope scale determination of danger levels.</strong></li>
+			<li><strong><i>YOU</i> are responsible for taking the next step in applying this regional scale danger level to the more slope specific terrain and travel decisions that <i>YOU</i> make.</strong></li>
+			<li><strong><i>YOUR</i> training, <i>YOUR</i> knowledge and <i>YOUR</i> decision-making and route finding skills will be critical in safely negotiating more detailed terrain based on the more general regional danger levels shown.</strong></li>
+        </ul>
+		<div><button onclick="$.mobile.changePage('#mapPage');">OK</button></div>
+     </div>
+    </div>
+	
+	<!-- Dynamically inject page of obs attributes -->
+	<div id="obsAttsPage" data-role="page">
+	  <div data-role="header" data-position="fixed">
+	  	<h1>Observation info</h1>
+		<a onclick="$.mobile.changePage('#mapPage')" class="backToMapButton">Map</a>
+	  </div>
+		  <div id="obsAttsContent" data-role="content">
+		  	<ul id="obsAtts" data-role="listview" data-inset="true"></ul>
+		  </div>
+	  </div>
+	
+  </body>
+</html>

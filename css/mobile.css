@@ -1,0 +1,289 @@
+#map {
+      /*	width:100%;
+        height:100%;*/
+		z-index:10;
+}
+	  
+#mapPage {
+	width	:	100%;
+	height	:	100%;
+	overflow:	hidden;
+}
+
+#mapPage .ui-header {
+	z-index: 99;
+    position : absolute;
+    top      : 0px;
+    left     : 0px;
+    width    : 100%;
+}
+
+/*
+ui-slider-handle ui-btn ui-btn-up-c ui-corner-bottom ui-controlgroup-last{
+	-moz-border-radius : 20px;
+	border-radius: 20px;
+a#basemapselect-button.ui-btn.ui-btn-icon-right.ui-btn-up-c {
+}
+#basemapselect-button {
+	margin-top: -25px !important;
+	margin-right: -15px !important;
+	margin-bottom: -10px !important;
+	margin-left: -15px !important;
+	border-bottom-right-radius: 8px !important;
+	border-bottom-left-radius: 8px !important;
+	height: 50px !important;
+}
+
+div.ui-slider-switch a.ui-slider-handle{
+	-moz-border-radius : 20px;
+	border-radius: 20px;
+}
+*/
+
+#map_zoom_slider {
+	top : 140px !important;
+}
+
+.page-map, #mapcontent.ui-content {
+        width: 100%;
+        padding: 0;
+        overflow: hidden;
+      }
+	  
+@-webkit-keyframes
+       pulse
+      {
+        0%
+        {
+          opacity: 1.0;
+
+        }
+        45%
+        {
+          opacity: .20;
+
+        }
+        100%
+        {
+          opacity: 1.0;
+
+        }
+      }
+	  
+@-moz-keyframes
+       pulse
+      {
+        0%
+        {
+          opacity: 1.0;
+        }
+        45%
+        {
+          opacity: .20;
+
+        }
+        100%
+        {
+          opacity: 1.0;
+        }
+      }
+
+#map_graphics_layer {
+        -webkit-animation-duration: 3s;
+        -webkit-animation-iteration-count: infinite;
+        -webkit-animation-name: pulse;
+        -moz-animation-duration: 3s;
+        -moz-animation-iteration-count: infinite;
+        -moz-animation-name: pulse;
+}
+
+/* make slider handle smaller and in the correct position relative to bar */	
+/*
+.ui-slider-handle#transparencySlider {
+font-size: 15px !important;
+margin: -10px !important;
+height: 20px !important;
+width: 20px !important;
+}
+.ui-slider#transparencySlider {
+	height: 8px !important;
+}
+
+#transparencySlider {
+	margin-left:auto;
+	margin-right:auto;
+	width:100%;
+	}
+*/
+.hidden {
+	display: none !important;
+}
+
+.backToMapButton {
+	width: 60px;
+}
+
+.strong {
+	font-weight: bold;
+}
+
+.hidden {
+	visibility : hidden;
+	display : none;
+}
+
+.centered{
+	align: center;
+}
+/*
+#calButtonGroup {
+	margin-left: 1% !important;
+	margin-right: 1% !important;
+	vertical-align: middle !important;
+}
+*/
+.calButton {
+	/*width: 30% !important;
+	 * 
+	padding-left: 20% !important;
+	display: block !important;
+    float: left !important;
+    display: -webkit-box !important;
+    display: -moz-box !important;
+    display: box !important;
+    -webkit-box-align: center !important;
+    -moz-box-align: center !important;
+    box-align: center !important;
+	height: 40px !important;
+	 * */
+	vertical-align: middle !important;
+	text-align: center !important;
+	font-size: 16px !important;
+}
+/*	
+#footerDiv {
+	text-align : center;
+}
+#footer {
+	visibility: hidden;
+	display: none;
+}
+*/
+#toolbar {
+	visibility: hidden;
+	display: none;
+}
+
+#minusDayBtn{
+	visibility: hidden;
+	/*display: none;*/
+ }
+#plusDayBtn{
+	visibility: hidden;
+	/*display: none;*/
+ }
+#infoDiv {
+	padding-top: 40px;
+    height:80%;
+	z-index: 9999;
+	display:block;
+    position:absolute;
+    left:0;
+    width:100%;
+}
+
+#goToAttsDiv {
+	text-align: center;
+	display: none;
+	visibility: hidden;
+	top: 80px;
+	/*bottom: 20px;
+	padding-bottom 10px;*/
+	z-index: 999;
+    position:absolute;
+    left:5px;
+    width:150px;
+}
+
+#askObsFormDiv {
+	text-align: center;
+	display: none;
+	visibility: hidden;
+	top: 80px;
+	/*padding-bottom 10px;*/
+	z-index: 9999;
+    position:absolute;
+    right:5px;
+    width:150px;
+}
+
+#askAddStabTestDiv {
+	text-align: center;
+	display: none;
+	visibility: hidden;
+	top: 80px;
+	z-index: 9999;
+    position:absolute;
+    right:50%;
+	left: 50%;
+    width:300px;
+}
+
+/*
+.noFlash {
+	-webkit-backface-visibility: hidden;
+}
+*/
+
+/* make button bigger */
+.ui-btn-inner .ui-btn-text{ 
+  white-space: normal !important; 
+}
+
+
+/* set select inside field contain to full width */
+.ui-field-contain .ui-select {
+	width : 100% !important;
+}
+/* set flip in to full width of fieldcontain  .ui-field-contain */
+div.ui-slider {
+    width: 100% !important;
+}
+
+div.ui-slider-switch a.ui-slider-handle {
+width: 100% !important;
+margin-left: -100% !important;
+}
+
+
+.fullPage {
+	width	:	100%;
+	height	:	100%;
+	overflow:	hidden;
+}
+
+/* validation */
+label.error { float: none; color: red; padding-left: .5em; vertical-align: top; }
+em { font-weight: bold; padding-right: 1em; vertical-align: top; }
+
+/*obType slider colors #changeReportSlider */
+#sliderLI > div > div.ui-slider-labelbg.ui-slider-labelbg-a.ui-btn-active.ui-btn-corner-left{
+	background: #9933FF !important;
+}
+#sliderLI > div > div.ui-slider-labelbg.ui-slider-labelbg-b.ui-btn-down-c.ui-btn-corner-right{
+	background: #0099FF !important;
+}
+
+#sliderLI > div > div > a > span.ui-slider-label.ui-slider-label-b.ui-btn-down-c.ui-btn-corner-right{
+	font-weight: bold;
+	color: white;
+	cursor: pointer;
+	text-shadow: 0 -1px 1px #145072;
+	text-decoration: none;
+}
+
+/*dateBox mods*/
+.ui-datebox-griddate .ui-corner-all .ui-btn-up-c .ui-datebox-griddate-disable{
+	color:#111;
+	background-color: #929292;
+}
