@@ -39,17 +39,6 @@ var proxyUrl;
 var queryTask, query, loading;
 var symbol, infoTemplate, popupRose;
 
-var day1Layer;
-var day2Layer;
-var day3Layer;
-var day4Layer;
-var day5Layer;
-var day6Layer;
-var day7Layer;
-var day8Layer;
-var day9Layer;
-var day10Layer;
-
 var RegionsBoth;
 var query, queryTask;
 
