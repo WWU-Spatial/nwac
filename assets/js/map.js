@@ -599,11 +599,6 @@ function init() {
     });
 	
    	addDangerOverlay();
-
-    // listen for zoom and checkShowZoomAlert
-    checkZoom = dojo.connect(map, "onZoomEnd", function (event) {
-		checkShowZoomAlert();
-    }); 
 	
 	// set symbols colors
 	currentLocSymbol = new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 12,
@@ -933,14 +928,6 @@ function hideInfoDiv() {
 
 	resizeMap();
 	map.enableMapNavigation(); 
-}
-
-//show zoom alert if first time zoomed to max zoom scale and then remove checkZoom event listener
-function checkShowZoomAlert() {
-    if (map.getScale() <= 72223.819286) {
-        $.mobile.changePage('#zoomAlert',{changeHash: false});
-        dojo.disconnect(checkZoom);
-    }
 }
 
 function addDangerOverlay() {
