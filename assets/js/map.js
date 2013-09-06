@@ -185,32 +185,6 @@ function onDOMLoad() {
 		jQueryReady;
 		$.mobile.showPageLoadingMsg();
 			
-		//detect device	
-//		if(screen.width < 500 ||
-//		 navigator.userAgent.match(/Android/i) ||
-//		 navigator.userAgent.match(/webOS/i) ||
-//		 navigator.userAgent.match(/iPhone/i) ||
-//		 navigator.userAgent.match(/iPod/i)) {
-//			alert("This is a mobile device");
-//			$('select').each(function(){
-//				console.log($(this)[0]);
-//				$(this).selectmenu({ nativeMenu: "true" });
-//			});
-//		}else{
-//			$('select').each(function(i){
-//				var id = '#' + $(this).attr('id') + '';
-//				var cls = $(this).attr('class');
-//				console.log($(this),$('select')[i],id,cls);
-//				if(cls!=='ui-slider-switch'){
-//					$(id).selectmenu({ nativeMenu: "false" });
-//					$(id).selectmenu("refresh");
-//				}
-//				console.log($(this).attr('data-native-menu'));
-//			});
-//		}
-		//
-			
-//		$('#infoDiv').height($('#mapPage').height());//- $('#header').height());// - $('#footer').height());
 
 		$('#obsForm').validate();
 		$("#avyObsForm").validate();		
@@ -957,7 +931,6 @@ function hideInfoDiv() {
 	$('#map_zoom_slider').css({visibility: "visible"});
 	$('#footerGroup').fadeIn(500);
 
-    checkHideButton();
 	resizeMap();
 	map.enableMapNavigation(); 
 }
@@ -1047,20 +1020,7 @@ function addDangerOverlay() {
 	        dateList.push(x[i].childNodes[0].nodeValue);
 		}else{/* don't add it to the array //dateList.push('No data')*/}
     }
-		
-    for (var j = 0; j < 13; j++) {
-//		console.log(j,"znum: ",zNum[0],"childNodes[j]: ",zNum[0].childNodes[j],"childNodes[j].childNodes[0]: ",zNum[0].childNodes[j].childNodes[0]);
-//        day1RoseList.push(zNum[0].childNodes[j].childNodes[0].nodeValue);
-//        day2RoseList.push(zNum[1].childNodes[j].childNodes[0].nodeValue);
-//        day3RoseList.push(zNum[2].childNodes[j].childNodes[0].nodeValue);
-//        day4RoseList.push(zNum[3].childNodes[j].childNodes[0].nodeValue);
-//        day5RoseList.push(zNum[4].childNodes[j].childNodes[0].nodeValue);
-//        day6RoseList.push(zNum[5].childNodes[j].childNodes[0].nodeValue);
-//        day7RoseList.push(zNum[6].childNodes[j].childNodes[0].nodeValue);
-//        day8RoseList.push(zNum[7].childNodes[j].childNodes[0].nodeValue);
-//        day9RoseList.push(zNum[8].childNodes[j].childNodes[0].nodeValue);
-//        day10RoseList.push(zNum[9].childNodes[j].childNodes[0].nodeValue);
-    }
+
     // end get dates and rose URLS from xml
 
     // build object array for day selector
@@ -1073,52 +1033,9 @@ function addDangerOverlay() {
     }
 		
 	// Handle for if there are no forecasts within 30 days
-	if(dateList.length>0){
-	    // set load value of dateSlider
-	    if (today === dateList[0]) {
-	        startLayer = dayLayerList[0];
-	        selectedDay = 0;
-	    } else if (today === dateList[1]) {
-	        startLayer = dayLayerList[1];
-	        selectedDay = 1;
-	    } else if (today === dateList[2]) {
-	        startLayer = dayLayerList[2];
-	        selectedDay = 2;
-	    } else {
-	        startLayer = dayLayerList[0];
-	        selectedDay = 0;
-	    };
-		
-	    //set date labels
-	    document.getElementById('dateLabel').innerHTML = dateList[selectedDay];
-	
-	    // add starting layers to map
-	    dojo.connect(map, 'onLoad', function (addStartLayers) {
-			///don't add danger overlays if it's the off season
-			
-	        for (var i = 0; i < dateList.length; i++) {
-	            map.addLayer(dayLayerList[i])
-	        }
-			//only add swipe listeners to header in season
-			$("#header").swipeleft(function () {
-		    	plusDay();
-		    });
-		    $("#header").swiperight(function () {
-		        minusDay();
-		    });
 
-	        startLayer.show();
-	        map.addLayer(RegionsBoth);
-	    });		
-		
-		
-	}else{
-		 //set date label to no recent forecasts
-	    document.getElementById('dateLabel').innerHTML = 'No recent forecasts';
 		map.addLayer(RegionsBoth);
-		$('#minusDayBtn').remove();
-		$('#plusDayBtn').remove();
-	}
+	
 	
 	// set date range for obs
 	setDatePicker();
@@ -1169,43 +1086,6 @@ function setDatePicker(){
 		}
 	});
 }	
-
-function plusDay() {
-    if (selectedDay != 0) {
-        selectedDay -= 1;
-        changeDay();
-    }
-}
-
-function minusDay() {
-    if (selectedDay != dateList.length-1) {
-        selectedDay += 1;
-        changeDay();
-    }
-}
-
-function changeDay() {
-    selLayer = dayLayerList[selectedDay];
-    for (var i = 0; i < dateList.length; i++) {
-        var layer = dayLayerList[i];
-        layer.hide();
-        (layer === selLayer) ? layer.show() : layer.hide();	
-        roseList[selectedDay] = dayRoseListArray[selectedDay][i];
-    }
-    selLayer.show();
-    document.getElementById('dateLabel').innerHTML = dateList[selectedDay];
-//    for (var l = 0; l < dayLayerList.length; l++) {
-//        roseList[selectedDay] = dayRoseListArray[selectedDay][l];
-//    }
-    checkHideButton();
-}
-
-function checkHideButton() {
-    var minusBtn = document.getElementById('minusDayBtn');
-    var plusBtn = document.getElementById('plusDayBtn');
-    minusBtn.style.visibility = (selectedDay != dateList.length-1) ? "visible" : "hidden";
-    plusBtn.style.visibility = (selectedDay != 0) ? "visible" : "hidden";
-}
 
 function getLocation() {
     if (navigator.geolocation) {
@@ -1374,14 +1254,13 @@ function resizeMap() {
         map.reposition();
         map.resize();
 		
-		var height = $('#mapPage').height();// - $('#header').height() - $('#footer').height();
+		var height = $('#mapPage').height();
         $('#mapPage').css("height", $('body').height());
         $('#map').css("height", $('body').height());
         $('#map').css("width", "auto");
 	
 		$('#footer').css("width",'100%');
 		$('#footer').css("bottom",'0');
-		$('#header').css("width",'100%');
     }
 }
 
