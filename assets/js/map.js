@@ -1,6 +1,3 @@
-//// set this variable to false in off season to not show any danger overlay or date/buttons
-var offseason = true;
-
 //initialize dojo
 dojo.require("esri.map");
 dojo.require("esri.tasks.locator");
@@ -671,13 +668,6 @@ function init() {
 	} 
 	////
 	
-	//handlers if it's the off season
-	// hide day changer buttons and change date label to offline message
-	if (offseason===true){
-		$('#minusDayBtn').hide();
-		$('#plusDayBtn').hide();
-		$('#dateLabel').html('The regular avalanche forecast is OFFLINE for the season').css({width : '100%'});
-	}
 }
 /////// end init 
 
@@ -1105,24 +1095,18 @@ function addDangerOverlay() {
 	    // add starting layers to map
 	    dojo.connect(map, 'onLoad', function (addStartLayers) {
 			///don't add danger overlays if it's the off season
-			if(offseason!==true){				
-		        for (var i = 0; i < dateList.length; i++) {
-		            map.addLayer(dayLayerList[i])
-		        }
-				//only add swipe listeners to header in season
-				$("#header").swipeleft(function () {
-			    	plusDay();
-			    });
-			    $("#header").swiperight(function () {
-			        minusDay();
-			    });
-			}else{
-				//show both obs types on load by default in off season because that's the main function of this app in that case
-				show_hideObs('showObs');				
-				$('#obsFlip')[0].selectedIndex = 1;
-				show_hideObs('showAvyObs');					
-				$('#avyObsFlip')[0].selectedIndex = 1;
-			}
+			
+	        for (var i = 0; i < dateList.length; i++) {
+	            map.addLayer(dayLayerList[i])
+	        }
+			//only add swipe listeners to header in season
+			$("#header").swipeleft(function () {
+		    	plusDay();
+		    });
+		    $("#header").swiperight(function () {
+		        minusDay();
+		    });
+
 	        startLayer.show();
 	        map.addLayer(RegionsBoth);
 	    });		
