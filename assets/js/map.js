@@ -62,22 +62,6 @@ var addLayer, startLayer, lastLayerAdded;
 
 // vars for day changer buttons
 var dayChangerArray = [];
-var selectedDay;
-
-var day1RoseList = [];
-var day2RoseList = [];
-var day3RoseList = [];
-var day4RoseList = [];
-var day5RoseList = [];
-var day6RoseList = [];
-var day7RoseList = [];
-var day8RoseList = [];
-var day9RoseList = [];
-var day10RoseList = [];
-var dayRoseListArray = [day1RoseList, day2RoseList, day3RoseList, day4RoseList, day5RoseList, day6RoseList, day7RoseList, day8RoseList, day9RoseList, day10RoseList];
-
-var day1Rose, day2Rose, day3Rose, day4Rose, day5Rose, day6Rose, day7Rose, day8Rose, day9Rose, day10Rose;
-var roseList = [day1Rose, day2Rose, day3Rose, day4Rose, day5Rose, day6Rose, day7Rose, day8Rose, day9Rose, day10Rose];
 
 // get today's date
 
@@ -164,21 +148,6 @@ function checkForURLParams(){
 		}	
 	}
 }
-
-function loadXMLDoc(dname)
-{
-	if (window.XMLHttpRequest)
-	  {
-	  xhttp=new XMLHttpRequest();
-	  }
-	else
-	  {
-	  xhttp=new ActiveXObject("Microsoft.XMLHTTP");
-	  }
-	xhttp.open("GET",dname,false);
-	xhttp.send();
-	return xhttp.responseXML;
-} 
 
 function onDOMLoad() {
     $(document).ready(function(){
@@ -931,98 +900,15 @@ function hideInfoDiv() {
 }
 
 function addDangerOverlay() {
-    day1Layer = new esri.layers.ArcGISTiledMapServiceLayer("http://140.160.114.190/arcgis/rest/services/NWAC/Day1/MapServer", {
-        "opacity": 0.4,
-        visible: false
-    });
-    day2Layer = new esri.layers.ArcGISTiledMapServiceLayer("http://140.160.114.190/arcgis/rest/services/NWAC/Day2/MapServer", {
-        "opacity": 0.4,
-        visible: false
-    });
-    day3Layer = new esri.layers.ArcGISTiledMapServiceLayer("http://140.160.114.190/arcgis/rest/services/NWAC/Day3/MapServer", {
-        "opacity": 0.4,
-        visible: false
-    });
-    day4Layer = new esri.layers.ArcGISTiledMapServiceLayer("http://140.160.114.190/arcgis/rest/services/NWAC/Day4/MapServer", {
-        "opacity": 0.4,
-        visible: false
-    });
-    day5Layer = new esri.layers.ArcGISTiledMapServiceLayer("http://140.160.114.190/arcgis/rest/services/NWAC/Day5/MapServer", {
-        "opacity": 0.4,
-        visible: false
-    });
-    day6Layer = new esri.layers.ArcGISTiledMapServiceLayer("http://140.160.114.190/arcgis/rest/services/NWAC/Day6/MapServer", {
-        "opacity": 0.4,
-        visible: false
-    });
-    day7Layer = new esri.layers.ArcGISTiledMapServiceLayer("http://140.160.114.190/arcgis/rest/services/NWAC/Day7/MapServer", {
-        "opacity": 0.4,
-        visible: false
-    });
-    day8Layer = new esri.layers.ArcGISTiledMapServiceLayer("http://140.160.114.190/arcgis/rest/services/NWAC/Day8/MapServer", {
-        "opacity": 0.4,
-        visible: false
-    });
-    day9Layer = new esri.layers.ArcGISTiledMapServiceLayer("http://140.160.114.190/arcgis/rest/services/NWAC/Day9/MapServer", {
-        "opacity": 0.4,
-        visible: false
-    });
-    day10Layer = new esri.layers.ArcGISTiledMapServiceLayer("http://140.160.114.190/arcgis/rest/services/NWAC/Day10/MapServer", {
-        "opacity": 0.4,
-        visible: false
-    });
-
-    dayLayerList = [day1Layer, day2Layer, day3Layer, day4Layer, day5Layer, day6Layer, day7Layer, day8Layer, day9Layer, day10Layer];
-
+    
     RegionsBoth = new esri.layers.ArcGISTiledMapServiceLayer("http://140.160.114.190/ArcGIS/rest/services/NWAC/RegionsBoth/MapServer", {
         "opacity": 0.55
     });
 	
 	//build query task for region
-	buildRegionQuery();
 
-    var layersLoaded = 0; //varible to keep track of when all layers have been loaded.
-    
-    // get dates and rose URLS from xml
-    var timeStampedXML = "http://140.160.114.190/nwac/forecastxml2.xml?=" + todayVar;
-    xmlDoc = loadXMLDoc(timeStampedXML);
-    var x = xmlDoc.getElementsByTagName("date");
-    var zNum = xmlDoc.getElementsByTagName("zones");
 
-	// convert today's date to milliseconds for comparrison
-	var currentDate = new Date().getTime();
-	
-    for (var i = 0; i < x.length; i++) {
-		/**
-		 * Handle if forecasts are older than 30 days
-		 */
-		// convert date from xml to milliseconds for comparison
-		var dfs = new Date(x[i].childNodes[0].nodeValue).getTime();
-
-		// Calculate the difference in milliseconds
-    	var diff = Math.round((Math.abs(currentDate - dfs))/ONE_DAY);
-		// Don't add dates to the array if they are older than 30 days
-		////////////////////// ENABLE THE FOLLOWING IF FOR PRODUCTION!!!!!!!!!!
-		if(diff<30){
-	        dateList.push(x[i].childNodes[0].nodeValue);
-		}else{/* don't add it to the array //dateList.push('No data')*/}
-    }
-
-    // end get dates and rose URLS from xml
-
-    // build object array for day selector
-    for (var m = 0; m < 10; m++) {
-        dayChangerArray.push({
-            id: m,
-            layer: dayLayerList[m],
-            roseArray: dayRoseListArray[m]
-        });
-    }
-		
-	// Handle for if there are no forecasts within 30 days
-
-		map.addLayer(RegionsBoth);
-	
+	map.addLayer(RegionsBoth);
 	
 	// set date range for obs
 	setDatePicker();
