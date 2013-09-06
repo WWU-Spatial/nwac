@@ -1449,12 +1449,6 @@ function bookmarkSelect_changeHandler(value) {
 	$.mobile.changePage('#mapPage');
 }
 
-function changeTransparency(value) {
-    for (var n = 0; n < dayLayerList.length; n++) {
-        dayLayerList[n].setOpacity(value / 10);
-    }
-}
-
 function toTitleCase(str)
 {
 	var s="";
