@@ -10,11 +10,7 @@ dojo.require("dijit.form.Slider");
 dojo.require("esri.tasks.query");
 dojo.require("esri.tasks.geometry");
 dojo.require("esri.arcgis.utils");
-// for esri.request JSON calls
 dojo.require("esri.utils");
-////
-
-dojo.addOnLoad(onDOMLoad);
 
 var map;
 
@@ -31,10 +27,6 @@ var avyObsGotten = false;
 var addObType;
 var prevFromDate, prevToDate;
 var datesChanged = false;
-
-var storeUser = 'NWACMobileUserInfo',
-	useLocalStorage = supports_local_storage();
-
 var proxyUrl;
 var queryTask, query, loading;
 var symbol, infoTemplate, popupRose;
@@ -58,7 +50,6 @@ var dayChangerArray = [];
 var ONE_DAY = 1000 * 60 * 60 * 24;
 
 var todayVar = new Date();
-var today = formatDate(todayVar, 'display');
 // get today's date end
 
 var checkZoom;
@@ -72,10 +63,11 @@ var obsSymbol;
 var highlighted;
 var prevObsLayer = null;
 var prevGraphic = null;
+var form;
 
 var lastObsAdded;
 
-var regions = ['Olympics','Cascade West Pass-Stevens Pass','Cascade West Pass-Snoq. Pass','Cascade West Pass - White Pass','Cascade West-Stevens Pass N','Cascade West-Stev to Snoq','Cascade West-Snoq to White','>Cascade West - White Pass','Cascade East - Stevens Pass','Cascade East-Stevens to Snoq','Cascade East-Snoq to White','Cascade East - White Pass S','Mt Hood']
+var regions = ['Olympics','Cascade West Pass-Stevens Pass','Cascade West Pass-Snoq. Pass','Cascade West Pass - White Pass','Cascade West-Stevens Pass N','Cascade West-Stev to Snoq','Cascade West-Snoq to White','Cascade West - White Pass','Cascade East - Stevens Pass','Cascade East-Stevens to Snoq','Cascade East-Snoq to White','Cascade East - White Pass S','Mt Hood'];
 var zone;
 
 var infoTimeout;
@@ -92,11 +84,34 @@ function formatDate(date, type){
 	}
 	var disp = mm + '/' + dd + '/' + yyyy;
 	var obs = yyyy + '-' + mm + '-' + dd;
+
 	if (type === 'display') {
-		return disp
-	}else{
-		return obs;
-	} 
+		return disp;
+	}
+	
+	return obs;
+}
+
+var today = formatDate(todayVar, 'display');
+
+function resizeMap() {
+    if (map && $.mobile.activePage.data('url')==='mapPage') {
+        map.reposition();
+        map.resize();
+		
+        $('#mapPage').css("height", $('body').height());
+        $('#map').css("height", $('body').height());
+        $('#map').css("width", "auto");
+	
+		$('#footer').css("width",'100%');
+		$('#footer').css("bottom",'0');
+    }
+}
+
+function jQueryReady() {
+    $('#mapPage').bind('pageshow', function (event, ui) {
+        resizeMap();
+    });
 }
 
 function isInputTypeFileImplemented() {
@@ -114,33 +129,396 @@ function isInputTypeFileImplemented() {
     }
 }
 
-// check gor URL query and show obs and/or avyObs if specified "TRUE"
-function checkForURLParams(){
-	var url = document.location.href;
-	var urlObject = esri.urlToObject(url);
-	if(urlObject.query){		
-		if (urlObject.query.obs) {
-			if (urlObject.query && urlObject.query.obs === 'TRUE') {
-					dojo.connect(map, "onLoad", function(){
-					show_hideObs('showObs');				
-					$('#obsFlip')[0].selectedIndex = 1;
-				});
-			}
+function supports_local_storage() {
+    try {
+      return 'localStorage' in window && window['localStorage'] !== null;
+    } catch( e ){
+      return false;
+    }
+}
+
+var storeUser = 'NWACMobileUserInfo',
+	useLocalStorage = supports_local_storage();
+	
+function addFilesForUpload(data){
+	// add image files to FormData if they have been selected
+	$.each($(':file'), function(item) {
+		var file = this.files[0];
+		var name = $(this).attr('name');
+		if(file){
+		    data.append(name, file);
 		}
-		if(urlObject.query.avyObs){	
-			if(urlObject.query && urlObject.query.avyObs === 'TRUE'){
-				dojo.connect(map, "onLoad", function () {	
-					show_hideObs('showAvyObs');					
-					$('#avyObsFlip')[0].selectedIndex = 1;
-				});
+	});
+	return data;
+}
+
+	
+function setUserInfo(item){
+	var json =  $.parseJSON(item);
+	//obsForm
+	$('#id_obs_observer-email').val(json.email);
+	$('#id_obs_observer-first_name').val(json.first_name);
+	$('#id_obs_observer-last_name').val(json.last_name);
+	//avyObsForm
+	$('#id_avyObs_observer-email').val(json.email);
+	$('#id_avyObs_observer-first_name').val(json.first_name);
+	$('#id_avyObs_observer-last_name').val(json.last_name);
+}
+
+function refreshUserInfo(email, first_name, last_name) {
+	var user = {'email':email,'first_name':first_name,'last_name':last_name};
+    if ( useLocalStorage ) {
+      window.localStorage.setItem(storeUser, dojo.toJson(user));
+    } else {
+      var exp = 7; // number of days to persist the cookie
+      dojo.cookie(storeUser, dojo.toJson(user), {expires: exp});
+    }
+  }
+
+function resetForms(form){	
+	//reset whole form
+	form[0].reset();
+	// reset checkboxes in form
+	try{
+		$.each($(':checkbox'),function(check){
+			var name =$(this).attr('name');
+			$('input[name='+ name +']').attr('checked', false).checkboxradio("refresh");
+		});
+	}catch(ignore){/*do nothing other than catch err*/
+	}	
+
+	//reset select menus in form
+	try {
+		form.find("select").val('').selectmenu("refresh", true);
+	} catch (e){
+		console.log(e);
+	}	
+	form.attr("name")==='obsForm'?function(){
+		try{
+			$('#obs_location-elevation_units').val('feet').selectmenu("refresh",true);
+		} catch (e){
+			console.log(e);
+		}
+	}:null;
+	form.attr("name")==='avyObsForm'?function(){
+		try {
+			$('#avy_location-elevation_units').val('feet').selectmenu("refresh",true);
+		} catch (e) {
+			console.log(e);
+		}
+	}:null;
+
+//	refill user info if stored
+	form.attr("name")!=='stabTestForm'? function(){useLocalStorage ? setUserInfo(window.localStorage.getItem(storeUser)):setUserInfo(dojo.cookie(storeUser));}:null;
+}
+
+function appendOb(layer, data, sym){
+	  var pt = esri.geometry.geographicToWebMercator(new esri.geometry.Point(data.location.longitude, data.location.latitude));
+	  var gr = new esri.Graphic(pt, sym, data);
+	  layer.add(gr);
+}
+
+function requestFailed(error) {
+  console.log("Error: ", error.message);
+}
+
+function getSingleObs(kind, id, sym, layer) {
+	var url = 'http://www.nwac.us/api/v1/' + kind + '/' + id;
+	var request = esri.request({
+	  url: url,
+	  // Service parameters if required, sent with URL as key/value pairs
+	  content: {
+    	format: 'json'
+	  },
+	  // Returned data format
+	  handleAs: "json"
+	});
+	request.then(function(data)
+	{
+	 	appendOb(layer,data,sym);
+	 }, 
+	 requestFailed);
+}
+
+function showGoToAttsDiv(){
+	$('#goToAttsDiv').css({
+            visibility: "visible",
+            display: "block"
+        });
+		
+	//hide the other div if it's visible
+	hideAskFillOutForm();
+}
+
+function hideGoToAttsDiv(){
+	$('#goToAttsDiv').css({
+            visibility: "hidden",
+            display: "none"
+        });		
+}
+
+function changeSymbol(gr, val, id){
+	var sym = new esri.symbol.SimpleMarkerSymbol();
+	
+	if (val === 'highlight') {
+		gr.setSymbol(highlighted);
+	}
+	else 
+		if (val === 'reset') {
+			if (id === "obsLayer_layer") {
+				sym.setColor(new dojo.Color([0, 153, 255, 0.5]));
+				gr.setSymbol(sym);
 			}
-		}	
+			else 
+				if (id === "avyObsLayer_layer") {
+					sym.setColor(new dojo.Color([153, 51, 255, 0.5]));
+					gr.setSymbol(sym);
+				}
+		}
+		prevGraphic = gr;
+		prevObsLayer = id;
+}
+
+function showAttributes(e){
+	//some bug makes this neccessary so as not to repeat this handler??
+	showObsAttsHandle?dojo.disconnect(showObsAttsHandle):null;
+	
+	showGoToAttsDiv();
+	
+	var id = e.currentTarget.id;
+	var gr = e.graphic;	
+	
+	$('#hideGoToAttsDivButton').bind('click',function(evt){
+		changeSymbol(gr,'reset',id);
+		hideGoToAttsDiv();
+	});	
+		
+	//reset symbol then change to highlighted color
+	!prevObsLayer?null:changeSymbol(prevGraphic,'reset',prevObsLayer);
+	changeSymbol(gr,'highlight',id);
+	
+	$('#obsAttsContent').children().empty();
+	markup = '';
+	$.each(gr.attributes, function(k, v) {
+	// Generate a list item for each item in the category and add it to our markup.
+		if(v!=null && v!=''){
+			if(k==='observer'){
+				$.each(v, function(observerK, observerV) {
+					if (observerV != null && observerV != '') {
+						if(observerK!=="id"  && observerK!=="resource_uri"){
+							window[observerK+"VAR"] = observerV;
+						}else{/** don't add it */}
+					}else{window[observerK+"VAR"] = '';}
+				});
+			}else if(k==='location'){
+				$.each(v, function(locationK, locationV) {
+					if (locationV != null && locationV != '') {
+						if(locationK==='region'){
+//							TODO don't add this now until an additional region = 'Other' is added to avalanche zones in api 
+//							markup += "<li data-role='list-divider' data-theme='a'>" + locationV.zone_name + "</li>";
+						}else{
+							if(locationK!=="id"  && locationK!=="resource_uri"){
+								window[locationK+"VAR"] = locationV;
+							}else{/** don't add it */}				
+						}
+					}else{
+						window[locationK+"VAR"] = '';
+						}
+				});
+			}else{
+				if(k!=="id" && k!=="resource_uri"){
+					if(k!=="id"  && k!=="resource_uri"/** && k!=="make_public"*/){
+						window[k+"VAR"] = v;
+					}else{/** don't add it */}
+				}else{/** don't add it */}
+			}
+		}else{
+			window[k+"VAR"] = '';
+			}
+	});
+	
+	//all types get these..
+	datetimeVAR !==''? addToMarkup('Date',datetimeVAR[5]+datetimeVAR[6]+'/'+datetimeVAR[8]+datetimeVAR[9]+'/'+datetimeVAR[0]+datetimeVAR[1]+datetimeVAR[2]+datetimeVAR[3]):null;
+	first_nameVAR  !==''?addToMarkup('Name',first_nameVAR + ' ' + last_nameVAR):null;
+	latitudeVAR !==''?addToMarkup('Latitude',Number(latitudeVAR).toFixed(6)):null;
+	longitudeVAR !==''?addToMarkup('Longitude',Number(longitudeVAR).toFixed(6)):null;
+	elevationVAR !==''?addToMarkup('Elevation',elevationVAR + ' ' + elevation_unitsVAR):null;
+	slope_angleVAR !==''?addToMarkup('Slope angle',slope_angleVAR + " degrees"):null;
+	slope_aspectVAR !==''?addToMarkup('Slope aspect',slope_aspectVAR):null;
+	descriptionVAR !==''?addToMarkup('Location description',descriptionVAR):null;
+	
+	if(id==='avyObsLayer_layer'){
+		//avy obs get these	
+		slide_typeVAR !==''?addToMarkup('Slide type',type_Lookup(slide_typeVAR)):null;
+		causeVAR !==''?addToMarkup('Caused by',cause_lookup(causeVAR)):null;
+		slide_widthVAR !==''?addToMarkup('Slide width',slide_widthVAR + ' ' + slide_width_unitsVAR):null;
+		runout_lengthVAR !==''?addToMarkup('Vertical fall',runout_lengthVAR + ' ' + runout_length_unitsVAR):null;
+		crown_depthVAR !==''?addToMarkup('Crown depth',crown_depthVAR + ' ' + crown_depth_unitsVAR):null;
+		weak_layerVAR !==''?weakLayer_lookup('Weak layer',weak_layerVAR):null;
+		bed_surfaceVAR !==''?addToMarkup('Bed surface',bedSurface_lookup(bed_surfaceVAR)):null;
+		number_caughtVAR !==''?addToMarkup('Number caught',number_caughtVAR):null;
+		number_carriedVAR !==''?addToMarkup('Number carried',number_carriedVAR):null;
+		number_buriedVAR !==''?addToMarkup('Number buried',number_buriedVAR):null;
+		number_partially_buriedVAR !==''?addToMarkup('Number partially buried',number_partially_buriedVAR):null;
+		number_injuredVAR !==''?addToMarkup('Number injured',number_injuredVAR):null;
+		number_killedVAR !==''?addToMarkup('Number killed',number_killedVAR):null;
+		avalanche_size_destructive_forceVAR !==''?addToMarkup('Size/Destructive force',sizeDF_lookup(avalanche_size_destructive_forceVAR)):null;
+		avalanche_size_relativeVAR !==''?addToMarkup('Size relative to path',sizeRelative_lookup(avalanche_size_relativeVAR)):null;
+	}else if(id==='obsLayer_layer'){
+		//snow and weather obs get these
+		air_tempVAR !==''? addToMarkup('Air temperature',air_tempVAR + air_tempVAR):null;
+		cloud_coverVAR !==''? addToMarkup('Cloud cover',cloud_coverVAR):null;
+		precipitation_typeVAR !==''? addToMarkup('Precipitation type',precipitation_typeVAR):null;
+		precipitation_intensityVAR !==''? addToMarkup('Precipitation intensity',precipitation_intensityVAR):null;
+		wind_directionVAR !==''? addToMarkup('Wind direction',wind_directionVAR):null;
+		wind_speedVAR !==''? addToMarkup('Wind speed',wind_speedVAR):null;
+		rapid_warmingVAR !==''? addToMarkup('Rapid warming?',TF_lookup(rapid_warmingVAR)):null;
+		recent_avalanchesVAR !==''? addToMarkup('Recent avalanches?',TF_lookup(recent_avalanchesVAR)):null;
+		recent_loadingVAR !==''? addToMarkup('Recent loading',TF_lookup(recent_loadingVAR)):null;
+		shooting_cracksVAR !==''? addToMarkup('Shooting cracks',TF_lookup(shooting_cracksVAR)):null;
+		signs_of_collapseVAR !==''? addToMarkup('Signs of collapse?',TF_lookup(signs_of_collapseVAR)):null;
+		terrain_trapsVAR !==''? addToMarkup('Terrain traps',TF_lookup(terrain_trapsVAR)):null;
+		weather_commentsVAR !==''? addToMarkup('Snowpack comments', replaceURL(weather_commentsVAR)):null;
+		snowpack_commentsVAR !==''? addToMarkup('Snowpack comments' ,replaceURL(snowpack_commentsVAR)):null;
+		observation_commentsVAR !==''? addToMarkup( 'Observation comments',replaceURL(observation_commentsVAR)):null;
+		snowpit_profile_imageVAR !==''? addImgLinkToMarkup('Snowpit profile image', snowpit_profile_imageVAR):null;
+		snowpit_profile_image_urlVAR !==''? addToMarkup('Snowpit profile image URL', replaceURL(snowpit_profile_image_urlVAR)):null; 
+		mediaVAR !==''? addImgLinkToMarkup( 'Photo', mediaVAR):null;	
+	}
+	
+	//add stability tests if obs, if avyobs then just make page
+	id==='obsLayer_layer'?getStabTest(gr, id):makePage(gr,id);
+}
+
+function askAddStabTest(){
+	$('#askAddStabTestDiv').css({
+            visibility: "visible",
+            display: "block"
+        });
+}
+
+function hideAskAddStabTestDiv(){
+	$('#askAddStabTestDiv').css({
+            visibility: "hidden",
+            display: "none"
+        });
+	$('#stabTestDivLabel').html('Add stability test with observation?');	
+}
+
+function formResponse(response,form){
+//	console.log('response is: ', response);
+    $.mobile.hidePageLoadingMsg();
+	
+	var json = JSON.stringify(response, null, 2);
+	var id = $.parseJSON(json).id;
+	//set for stabTest adds
+	lastObsAdded = id;
+	var layer;
+	var sym = new esri.symbol.SimpleMarkerSymbol();
+
+	// add the graphic to correct graphicsLayer if layer already populated
+		switch (addObType) {
+        case 'addObByClick' || 'addObByGeoloc':
+			sym.setColor(new dojo.Color([0,153,255, 0.5]));
+			layer=map.getLayer('obsLayer');
+			!obsGotten?null: getSingleObs('observation',id,sym,layer);
+			askAddStabTest();
+            break;
+        case 'addAvyObByClick' || 'addAvyObByGeoloc':
+			sym.setColor(new dojo.Color([153,51,255, 0.5]));
+			layer=map.getLayer('avyObsLayer');
+			!avyObsGotten?null: getSingleObs('avalancheObservation',id,sym,layer);
+            break;
+		}				
+	map.graphics.hide();
+	
+	hideAskFillOutForm();
+	updateGraphicHandles();
+	$.mobile.changePage('#mapPage');//,{changeHash: false});
+	resetForms(form);
+}
+
+function submitForm($this){
+	if (window.FormData !== undefined) {
+		var data = new FormData();
+		$this.serializeArray().forEach(function(field){
+			switch (field.name) {
+				case 'datetime':
+					var dt = new Date(field.value);
+					field.value = formatDate(dt, 'obs') + ' 12:00';// TODO add a time selector as well before final release
+					data.append(field.name, field.value);
+					break;  		
+			}
+			data.append(field.name, field.value);
+		});
+		
+		//append region name to FormData
+		data.append('location-region', zone);
+		
+		// add image files to FormData if they have been selected
+		addFilesForUpload(data);
+			
+		$.ajax({
+			url: proxyUrl + '?' + $this.attr('action'),
+			data: data,
+			cache: false,
+			contentType: false,
+			processData: false,
+			type: 'POST',
+			success: function(response){
+				formResponse(response, $this);
+			},
+			error: function(error){
+				formFail(error);
+			}
+		});
+	}
+	else { //TODO perhaps make this the only form submission method - remove $.ajax method and if window.FormData evaluation...
+		dtf = $this.find(':input[name=datetime]');
+		dtf.val(formatDate(new Date(dtf.val()), 'obs') + ' 12:00');
+		var options = {
+			url: proxyUrl + '?' + $this.attr('action'),
+			//add location-region
+			data: { 'location-region': zone },
+			cache: false,
+			contentType: false,
+			processData: false,
+			type: 'POST',
+			success: function(response){
+				formResponse(response, $this);
+			}, // post-submit callback 
+			error: function(error){
+				formFail(error);
+			}
+		};
+		$this.ajaxSubmit(options);
+		// always return false to prevent standard browser submit and page navigation 
+//        return false; 
+	}
+}
+
+function stabTestFormResponse(response){
+	$('#stabTestDivLabel').html('Add another stability test?');
+	$.mobile.changePage('#mapPage');
+	resetForms(form);
+}
+
+function stabFormReturn(data,form){
+	$.mobile.hidePageLoadingMsg();
+	var json = JSON.stringify(data, null, 2);
+	var statusText = $.parseJSON(json).statusText;
+	if(statusText==='OK'){
+		$('#stabTestDivLabel').html('Add another stability test?');
+		$.mobile.changePage('#mapPage');
+		resetForms(form);
+	}else{
+		alert('Oops, error submitting stability test');
 	}
 }
 
 function onDOMLoad() {
     $(document).ready(function(){
-		jQueryReady;
+		jQueryReady();
 		$.mobile.showPageLoadingMsg();
 			
 
@@ -273,16 +651,16 @@ function onDOMLoad() {
 //			console.log(formName);			
 			if(formName==="obsForm"){
 				if ($('#id_snowpit_profile_image_url').val().length > 0 && $('#id_snowpit_profile_image_url').val().substr(0,7) !== 'http://') {
-					$('#id_snowpit_profile_image_url').val('http://'+$('#id_snowpit_profile_image_url').val())
+					$('#id_snowpit_profile_image_url').val('http://'+$('#id_snowpit_profile_image_url').val());
 					$(this).validate({			
 						rules: {
 				      		url: true
 						}				
 					  });					
-				}else{ /*do nothing*/}
+				}
 					
 				if ($(this).valid()) {
-					refreshUserInfo($('#id_obs_observer-email').val(),$('#id_obs_observer-first_name').val(),$('#id_obs_observer-last_name').val())
+					refreshUserInfo($('#id_obs_observer-email').val(),$('#id_obs_observer-first_name').val(),$('#id_obs_observer-last_name').val());
 					submitForm($this);
 				}
 				else {
@@ -291,7 +669,7 @@ function onDOMLoad() {
 				}
 			}else{	//avyObsForm
 				if ($(this).valid()) {
-					refreshUserInfo($('#id_avyObs_observer-email').val(),$('#id_avyObs_observer-first_name').val(),$('#id_avyObs_observer-last_name').val())
+					refreshUserInfo($('#id_avyObs_observer-email').val(),$('#id_avyObs_observer-first_name').val(),$('#id_avyObs_observer-last_name').val());
 					submitForm($this);
 				}
 				else {
@@ -304,134 +682,42 @@ function onDOMLoad() {
 	init();
 }
 
-function submitForm($this){
-	if (window.FormData !== undefined) {
-		var data = new FormData();
-		$this.serializeArray().forEach(function(field){
-			switch (field.name) {
-				case 'datetime':
-					var dt = new Date(field.value);
-					field.value = formatDate(dt, 'obs') + ' 12:00';// TODO add a time selector as well before final release
-					data.append(field.name, field.value);
-					break;  		
-			}
-			data.append(field.name, field.value);
-		});
-		
-		//append region name to FormData
-		data.append('location-region', zone);
-		
-		// add image files to FormData if they have been selected
-		addFilesForUpload(data);
-			
-		$.ajax({
-			url: proxyUrl + '?' + $this.attr('action'),
-			data: data,
-			cache: false,
-			contentType: false,
-			processData: false,
-			type: 'POST',
-			success: function(response){
-				formResponse(response, $this);
-			},
-			error: function(error){
-				formFail(error);
-			}
-		});
-	}
-	else { //TODO perhaps make this the only form submission method - remove $.ajax method and if window.FormData evaluation...
-		dtf = $this.find(':input[name=datetime]');
-		dtf.val(formatDate(new Date(dtf.val()), 'obs') + ' 12:00');
-		var options = {
-			url: proxyUrl + '?' + $this.attr('action'),
-			//add location-region
-			data: { 'location-region': zone },
-			cache: false,
-			contentType: false,
-			processData: false,
-			type: 'POST',
-			success: function(response){
-				formResponse(response, $this);
-			}, // post-submit callback 
-			error: function(error){
-				formFail(error);
+dojo.addOnLoad(onDOMLoad);
+
+
+
+
+
+// check gor URL query and show obs and/or avyObs if specified "TRUE"
+function checkForURLParams(){
+	var url = document.location.href;
+	var urlObject = esri.urlToObject(url);
+	if(urlObject.query){		
+		if (urlObject.query.obs) {
+			if (urlObject.query && urlObject.query.obs === 'TRUE') {
+					dojo.connect(map, "onLoad", function(){
+					show_hideObs('showObs');				
+					$('#obsFlip')[0].selectedIndex = 1;
+				});
 			}
 		}
-		$this.ajaxSubmit(options);
-		// always return false to prevent standard browser submit and page navigation 
-//        return false; 
+		if(urlObject.query.avyObs){	
+			if(urlObject.query && urlObject.query.avyObs === 'TRUE'){
+				dojo.connect(map, "onLoad", function () {	
+					show_hideObs('showAvyObs');					
+					$('#avyObsFlip')[0].selectedIndex = 1;
+				});
+			}
+		}	
 	}
 }
 
-function addFilesForUpload(data){
-	// add image files to FormData if they have been selected
-	$.each($(':file'), function(item) {
-		var file = this.files[0];
-		var name = $(this).attr('name');
-		if(!file){/* nothing */
-		}else{
-		    data.append(name, file);
-		}
-	});
-	return data
-}
 
-function stabFormReturn(data,form){
-	$.mobile.hidePageLoadingMsg();
-	var json = JSON.stringify(data, null, 2);
-	var statusText = $.parseJSON(json).statusText;
-	if(statusText==='OK'){
-		$('#stabTestDivLabel').html('Add another stability test?');
-		$.mobile.changePage('#mapPage');
-		resetForms(form);
-	}else{
-		alert('Oops, error submitting stability test');
-	}
-}
 
 function formFail (error){
 	$.mobile.hidePageLoadingMsg();
-	alert('Oops, error adding your observation', error)
+	alert('Oops, error adding your observation', error);
 	console.log(error);
-}
-
-function stabTestFormResponse(response){
-	$('#stabTestDivLabel').html('Add another stability test?');
-	$.mobile.changePage('#mapPage');
-	resetForms(form);
-}
-
-function formResponse(response,form){
-//	console.log('response is: ', response);
-    $.mobile.hidePageLoadingMsg();
-	
-	var json = JSON.stringify(response, null, 2);
-	var id = $.parseJSON(json).id;
-	//set for stabTest adds
-	lastObsAdded = id;
-	var layer;
-	var sym = new esri.symbol.SimpleMarkerSymbol();
-
-	// add the graphic to correct graphicsLayer if layer already populated
-		switch (addObType) {
-        case 'addObByClick' || 'addObByGeoloc':
-			sym.setColor(new dojo.Color([0,153,255, 0.5]));
-			layer=map.getLayer('obsLayer');
-			!obsGotten?null: getSingleObs('observation',id,sym,layer);
-			askAddStabTest();
-            break;
-        case 'addAvyObByClick' || 'addAvyObByGeoloc':
-			sym.setColor(new dojo.Color([153,51,255, 0.5]));
-			layer=map.getLayer('avyObsLayer');
-			!avyObsGotten?null: getSingleObs('avalancheObservation',id,sym,layer);
-            break;
-		}				
-	map.graphics.hide();
-	
-	hideAskFillOutForm();
-	updateGraphicHandles();
-	$.mobile.changePage('#mapPage');//,{changeHash: false});
-	resetForms(form);
 }
 
 function getSingleObs(kind, id, sym, layer) {
@@ -447,52 +733,9 @@ function getSingleObs(kind, id, sym, layer) {
 	});
 	request.then(function(data)
 	{
-	 	appendOb(layer,data,sym)
+	 	appendOb(layer,data,sym);
 	 }, 
 	 requestFailed);
-}
-
-function appendOb(layer, data, sym){
-	  var pt = esri.geometry.geographicToWebMercator(new esri.geometry.Point(data.location.longitude, data.location.latitude));
-	  var gr = new esri.Graphic(pt, sym, data);
-	  layer.add(gr);
-}
-
-function resetForms(form){	
-	//reset whole form
-	form[0].reset();
-	// reset checkboxes in form
-	try{
-		$.each($(':checkbox'),function(check){
-			var name =$(this).attr('name');
-			$('input[name='+ name +']').attr('checked', false).checkboxradio("refresh");
-		});
-	}catch(err){/*do nothing other than catch err*/
-	}	
-
-	//reset select menus in form
-	try {
-		form.find("select").val('').selectmenu("refresh", true);
-	} catch (e){
-		console.log(e);
-	}	
-	form.attr("name")==='obsForm'?function(){
-		try{
-			$('#obs_location-elevation_units').val('feet').selectmenu("refresh",true);
-		} catch (e){
-			console.log(e);
-		}
-	}:null;
-	form.attr("name")==='avyObsForm'?function(){
-		try {
-			$('#avy_location-elevation_units').val('feet').selectmenu("refresh",true);
-		} catch (e) {
-			console.log(e);
-		}
-	}:null;
-
-//	refill user info if stored
-	form.attr("name")!=='stabTestForm'? function(){useLocalStorage ? setUserInfo(window.localStorage.getItem(storeUser)):setUserInfo(dojo.cookie(storeUser))}:null;
 }
 
 function init() {
@@ -549,7 +792,7 @@ function init() {
     dojo.connect(map, "onLoad", function () {
 		infoTimeout=setTimeout(function(){
 			// hide infoDive after 5 seconds
-			hideInfoDiv()
+			hideInfoDiv();
 		},5000);
         resizeMap();
 		$.mobile.hidePageLoadingMsg();
@@ -679,14 +922,6 @@ function show_hideObs(value){
 				}				
 }
 
-function removeAddGraphicHandles(){
-	//remove map graphic (obs point) if not just location
-	dojo.disconnect(addGraphicHandle);
-	!addObType?null:graphic.setSymbol(null); 		
-	addObType = null;
-	addGraphicHandle=null;
-}
-
 function getObs(kind) {
 	type = kind;
 	// add day so obs request contains the last day in range
@@ -720,10 +955,6 @@ function avyObsRequestSucceeded(data){
 	var json = JSON.stringify(data, null, 2);
 	var parsed = $.parseJSON(json);
 	addAvyObsLayer(parsed);
-}
-
-function requestFailed(error) {
-  console.log("Error: ", error.message);
 }
 
 function addObsLayer(data) {
@@ -790,12 +1021,10 @@ function getStabTest(gr,id) {
 }
 
 function stabTestRequestSucceeded(data,gr,id){
-//	console.log(data.objects);
 	var json = JSON.stringify(data, null, 2);
 	var parsed = $.parseJSON(json);
 	if(parsed.objects){
 		$.each(parsed.objects, function(num, obj){
-//			console.log(num, obj);
 			markup += "<li data-role='list-divider' data-theme='a'>" + 'Stability Test ' + (num+1) + "</li>";
 				obj.test_type!==''&&obj.test_type!==null?addToMarkup('Shear quality',obj.test_type):null;
 				obj.failure_load!==''&&obj.failure_load!==null?addToMarkup('Shear quality',obj.failure_load):null;
@@ -803,11 +1032,10 @@ function stabTestRequestSucceeded(data,gr,id){
 				obj.shear_quality!==''&&obj.shear_quality!==null?addToMarkup('Shear quality','Q' + obj.shear_quality):null;
 				obj.observations_comments!==''&&obj.observations_comments!==null?addToMarkup('Test comments',obj.observations_comments):null;			
 		});
-	}else{console.log('no parsed.objects') /* just make the page */}
-	
+	}
 	makePage(gr,id);
 }
-////
+
 function getElevation(lt,lng) {
 	var getURL = 'http://open.mapquestapi.com/elevation/v1/profile?shapeFormat=raw&unit=f&latLngCollection='+lt+','+lng;
 	var request = esri.request({
@@ -1096,33 +1324,12 @@ function getSymbol() {
 	}else{
 		symbol = obsSymbol;
 	}
-	return symbol
-}
-
-function jQueryReady() {
-    $('#mapPage').bind('pageshow', function (event, ui) {
-        resizeMap();
-    });
+	return symbol;
 }
 
 function orientationChanged() {
     if (map) {
         resizeMap();
-    }
-}
-
-function resizeMap() {
-    if (map && $.mobile.activePage.data('url')==='mapPage') {
-        map.reposition();
-        map.resize();
-		
-		var height = $('#mapPage').height();
-        $('#mapPage').css("height", $('body').height());
-        $('#map').css("height", $('body').height());
-        $('#map').css("width", "auto");
-	
-		$('#footer').css("width",'100%');
-		$('#footer').css("bottom",'0');
     }
 }
 
@@ -1186,139 +1393,6 @@ function changeObs(val){
 	graphic.setSymbol(getSymbol());
 	val==='addObByClick'?$('#changeReportSlider').attr('data-theme','b'):$('#changeReportSlider').attr('data-theme','d');
 	$('#changeReportSlider').slider('refresh');
-}
-
-function changeSymbol(gr, val, id){
-	var sym = new esri.symbol.SimpleMarkerSymbol();
-	
-	if (val === 'highlight') {
-		gr.setSymbol(highlighted);
-	}
-	else 
-		if (val === 'reset') {
-			if (id === "obsLayer_layer") {
-				sym.setColor(new dojo.Color([0, 153, 255, 0.5]));
-				gr.setSymbol(sym);
-			}
-			else 
-				if (id === "avyObsLayer_layer") {
-					sym.setColor(new dojo.Color([153, 51, 255, 0.5]));
-					gr.setSymbol(sym);
-				}
-		}
-		prevGraphic = gr;
-		prevObsLayer = id;
-}
-
-function showAttributes(e){
-	//some bug makes this neccessary so as not to repeat this handler??
-	showObsAttsHandle?dojo.disconnect(showObsAttsHandle):null;
-	
-	showGoToAttsDiv();
-	
-	var id = e.currentTarget.id;
-	var gr = e.graphic;	
-	
-	$('#hideGoToAttsDivButton').bind('click',function(evt){
-		changeSymbol(gr,'reset',id);
-		hideGoToAttsDiv();
-	});	
-		
-	//reset symbol then change to highlighted color
-	!prevObsLayer?null:changeSymbol(prevGraphic,'reset',prevObsLayer);
-	changeSymbol(gr,'highlight',id);
-	
-	$('#obsAttsContent').children().empty();
-	markup = '';
-	$.each(gr.attributes, function(k, v) {
-	// Generate a list item for each item in the category and add it to our markup.
-		if(v!=null && v!=''){
-			if(k==='observer'){
-				$.each(v, function(observerK, observerV) {
-					if (observerV != null && observerV != '') {
-						if(observerK!=="id"  && observerK!=="resource_uri"){
-							window[observerK+"VAR"] = observerV;
-						}else{/** don't add it */}
-					}else{window[observerK+"VAR"] = '';}
-				});
-			}else if(k==='location'){
-				$.each(v, function(locationK, locationV) {
-					if (locationV != null && locationV != '') {
-						if(locationK==='region'){
-//							TODO don't add this now until an additional region = 'Other' is added to avalanche zones in api 
-//							markup += "<li data-role='list-divider' data-theme='a'>" + locationV.zone_name + "</li>";
-						}else{
-							if(locationK!=="id"  && locationK!=="resource_uri"){
-								window[locationK+"VAR"] = locationV;
-							}else{/** don't add it */}				
-						}
-					}else{
-						window[locationK+"VAR"] = '';
-						}
-				});
-			}else{
-				if(k!=="id" && k!=="resource_uri"){
-					if(k!=="id"  && k!=="resource_uri"/** && k!=="make_public"*/){
-						window[k+"VAR"] = v;
-					}else{/** don't add it */}
-				}else{/** don't add it */}
-			}
-		}else{
-			window[k+"VAR"] = '';
-			}
-	});
-	
-	//all types get these..
-	datetimeVAR !==''? addToMarkup('Date',datetimeVAR[5]+datetimeVAR[6]+'/'+datetimeVAR[8]+datetimeVAR[9]+'/'+datetimeVAR[0]+datetimeVAR[1]+datetimeVAR[2]+datetimeVAR[3]):null;
-	first_nameVAR  !==''?addToMarkup('Name',first_nameVAR + ' ' + last_nameVAR):null;
-	latitudeVAR !==''?addToMarkup('Latitude',Number(latitudeVAR).toFixed(6)):null;
-	longitudeVAR !==''?addToMarkup('Longitude',Number(longitudeVAR).toFixed(6)):null;
-	elevationVAR !==''?addToMarkup('Elevation',elevationVAR + ' ' + elevation_unitsVAR):null;
-	slope_angleVAR !==''?addToMarkup('Slope angle',slope_angleVAR + " degrees"):null;
-	slope_aspectVAR !==''?addToMarkup('Slope aspect',slope_aspectVAR):null;
-	descriptionVAR !==''?addToMarkup('Location description',descriptionVAR):null;
-	
-	if(id==='avyObsLayer_layer'){
-		//avy obs get these	
-		slide_typeVAR !==''?addToMarkup('Slide type',type_Lookup(slide_typeVAR)):null;
-		causeVAR !==''?addToMarkup('Caused by',cause_lookup(causeVAR)):null;
-		slide_widthVAR !==''?addToMarkup('Slide width',slide_widthVAR + ' ' + slide_width_unitsVAR):null;
-		runout_lengthVAR !==''?addToMarkup('Vertical fall',runout_lengthVAR + ' ' + runout_length_unitsVAR):null;
-		crown_depthVAR !==''?addToMarkup('Crown depth',crown_depthVAR + ' ' + crown_depth_unitsVAR):null;
-		weak_layerVAR !==''?weakLayer_lookup('Weak layer',weak_layerVAR):null;
-		bed_surfaceVAR !==''?addToMarkup('Bed surface',bedSurface_lookup(bed_surfaceVAR)):null;
-		number_caughtVAR !==''?addToMarkup('Number caught',number_caughtVAR):null;
-		number_carriedVAR !==''?addToMarkup('Number carried',number_carriedVAR):null;
-		number_buriedVAR !==''?addToMarkup('Number buried',number_buriedVAR):null;
-		number_partially_buriedVAR !==''?addToMarkup('Number partially buried',number_partially_buriedVAR):null;
-		number_injuredVAR !==''?addToMarkup('Number injured',number_injuredVAR):null;
-		number_killedVAR !==''?addToMarkup('Number killed',number_killedVAR):null;
-		avalanche_size_destructive_forceVAR !==''?addToMarkup('Size/Destructive force',sizeDF_lookup(avalanche_size_destructive_forceVAR)):null;
-		avalanche_size_relativeVAR !==''?addToMarkup('Size relative to path',sizeRelative_lookup(avalanche_size_relativeVAR)):null;
-	}else if(id==='obsLayer_layer'){
-		//snow and weather obs get these
-		air_tempVAR !==''? addToMarkup('Air temperature',air_tempVAR + air_tempVAR):null;
-		cloud_coverVAR !==''? addToMarkup('Cloud cover',cloud_coverVAR):null;
-		precipitation_typeVAR !==''? addToMarkup('Precipitation type',precipitation_typeVAR):null;
-		precipitation_intensityVAR !==''? addToMarkup('Precipitation intensity',precipitation_intensityVAR):null;
-		wind_directionVAR !==''? addToMarkup('Wind direction',wind_directionVAR):null;
-		wind_speedVAR !==''? addToMarkup('Wind speed',wind_speedVAR):null;
-		rapid_warmingVAR !==''? addToMarkup('Rapid warming?',TF_lookup(rapid_warmingVAR)):null;
-		recent_avalanchesVAR !==''? addToMarkup('Recent avalanches?',TF_lookup(recent_avalanchesVAR)):null;
-		recent_loadingVAR !==''? addToMarkup('Recent loading',TF_lookup(recent_loadingVAR)):null;
-		shooting_cracksVAR !==''? addToMarkup('Shooting cracks',TF_lookup(shooting_cracksVAR)):null;
-		signs_of_collapseVAR !==''? addToMarkup('Signs of collapse?',TF_lookup(signs_of_collapseVAR)):null;
-		terrain_trapsVAR !==''? addToMarkup('Terrain traps',TF_lookup(terrain_trapsVAR)):null;
-		weather_commentsVAR !==''? addToMarkup('Snowpack comments', replaceURL(weather_commentsVAR)):null;
-		snowpack_commentsVAR !==''? addToMarkup('Snowpack comments' ,replaceURL(snowpack_commentsVAR)):null;
-		observation_commentsVAR !==''? addToMarkup( 'Observation comments',replaceURL(observation_commentsVAR)):null;
-		snowpit_profile_imageVAR !==''? addImgLinkToMarkup('Snowpit profile image', snowpit_profile_imageVAR):null;
-		snowpit_profile_image_urlVAR !==''? addToMarkup('Snowpit profile image URL', replaceURL(snowpit_profile_image_urlVAR)):null; 
-		mediaVAR !==''? addImgLinkToMarkup( 'Photo', mediaVAR):null;	
-	}
-	
-	//add stability tests if obs, if avyobs then just make page
-	id==='obsLayer_layer'?getStabTest(gr, id):makePage(gr,id);
 }
 
 function replaceURL(val) {
@@ -1392,7 +1466,7 @@ function bedSurface_lookup(bS){
 	else if(bS == "G"){bSText = "The avalanche released at the ground, glacial ice or firn.";}
 	else if(bS == "U"){bSText = "Unknown";}
 	
-	return bSText
+	return bSText;
 }
 
 function type_Lookup(type){
@@ -1443,22 +1517,6 @@ function cause_lookup(cause){
 	return causeText;
 }
 
-function showGoToAttsDiv(){
-	$('#goToAttsDiv').css({
-            visibility: "visible",
-            display: "block"
-        });
-		
-	//hide the other div if it's visible
-	hideAskFillOutForm();
-}
-
-function hideGoToAttsDiv(){
-	$('#goToAttsDiv').css({
-            visibility: "hidden",
-            display: "none"
-        });		
-}
 
 function askFillOutForm(){	
 	//show form
@@ -1484,41 +1542,10 @@ function askFillOutForm(){
 	hideGoToAttsDiv();
 }
 
-function askAddStabTest(){
-	$('#askAddStabTestDiv').css({
-            visibility: "visible",
-            display: "block"
-        });
-}
-function hideAskAddStabTestDiv(){
-	$('#askAddStabTestDiv').css({
-            visibility: "hidden",
-            display: "none"
-        });
-	$('#stabTestDivLabel').html('Add stability test with observation?');	
-}
-
-function hideAskFillOutForm(){
-	$('#askObsFormDiv').css({
-            visibility: "hidden",
-            display: "none"
-        });	
-		
-	map.graphics.hide();	
-	addObType=null;
-	updateGraphicHandles();
-}
-
 function disconnectShowAttsHandles(){
 	showObsAttsHandle?dojo.disconnect(showObsAttsHandle):null;
 	showAvyObsAttsHandle?dojo.disconnect(showAvyObsAttsHandle):null;
 }
-
-function updateGraphicHandles(){	
-	!addGraphicHandle?null:removeAddGraphicHandles();
-	!obsGotten?null:showObsAttsHandle=dojo.connect(map.getLayer('obsLayer'), "onClick", showAttributes);
-	!avyObsGotten?null:showAvyObsAttsHandle=dojo.connect(map.getLayer('avObsLayer'), "onClick", showAttributes);
-}	
 
 function buildRegionQuery() {
 	dojo.connect(map, "onClick", getRegion);
@@ -1556,32 +1583,4 @@ function upDatePoint(lt,lng){
 	graphic.setGeometry(pt);
 }
 
-function supports_local_storage() {
-    try {
-      return 'localStorage' in window && window['localStorage'] !== null;
-    } catch( e ){
-      return false;
-    }
-}
  
-function refreshUserInfo(email, first_name, last_name) {
-	var user = {'email':email,'first_name':first_name,'last_name':last_name};
-    if ( useLocalStorage ) {
-      window.localStorage.setItem(storeUser, dojo.toJson(user));
-    } else {
-      var exp = 7; // number of days to persist the cookie
-      dojo.cookie(storeUser, dojo.toJson(user), {expires: exp});
-    }
-  }
-  
-function setUserInfo(item){
-	var json =  $.parseJSON(item);
-	//obsForm
-	$('#id_obs_observer-email').val(json.email);
-	$('#id_obs_observer-first_name').val(json.first_name);
-	$('#id_obs_observer-last_name').val(json.last_name);
-	//avyObsForm
-	$('#id_avyObs_observer-email').val(json.email);
-	$('#id_avyObs_observer-first_name').val(json.first_name);
-	$('#id_avyObs_observer-last_name').val(json.last_name);
-}
