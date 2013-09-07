@@ -13,6 +13,7 @@ dojo.require("esri.arcgis.utils");
 dojo.require("esri.utils");
 
 var map;
+var api = "http://www.nwac.us/api/v1/";
 
 var gallery;
 var basemaps;
@@ -223,7 +224,7 @@ function requestFailed(error) {
 }
 
 function getSingleObs(kind, id, sym, layer) {
-	var url = 'http://www.nwac.us/api/v1/' + kind + '/' + id;
+	var url = api + kind + '/' + id;
 	var request = esri.request({
 	  url: url,
 	  // Service parameters if required, sent with URL as key/value pairs
@@ -307,20 +308,15 @@ function showAttributes(e){
 					if (observerV != null && observerV != '') {
 						if(observerK!=="id"  && observerK!=="resource_uri"){
 							window[observerK+"VAR"] = observerV;
-						}else{/** don't add it */}
+						}
 					}else{window[observerK+"VAR"] = '';}
 				});
 			}else if(k==='location'){
 				$.each(v, function(locationK, locationV) {
 					if (locationV != null && locationV != '') {
-						if(locationK==='region'){
-//							TODO don't add this now until an additional region = 'Other' is added to avalanche zones in api 
-//							markup += "<li data-role='list-divider' data-theme='a'>" + locationV.zone_name + "</li>";
-						}else{
-							if(locationK!=="id"  && locationK!=="resource_uri"){
-								window[locationK+"VAR"] = locationV;
-							}else{/** don't add it */}				
-						}
+						if(locationK!=="id"  && locationK!=="resource_uri"){
+							window[locationK+"VAR"] = locationV;
+						}			
 					}else{
 						window[locationK+"VAR"] = '';
 						}
@@ -329,8 +325,8 @@ function showAttributes(e){
 				if(k!=="id" && k!=="resource_uri"){
 					if(k!=="id"  && k!=="resource_uri"/** && k!=="make_public"*/){
 						window[k+"VAR"] = v;
-					}else{/** don't add it */}
-				}else{/** don't add it */}
+					}
+				}
 			}
 		}else{
 			window[k+"VAR"] = '';
@@ -388,6 +384,31 @@ function showAttributes(e){
 	
 	//add stability tests if obs, if avyobs then just make page
 	id==='obsLayer_layer'?getStabTest(gr, id):makePage(gr,id);
+}
+
+function removeAddGraphicHandles(){
+	//remove map graphic (obs point) if not just location
+	dojo.disconnect(addGraphicHandle);
+	!addObType?null:graphic.setSymbol(null); 		
+	addObType = null;
+	addGraphicHandle=null;
+}
+
+function updateGraphicHandles(){	
+	!addGraphicHandle?null:removeAddGraphicHandles();
+	!obsGotten?null:showObsAttsHandle=dojo.connect(map.getLayer('obsLayer'), "onClick", showAttributes);
+	!avyObsGotten?null:showAvyObsAttsHandle=dojo.connect(map.getLayer('avObsLayer'), "onClick", showAttributes);
+}
+
+function hideAskFillOutForm(){
+	$('#askObsFormDiv').css({
+            visibility: "hidden",
+            display: "none"
+        });	
+		
+	map.graphics.hide();	
+	addObType=null;
+	updateGraphicHandles();
 }
 
 function askAddStabTest(){
@@ -721,7 +742,7 @@ function formFail (error){
 }
 
 function getSingleObs(kind, id, sym, layer) {
-	var url = 'http://www.nwac.us/api/v1/' + kind + '/' + id;
+	var url = api + kind + '/' + id;
 	var request = esri.request({
 	  url: url,
 	  // Service parameters if required, sent with URL as key/value pairs
@@ -926,7 +947,7 @@ function getObs(kind) {
 	type = kind;
 	// add day so obs request contains the last day in range
 	var plusDay = new Date(new Date(prevToDate).getTime() + ONE_DAY);
-	var url = 'http://www.nwac.us/api/v1/' + type + '/';
+	var url = api + type + '/';
 	var request = esri.request({
 	  url: url,
 	  // Service parameters if required, sent with URL as key/value pairs
@@ -1004,7 +1025,7 @@ function getStabTest(gr,id) {
 //	console.log('getting stabTest...');
 	var num = gr.attributes.id;
 	// add day so obs request contains the last day in range
-	var url = 'http://www.nwac.us/api/v1/stabilityTest/';
+	var url = api + 'stabilityTest/';
 	var rq = esri.request({
 	  url: url,
 	  content: {
