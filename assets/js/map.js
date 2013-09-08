@@ -13,7 +13,7 @@ dojo.require("esri.arcgis.utils");
 dojo.require("esri.utils");
 
 var map;
-var api = "http://www.nwac.us/api/v1/";
+var api = "http://dev.nwac.us/api/v1/";
 
 var gallery;
 var basemaps;
