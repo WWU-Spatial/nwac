@@ -5,16 +5,10 @@ var esri, dojo, alert;
 
 //initialize dojo
 dojo.require("esri.map");
-dojo.require("dijit.layout.BorderContainer");
-dojo.require("dijit.layout.ContentPane");
-dojo.require("esri.dijit.Gallery");
 dojo.require("esri.dijit.BasemapGallery");
-dojo.require("dijit.Menu");
 dojo.require("dijit.form.Slider");
 dojo.require("esri.tasks.query");
 dojo.require("esri.tasks.geometry");
-dojo.require("esri.arcgis.utils");
-dojo.require("esri.utils");
 
 
 var map;
