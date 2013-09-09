@@ -117,19 +117,6 @@ function checkForURLParams() {
 
 
 
-function addFilesForUpload(data) {
-	// add image files to FormData if they have been selected
-	$.each($(':file'), function() {
-		var file = this.files[0];
-		var name = $(this).attr('name');
-		if (file) {
-			data.append(name, file);
-		}
-	});
-	return data;
-}
-
-
 function stabFormReturn(data, form) {
 	$.mobile.hidePageLoadingMsg();
 	var json = JSON.stringify(data, null, 2);
@@ -279,7 +266,14 @@ function submitForm($this) {
 		data.append('location-region', zone);
 
 		// add image files to FormData if they have been selected
-		addFilesForUpload(data);
+		$.each($(':file'), function() {
+			var file = this.files[0];
+			var name = $(this).attr('name');
+			console.log(name, file);
+			if (file) {
+				data.append(name, file);
+			}
+		});
 
 		$.ajax({
 			url : proxyUrl + '?' + $this.attr('action'),
