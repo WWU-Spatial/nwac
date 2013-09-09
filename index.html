@@ -10,7 +10,8 @@
 	<link rel="shortcut icon" href="images/favicon.ico">
 	<link rel="stylesheet" type="text/css" href="assets/css/mobile.css">
 	<link rel="stylesheet" type="text/css" href="http://serverapi.arcgisonline.com/jsapi/arcgis/3.2/js/esri/css/esri.css" />
-	<link rel="stylesheet" type="text/css" href="assets/css/jqm-datebox.min.css" /> 	
+	<link rel="stylesheet" type="text/css" href="assets/css/jqm-datebox.min.css" /> 
+	
 	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.0.1/jquery.mobile-1.0.1.min.css"/>
 	 
 	<!-- google analytics -->
@@ -30,8 +31,6 @@
 
     <script type="text/javascript" src="http://serverapi.arcgisonline.com/jsapi/arcgis/?v=3.2compact"></script>
 	<script type="text/javascript" src="http://code.jquery.com/jquery-1.6.4.min.js"></script>	
-	
-	<!--validation  http://docs.jquery.com/Plugins/Validation-->
 	<script type="text/javascript" src="assets/js/jquery.validate.js"></script>
 	
 	<script type="text/javascript">
@@ -39,20 +38,13 @@
 			$(document).bind("mobileinit", function(){
 				// load on start page
 				document.location.hash="";
-//				$.mobile.selectmenu.prototype.options.nativeMenu = false;
 			});
 		})();
 	</script>	
 	<script type="text/javascript">var dojoConfig = {parseOnLoad : true}</script>			
     <script type="text/javascript" src="http://code.jquery.com/mobile/1.0.1/jquery.mobile-1.0.1.min.js"></script>
-
-	<!-- FormData plugin -->
     <script type="text/javascript" src="assets/js/jquery.form.js"></script>
-
-	<!-- mapping -->
 	<script type="text/javascript" src="assets/js/map.js"></script>
-	
-	<!-- DateBox -->
 	<script type="text/javascript" src="assets/js/jquery.mobile.datebox.min.js"></script>
 	<script type="text/javascript" src="assets/js/jquery.mobile.simpledialog.min.js"></script>
 
@@ -66,13 +58,13 @@
 			<fieldset id="footerGroup" data-role="controlgroup" data-type="horizontal">
 				<a class="halfBTN" id="optionsBTN" data-role="button" onclick="$.mobile.changePage('#options');" data-icon="gear" data-inline="false">Options</a>
 				<a class="halfBTN" data-role="button" onclick="$.mobile.changePage('#info',{changeHash: false});" data-icon="info" data-inline="false">Info</a>
-			</fieldset>	 
+			</fieldset>	
 		 </div>	
-				<div id="infoDiv" >	
+			<div id="infoDiv" >	
 				<p>Enter observations by clicking the options button at the bottom of the page.</p>
 				<p>Tap or click on an observation point to view it's details.</p>
-				<p>Observations are shown by default for the past two weeks.  You can change the date range on the options page.</p>
-			<button id="infoDivOKBtn" onclick="hideInfoDiv()">OK</button>
+				<p>Observations are shown by default for the past two weeks. You can change the date range on the options page.</p>
+				<button id="infoDivOKBtn" onclick="hideInfoDiv()">OK</button>
 	     </div> 
 		  
     	<div id="map"></div>
@@ -118,9 +110,9 @@
       </div>
       <div data-role="content">		
       	<ul data-role="listview" data-inset="true">
-				<li>Enter observations by clicking the options button at the bottom of the page.</li>
-				<li>Tap or click on an observation point to view it's details.</li>
-				<li>Observations are shown by default for the past two weeks.  You can change the date range on the options page.</li>
+			<li>Enter observations by clicking the options button at the bottom of the page.</li>
+			<li>Tap or click on an observation point to view it's details.</li>
+			<li>Observations are shown by default for the past two weeks. You can change the date range on the options page.</li>
         </ul>
 		<div><button onclick="$.mobile.changePage('#mapPage');">OK</button></div>
       </div>
@@ -240,6 +232,7 @@
 					</li>
 				</ul>	
 	        </div>
+	
 			<a data-role="button" href="http://m.nwac.us/" target="_blank">Go to NWAC mobile for detailed forecasts</a>		
 	 		<a data-role="button" onclick="$.mobile.changePage('#mapPage')">Back to map</a>
 	  </form>
@@ -254,7 +247,7 @@
       </div>
       <div data-role="content">
       	<div data-role="controlgroup">
-		<form name="avyObsForm" enctype="multipart/form-data" method="post" data-ajax="false" action="http://www.nwac.us/api/v1/avalancheObservation/create/">
+		<form name="avyObsForm" enctype="multipart/form-data" method="post" data-ajax="false" action="http://dev.nwac.us/api/v1/avalancheObservation/create/">
 			  <fieldset data-role="controlgroup">				
 				<ul data-role="listview" data-inset="true">	
 					<li data-role='list-divider'><h2>Observer</h2></li>
@@ -419,7 +412,7 @@
 		<a onclick="$.mobile.changePage('#mapPage')" class="backToMapButton">Map</a>
       </div>
       <div data-role="content">
-		<form name="obsForm" enctype="multipart/form-data" method="post" data-ajax="false" action="http://www.nwac.us/api/v1/observation/create/">
+		<form name="obsForm" enctype="multipart/form-data" method="post" data-ajax="false" action="http://dev.nwac.us/api/v1/observation/create/">
 			<fieldset data-role="controlgroup">
 				<ul data-role="listview" data-inset="true">	
 					<li data-role='list-divider'><h2>Observer</h2></li>
@@ -546,7 +539,7 @@
       </div>
       <div data-role="content">
       	<div data-role="controlgroup">
-		 <form name="stabTestForm" enctype="application/json" method="post" data-ajax="false" action="http://www.nwac.us/api/v1/stabilityTest/?format=json">
+		 <form name="stabTestForm" enctype="application/json" method="post" data-ajax="false" action="http://dev.nwac.us/api/v1/stabilityTest/?format=json">
 			  <fieldset data-role="controlgroup">				
 				<ul data-role="listview" data-inset="true">	
 					<li><h4>Test type</h4> 
