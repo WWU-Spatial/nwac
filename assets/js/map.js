@@ -82,27 +82,36 @@ function formatDate(date, format) {
 }
 
 
-// check for URL query and show obs and/or avyObs if specified "TRUE"
+/*
+ * Parses the url for parameters onload and adds the appropriate layer.
+ * If snowpack=true, then the snowpack observation layer is loaded by default
+ * if avalanche=true, then the avalanche observation layer is loaded by default
+ * Previously, the parameter "obs" was used for the snowpack observations and
+ * the paramter avyObs was used for avalanche observations.  These have been 
+ * removed and replaced with snowpack and avalanche for better clarity.
+ * If the previous links are still used, we can add them back
+ */
 function checkForURLParams() {
-	var url = document.location.href;
-	var urlObject = esri.urlToObject(url);
+	var urlObject = esri.urlToObject(document.location.href);
+	
 	if (urlObject.query) {
-		if (urlObject.query.obs) {
-			if (urlObject.query && urlObject.query.obs === 'TRUE') {
-				dojo.connect(map, "onLoad", function() {
-					show_hideObs('showObs');
-					$('#obsFlip')[0].selectedIndex = 1;
-				});
-			}
+
+		if (urlObject.query.snowpack === 'true') {
+			dojo.connect(map, "onLoad", function() {
+				show_hideObs('showObs');
+				$('#obsFlip')[0].selectedIndex = 1;
+			});
 		}
+		
 		if (urlObject.query.avyObs) {
-			if (urlObject.query && urlObject.query.avyObs === 'TRUE') {
+			if (urlObject.query.avalanche === 'TRUE') {
 				dojo.connect(map, "onLoad", function() {
 					show_hideObs('showAvyObs');
 					$('#avyObsFlip')[0].selectedIndex = 1;
 				});
 			}
 		}
+		
 	}
 }
 
