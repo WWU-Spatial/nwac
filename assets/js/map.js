@@ -10,7 +10,15 @@ dojo.require("dijit.form.Slider");
 dojo.require("esri.tasks.query");
 dojo.require("esri.tasks.geometry");
 
+/**************************** CHECK FOR BROWSER SUPPORT ***************************/
 
+
+
+/********************************** CONSTANTS *************************************/
+var DAY_IN_MILLISECONDS = 1000 * 60 * 60 * 24;
+
+
+/******************************** GLOBAL VARIABLES ********************************/
 var map;
 var basemaps;
 var markup;
@@ -31,10 +39,7 @@ var query, queryTask;
 var initExtent;
 var form;
 var basemapGallery;
-// The number of milliseconds in one day
-var ONE_DAY = 1000 * 60 * 60 * 24;
-var todayVar = new Date();
-var today = formatDate(todayVar, 'display');
+var today = formatDate(new Date(), 'display');
 var showObsAttsHandle, showAvyObsAttsHandle;
 var addGraphicHandle;
 var currentLocSymbol;
@@ -47,23 +52,33 @@ var lastObsAdded;
 var zone;
 var infoTimeout;
 
+/********************************** FUNCTIONS *************************************/
 
-function formatDate(date, type) {
-	var dd = date.getDate(), mm = date.getMonth() + 1, //January is 0!
-	yyyy = date.getFullYear();
+/*
+ * Formats a javascript Date() object and returns it as a string.  Accepts two 
+ * parameters.  The first parameter is the date object.  The second parameter is 
+ * the optional format.  If no format parameter is passed, then the date string is 
+ * returned as yyyy-mm-dd.  If the second parameter is set to "display" then the date 
+ * string is returned as yyyy-mm-dd
+ */
+function formatDate(date, format) {
+	var dd = date.getDate();
+	var mm = date.getMonth() + 1; //Jan = 0
+	var yyyy = date.getFullYear();
+	
 	if (dd < 10) {
 		dd = '0' + dd;
 	}
+	
 	if (mm < 10) {
 		mm = '0' + mm;
 	}
-	var disp = mm + '/' + dd + '/' + yyyy;
-	var obs = yyyy + '-' + mm + '-' + dd;
-	if (type === 'display') {
-		return disp;
-	} else {
-		return obs;
+	
+	if (format === 'display') {
+		return mm + '/' + dd + '/' + yyyy;
 	}
+	
+	return yyyy + '-' + mm + '-' + dd;
 }
 
 
@@ -362,7 +377,7 @@ function removeAddGraphicHandles() {
 function getObs(kind) {
 	type = kind;
 	// add day so obs request contains the last day in range
-	var plusDay = new Date(new Date(prevToDate).getTime() + ONE_DAY);
+	var plusDay = new Date(new Date(prevToDate).getTime() + DAY_IN_MILLISECONDS);
 	var url = 'http://dev.nwac.us/api/v1/' + type + '/';
 	var request = esri.request({
 		url : url,
@@ -592,7 +607,7 @@ function setDate(db) {
 function setDatePicker() {
 	console.log("FUNCTION: setDatePicker");
 	prevToDate = today;
-	prevFromDate = formatDate(new Date(new Date(prevToDate).getTime() - 10 * ONE_DAY), 'display');
+	prevFromDate = formatDate(new Date(new Date(prevToDate).getTime() - 10 * DAY_IN_MILLISECONDS), 'display');
 	$('#from').html('From:  ' + prevFromDate);
 	$('#to').html('To:  ' + prevToDate);
 
@@ -604,9 +619,9 @@ function setDatePicker() {
 
 		$('#toDate').data('datebox').options.minDays = diffstrt;
 
-		var dif = Math.round(((new Date($('#fromDate').val()).getTime() - new Date($('#toDate').val()).getTime())) / ONE_DAY);
+		var dif = Math.round(((new Date($('#fromDate').val()).getTime() - new Date($('#toDate').val()).getTime())) / DAY_IN_MILLISECONDS);
 		if (dif > 0) {
-			var newTo = formatDate(new Date(new Date($('#fromDate').val()).getTime() + ONE_DAY), 'display');
+			var newTo = formatDate(new Date(new Date($('#fromDate').val()).getTime() + DAY_IN_MILLISECONDS), 'display');
 			$('#toDate').val(newTo);
 			$('#to').html('To:  ' + $('#toDate').val());
 			prevToDate = newTo;
