@@ -82,24 +82,6 @@ function formatDate(date, format) {
 }
 
 
-function isInputTypeFileImplemented() {
-	var elem = document.createElement("input");
-	elem.type = "file";
-	if (elem.disabled) {
-		$('.fileInput').remove();
-		return false;
-	}
-	try {
-		elem.value = "Test";
-		//Throws error if type=file is implemented
-		return elem.value !== "Test";
-	} catch (e) {
-		return elem.type === "file";
-	}
-}
-
-
-
 // check for URL query and show obs and/or avyObs if specified "TRUE"
 function checkForURLParams() {
 	var url = document.location.href;
@@ -1462,9 +1444,6 @@ function onDOMLoad() {
 		});
 
 	});
-
-	// check if file input is supported
-	isInputTypeFileImplemented();
 
 	// set validator defaults
 	jQuery.validator.setDefaults({
