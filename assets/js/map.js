@@ -1389,7 +1389,10 @@ function setUserInfo(item) {
 	$('#id_avyObs_observer-last_name').val(json.last_name);
 }
 
-
+function showCalendar (el) {
+	$thisCalendar = $(el).attr('id');
+	$('#'+$thisCalendar+'Date').datebox('open');
+}
 
 
 function init() {
