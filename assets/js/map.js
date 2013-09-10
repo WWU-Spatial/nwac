@@ -27,7 +27,7 @@ var AVALANCHE_SYMBOL_COLOR = [153, 51, 255, 0.5];
  * Use http://dev.nwac.us/api/v1/ for development and debugging
  * NOTE: the nwac api does not support cross-domain requests.  For get requests
  * you can use a jsonp callback which is supported.  For posts, the proxy server
- * will need to be changed.
+ * will need to be used.
  */
 var NWAC_API = "http://dev.nwac.us/api/v1/";
 
