@@ -1,6 +1,6 @@
 /*JSHINT Disable for ALL Other USES*/
-var esri, dojo, alert;
 /*jshint expr:true */
+/*global esri: true, dojo: true/*
 /* END JSHINT*/
 
 //initialize dojo
@@ -192,8 +192,13 @@ function formFail(error) {
 }
 
 
-
-function getSingleObs(endpoint, id, symbol, layer) {
+/*
+ * Gets an observation from the NWAC API.  Can get observations from either the 
+ * 'observation', or avalancheObservation endpoints'.  The api server does not support
+ * cross-domain requests, so we use a jsonp callback.  The callback parses the data
+ * and adds an appropriate point to the map using the addObservationToMap functoin
+ */
+function getObservationById(endpoint, id, symbol, layer) {
 	var url = 'http://dev.nwac.us/api/v1/' + endpoint + '/' + id + '/';
 	$.ajax({
 		url : url,
@@ -210,6 +215,12 @@ function getSingleObs(endpoint, id, symbol, layer) {
 	});
 }
 
+/*
+ * Adds an observation to the map using the appropriate symbol and observation type. 
+ * snowpack/weather observations get added to the 'obsLayer' and avalanche observations
+ * get added to the avyObsLayer using the appropriate symbols and layers passed in with 
+ * the symbol and layer parameters
+ */
 function addObservationToMap(symbol, layer, data) {
 	var pt = esri.geometry.geographicToWebMercator(new esri.geometry.Point(data.location.longitude, data.location.latitude));
 	var graphic = new esri.Graphic(pt, symbol, data);
