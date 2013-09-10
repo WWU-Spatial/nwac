@@ -179,19 +179,13 @@ function formResponse(response, form) {
 }
 
 
-
+/*
+ * Handles an unsucessful snowpack or avalanche submission by hiding the loading message
+ * and displaying a popup alert
+ */
 function formFail(error) {
 	$.mobile.hidePageLoadingMsg();
 	alert('Oops, error adding your observation', error);
-	console.log(error);
-}
-
-
-
-function stabTestFormResponse() {
-	$('#stabTestDivLabel').html('Add another stability test?');
-	$.mobile.changePage('#mapPage');
-	resetForms(form);
 }
 
 
