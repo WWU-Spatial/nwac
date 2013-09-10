@@ -116,15 +116,23 @@ function checkForURLParams() {
 }
 
 
-
-function stabFormReturn(data, form) {
+/*
+ * This function runs upon the completion of a Stability Test form
+ * submission.  If the form was submitted correctly (statusText === 'OK') then
+ * the add stability dialog box's main message is changed to 'Add another stability
+ * test?', the forms fields are reset, and the page changes from the stability form
+ * to the main map page where the add stability form dialog is still showing from
+ * the initial submission.  If the form is not correctly processed, then an alert
+ * message is presented to the user.
+ * NOTE: The add stability dialog is displayed from another function upon successful
+ * completion of either a snowpack or avalanche observation form submittal
+ */
+function stabFormReturn(response) {
 	$.mobile.hidePageLoadingMsg();
-	var json = JSON.stringify(data, null, 2);
-	var statusText = $.parseJSON(json).statusText;
-	if (statusText === 'OK') {
+	if (response.statusText === 'OK') {
 		$('#stabTestDivLabel').html('Add another stability test?');
+		resetForms($('#stabTestForm'));
 		$.mobile.changePage('#mapPage');
-		resetForms(form);
 	} else {
 		alert('Oops, error submitting stability test');
 	}
@@ -269,7 +277,6 @@ function submitForm($this) {
 		$.each($(':file'), function() {
 			var file = this.files[0];
 			var name = $(this).attr('name');
-			console.log(name, file);
 			if (file) {
 				data.append(name, file);
 			}
@@ -1524,11 +1531,8 @@ function onDOMLoad() {
 						contentType : 'application/json',
 						dataType : "json",
 						type : 'POST',
-						success : function(response) {
-							stabTestFormResponse(response, $this);
-						},
-						error : function(data) {
-							stabFormReturn(data, $this);
+						complete : function(response) {
+							stabFormReturn(response);
 						}
 					});
 				} else {
