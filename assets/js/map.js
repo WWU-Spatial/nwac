@@ -145,7 +145,7 @@ function stabFormReturn(response) {
 	$.mobile.hidePageLoadingMsg();
 	if (response.statusText === 'OK') {
 		$('#stabTestDivLabel').html('Add another stability test?');
-		resetForms($('#stabTestForm'));
+		resetForm('stabTestForm');
 		$.mobile.changePage('#mapPage');
 	} else {
 		alert('Oops, error submitting stability test');
@@ -187,7 +187,7 @@ function formResponse(response, form) {
 	map.graphics.hide();
 	hideAskFillOutForm();
 	updateGraphicHandles();
-	resetForms(form);
+	resetForm(form);
 	$.mobile.changePage('#mapPage');
 	$.mobile.hidePageLoadingMsg();
 
@@ -241,33 +241,41 @@ function addObservationToMap(symbol, layer, data) {
 
 
 
-
-function resetForms(form) {
+/*
+ * Resets a form to it's default state by passing the name of the form to reset as a
+ * string.  Will also repopulate the firstname, lastname and email address fields
+ * from localstorage, if supported, or from a cookie
+ */
+function resetForm(formName) {
+	var form = $("[name=" + formName);
 	//reset whole form
 	form[0].reset();
 	
-	// reset checkboxes in form
-	$.each($(':checkbox'), function() {
-		var name = $(this).attr('name');
-		$('input[name=' + name + ']').attr('checked', false).checkboxradio("refresh");
-	});
+	// Uncheck all checkboxes in form
+	form.find(':checkbox').attr('checked', false).checkboxradio("refresh");
 
-	//reset select menus in form
-
+	//reset select menus to their blank default
 	form.find("select").val('').selectmenu("refresh", true);
 
-	if (form.attr("name") === 'obsForm') {
+	//Set the observation form units field back to feet
+	if (formName === 'obsForm') {
 			$('#obs_location-elevation_units').val('feet').selectmenu("refresh", true);
 	};
 	
-	if (form.attr("name") === 'avyObsForm') {
+	//Set the avalanche form units field back to feet
+	if (formName === 'avyObsForm') {
 		$('#avy_location-elevation_units').val('feet').selectmenu("refresh", true);
 	}
 		
-
-	//	refill user info if stored
-	if (form.attr("name") !== 'stabTestForm') {
-		useLocalStorage ? setUserInfo(window.localStorage.getItem(storeUser)) : setUserInfo(dojo.cookie(storeUser));
+	//Repopulate user info (email, firstname, lastname) from storage/cookie
+	if (formName !== 'stabTestForm') {
+		if (useLocalStorage) {
+			//Get from local storage if supported in the browser
+			setUserInfo(window.localStorage.getItem(storeUser));
+		} else {
+			//Otherwise, get from a cookie
+			setUserInfo(dojo.cookie(storeUser));
+		}
 	}
 }
 
@@ -311,7 +319,7 @@ function submitForm($this) {
 			processData : false,
 			type : 'POST',
 			success : function(response) {
-				formResponse(response, $this);
+				formResponse(response, $this[0].name);
 			},
 			error : function(error) {
 				formFail(error);
