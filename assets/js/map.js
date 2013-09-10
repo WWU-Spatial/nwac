@@ -1,5 +1,5 @@
 /*JSHINT Disable for ALL Other USES*/
-var esri, dojo, alert;
+/*var esri, dojo, alert;
 /*jshint expr:true */
 /* END JSHINT*/
 
@@ -16,6 +16,8 @@ dojo.require("esri.tasks.geometry");
 
 /********************************** CONSTANTS *************************************/
 var DAY_IN_MILLISECONDS = 1000 * 60 * 60 * 24;
+var SNOWPACK_SYMBOL_COLOR = [0, 153, 255, 0.5];
+var AVALANCHE_SYMBOL_COLOR = [153, 51, 255, 0.5];
 
 
 /******************************** GLOBAL VARIABLES ********************************/
@@ -139,6 +141,44 @@ function stabFormReturn(response) {
 }
 
 
+/*
+ * Processes a successful avalanche or observation form response.  Gets the object
+ * id of the observation.  The id is created on the server and returned as part of the
+ * response.  The id is set to the global lastObsAdded variable.  This is used for any
+ * subsequent stability tests that need to be linked to the observation.
+ * Additionally, an appropriate symbol is created for the point and added to the correct
+ * layer for the observation type.
+ */
+function formResponse(response, form) {
+	var layer;
+	var symbol = new esri.symbol.SimpleMarkerSymbol();
+	
+	//set for stabTest adds
+	lastObsAdded = response.id;
+
+	// add the graphic to correct graphicsLayer if layer already populated
+	switch (addObType) {
+		case 'addObByClick' || 'addObByGeoloc':
+			symbol.setColor(new dojo.Color(SNOWPACK_SYMBOL_COLOR));
+			layer = map.getLayer('obsLayer');
+			!obsGotten ? null : getSingleObs('observation', lastObsAdded, symbol, layer);
+			askAddStabTest();
+			break;
+		case 'addAvyObByClick' || 'addAvyObByGeoloc':
+			symbol.setColor(new dojo.Color(AVALANCHE_SYMBOL_COLOR));
+			layer = map.getLayer('avyObsLayer');
+			!avyObsGotten ? null : getSingleObs('avalancheObservation', lastObsAdded, symbol, layer);
+			break;
+	}
+	map.graphics.hide();
+	hideAskFillOutForm();
+	updateGraphicHandles();
+	resetForms(form);
+	$.mobile.changePage('#mapPage');
+	$.mobile.hidePageLoadingMsg();
+}
+
+
 
 function formFail(error) {
 	$.mobile.hidePageLoadingMsg();
@@ -222,37 +262,7 @@ function resetForms(form) {
 
 
 
-function formResponse(response, form) {
-	//	console.log('response is: ', response);
-	$.mobile.hidePageLoadingMsg();
 
-	var json = JSON.stringify(response, null, 2);
-	var id = $.parseJSON(json).id;
-	//set for stabTest adds
-	lastObsAdded = id;
-	var layer;
-	var sym = new esri.symbol.SimpleMarkerSymbol();
-
-	// add the graphic to correct graphicsLayer if layer already populated
-	switch (addObType) {
-		case 'addObByClick' || 'addObByGeoloc':
-			sym.setColor(new dojo.Color([0, 153, 255, 0.5]));
-			layer = map.getLayer('obsLayer');
-			!obsGotten ? null : getSingleObs('observation', id, sym, layer);
-			askAddStabTest();
-			break;
-		case 'addAvyObByClick' || 'addAvyObByGeoloc':
-			sym.setColor(new dojo.Color([153, 51, 255, 0.5]));
-			layer = map.getLayer('avyObsLayer');
-			!avyObsGotten ? null : getSingleObs('avalancheObservation', id, sym, layer);
-			break;
-	}
-	map.graphics.hide();
-	hideAskFillOutForm();
-	updateGraphicHandles();
-	$.mobile.changePage('#mapPage');
-	resetForms(form);
-}
 
 
 
@@ -408,7 +418,7 @@ function requestFailed(error) {
 function addObsLayer(data) {
 	var sym = new esri.symbol.SimpleMarkerSymbol();
 	var obsLayer = new esri.layers.GraphicsLayer();
-	sym.setColor(new dojo.Color([0, 153, 255, 0.5]));
+	sym.setColor(new dojo.Color(SNOWPACK_SYMBOL_COLOR));
 	obsLayer.id = 'obsLayer';
 	obsGotten = true;
 	//Add to map
@@ -430,7 +440,7 @@ function addObsLayer(data) {
 function addAvyObsLayer(data) {
 	var sym = new esri.symbol.SimpleMarkerSymbol();
 	var avyObsLayer = new esri.layers.GraphicsLayer();
-	sym.setColor(new dojo.Color([153, 51, 255, 0.5]));
+	sym.setColor(new dojo.Color(AVALANCHE_SYMBOL_COLOR));
 	avyObsLayer.id = 'avyObsLayer';
 	avyObsGotten = true;
 
@@ -887,10 +897,10 @@ function changeSymbol(gr, val, id) {
 		gr.setSymbol(highlighted);
 	} else if (val === 'reset') {
 		if (id === "obsLayer_layer") {
-			sym.setColor(new dojo.Color([0, 153, 255, 0.5]));
+			sym.setColor(new dojo.Color(SNOWPACK_SYMBOL_COLOR));
 			gr.setSymbol(sym);
 		} else if (id === "avyObsLayer_layer") {
-			sym.setColor(new dojo.Color([153, 51, 255, 0.5]));
+			sym.setColor(new dojo.Color(AVALANCHE_SYMBOL_COLOR));
 			gr.setSymbol(sym);
 		}
 	}
@@ -1412,8 +1422,8 @@ function init() {
 
 	// set symbols colors
 	currentLocSymbol = new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 12, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([210, 150, 50, 0.5]), 8), new dojo.Color([210, 150, 50, 0.9]));
-	avyObsSymbol = new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 12, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([153, 51, 255, 0.5]), 8), new dojo.Color([153, 51, 255, 0.9]));
-	obsSymbol = new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 12, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([0, 153, 255, 0.5]), 8), new dojo.Color([0, 153, 255, 0.9]));
+	avyObsSymbol = new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 12, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color(AVALANCHE_SYMBOL_COLOR), 8), new dojo.Color([153, 51, 255, 0.9]));
+	obsSymbol = new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 12, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color(SNOWPACK_SYMBOL_COLOR), 8), new dojo.Color([0, 153, 255, 0.9]));
 	highlighted = new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 20, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([0, 0, 0]), 2), new dojo.Color([245, 7, 189, 0.5]));
 
 	// preemptively add graphic so it appears at first click when adding an observation	-- hacky but works
