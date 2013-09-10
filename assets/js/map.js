@@ -20,6 +20,13 @@ var SNOWPACK_SYMBOL_COLOR = [0, 153, 255, 0.5];
 var AVALANCHE_SYMBOL_COLOR = [153, 51, 255, 0.5];
 
 
+/************************************* APIS ***************************************/
+
+//Use http://www.nwac.us/api/v1/ for production
+//Use http://dev.nwac.us/api/v1/ for development and debugging
+var NWAC_API = "http://dev.nwac.us/api/v1/";
+
+
 /******************************** GLOBAL VARIABLES ********************************/
 var map;
 var basemaps;
@@ -199,7 +206,7 @@ function formFail(error) {
  * and adds an appropriate point to the map using the addObservationToMap functoin
  */
 function getObservationById(endpoint, id, symbol, layer) {
-	var url = 'http://dev.nwac.us/api/v1/' + endpoint + '/' + id + '/';
+	var url = NWAC_API + endpoint + '/' + id + '/';
 	$.ajax({
 		url : url,
 		contentType : 'application/json',
@@ -387,7 +394,7 @@ function getObs(kind) {
 	type = kind;
 	// add day so obs request contains the last day in range
 	var plusDay = new Date(new Date(prevToDate).getTime() + DAY_IN_MILLISECONDS);
-	var url = 'http://dev.nwac.us/api/v1/' + type + '/';
+	var url = NWAC_API + type + '/';
 	var request = esri.request({
 		url : url,
 		// Service parameters if required, sent with URL as key/value pairs
@@ -469,7 +476,7 @@ function addAvyObsLayer(data) {
 function getStabTest(gr, id) {
 	var num = gr.attributes.id;
 	// add day so obs request contains the last day in range
-	var url = 'http://dev.nwac.us/api/v1/stabilityTest/';
+	var url = NWAC_API + 'stabilityTest/';
 	var rq = esri.request({
 		url : url,
 		content : {
