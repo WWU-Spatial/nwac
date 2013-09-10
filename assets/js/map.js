@@ -1,5 +1,5 @@
 /*JSHINT Disable for ALL Other USES*/
-/*var esri, dojo, alert;
+var esri, dojo, alert;
 /*jshint expr:true */
 /* END JSHINT*/
 
@@ -152,6 +152,7 @@ function stabFormReturn(response) {
 function formResponse(response, form) {
 	var layer;
 	var symbol = new esri.symbol.SimpleMarkerSymbol();
+	var endpoint;
 	
 	//set for stabTest adds
 	lastObsAdded = response.id;
@@ -161,21 +162,23 @@ function formResponse(response, form) {
 		case 'addObByClick' || 'addObByGeoloc':
 			symbol.setColor(new dojo.Color(SNOWPACK_SYMBOL_COLOR));
 			layer = map.getLayer('obsLayer');
-			!obsGotten ? null : getSingleObs('observation', lastObsAdded, symbol, layer);
+			endpoint = 'observation';
 			askAddStabTest();
 			break;
 		case 'addAvyObByClick' || 'addAvyObByGeoloc':
 			symbol.setColor(new dojo.Color(AVALANCHE_SYMBOL_COLOR));
 			layer = map.getLayer('avyObsLayer');
-			!avyObsGotten ? null : getSingleObs('avalancheObservation', lastObsAdded, symbol, layer);
+			endpoint = 'avalancheObservation';
 			break;
 	}
+	getSingleObs(endpoint, lastObsAdded, symbol, layer);
 	map.graphics.hide();
 	hideAskFillOutForm();
 	updateGraphicHandles();
 	resetForms(form);
 	$.mobile.changePage('#mapPage');
 	$.mobile.hidePageLoadingMsg();
+
 }
 
 
@@ -190,22 +193,27 @@ function formFail(error) {
 
 
 
-function getSingleObs(kind, id, sym, layer) {
-	var url = 'http://dev.nwac.us/api/v1/' + kind + '/' + id;
-	var request = esri.request({
+function getSingleObs(endpoint, id, symbol, layer) {
+	var url = 'http://dev.nwac.us/api/v1/' + endpoint + '/' + id + '/';
+	$.ajax({
 		url : url,
-		// Service parameters if required, sent with URL as key/value pairs
-		content : {
-			format : 'json'
+		contentType : 'application/json',
+		dataType : "jsonp",
+		data : {'format' : 'jsonp'},
+		type : 'GET',
+		success : function(data) {
+			addObservationToMap(symbol, layer, data);
 		},
-		// Returned data format
-		handleAs : "json"
+		error : function(error) {
+			console.log(error);
+		}
 	});
-	request.then(function(data) {
-		var pt = esri.geometry.geographicToWebMercator(new esri.geometry.Point(data.location.longitude, data.location.latitude));
-		var gr = new esri.Graphic(pt, sym, data);
-		layer.add(gr);
-	}, requestFailed);
+}
+
+function addObservationToMap(symbol, layer, data) {
+	var pt = esri.geometry.geographicToWebMercator(new esri.geometry.Point(data.location.longitude, data.location.latitude));
+	var graphic = new esri.Graphic(pt, symbol, data);
+	layer.add(graphic);
 }
 
 
