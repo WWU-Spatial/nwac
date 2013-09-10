@@ -247,7 +247,7 @@ function addObservationToMap(symbol, layer, data) {
  * from localstorage, if supported, or from a cookie
  */
 function resetForm(formName) {
-	var form = $("[name=" + formName);
+	var form = $('[name"' + formName + '"]');
 	//reset whole form
 	form[0].reset();
 	
@@ -285,7 +285,10 @@ function resetForm(formName) {
 
 
 
-function submitForm($this) {
+function submitForm(formName) {
+	var form = $('name=' + formName);
+	
+	
 	if (window.FormData !== undefined) {
 		var data = new FormData();
 		$this.serializeArray().forEach(function(field) {
