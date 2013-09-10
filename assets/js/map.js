@@ -22,8 +22,13 @@ var AVALANCHE_SYMBOL_COLOR = [153, 51, 255, 0.5];
 
 /************************************* APIS ***************************************/
 
-//Use http://www.nwac.us/api/v1/ for production
-//Use http://dev.nwac.us/api/v1/ for development and debugging
+/*
+ * Use http://www.nwac.us/api/v1/ for production
+ * Use http://dev.nwac.us/api/v1/ for development and debugging
+ * NOTE: the nwac api does not support cross-domain requests.  For get requests
+ * you can use a jsonp callback which is supported.  For posts, the proxy server
+ * will need to be changed.
+ */
 var NWAC_API = "http://dev.nwac.us/api/v1/";
 
 
@@ -235,43 +240,35 @@ function addObservationToMap(symbol, layer, data) {
 }
 
 
+
+
 function resetForms(form) {
 	//reset whole form
 	form[0].reset();
+	
 	// reset checkboxes in form
-	try {
-		$.each($(':checkbox'), function() {
-			var name = $(this).attr('name');
-			$('input[name=' + name + ']').attr('checked', false).checkboxradio("refresh");
-		});
-	} catch(err) {/*do nothing other than catch err*/
-	}
+	$.each($(':checkbox'), function() {
+		var name = $(this).attr('name');
+		$('input[name=' + name + ']').attr('checked', false).checkboxradio("refresh");
+	});
 
 	//reset select menus in form
-	try {
-		form.find("select").val('').selectmenu("refresh", true);
-	} catch (e) {
-		console.log(e);
-	}
-	form.attr("name") === 'obsForm' ? function() {
-		try {
+
+	form.find("select").val('').selectmenu("refresh", true);
+
+	if (form.attr("name") === 'obsForm') {
 			$('#obs_location-elevation_units').val('feet').selectmenu("refresh", true);
-		} catch (e) {
-			console.log(e);
-		}
-	} : null;
-	form.attr("name") === 'avyObsForm' ? function() {
-		try {
-			$('#avy_location-elevation_units').val('feet').selectmenu("refresh", true);
-		} catch (e) {
-			console.log(e);
-		}
-	} : null;
+	};
+	
+	if (form.attr("name") === 'avyObsForm') {
+		$('#avy_location-elevation_units').val('feet').selectmenu("refresh", true);
+	}
+		
 
 	//	refill user info if stored
-	form.attr("name") !== 'stabTestForm' ? function() {
+	if (form.attr("name") !== 'stabTestForm') {
 		useLocalStorage ? setUserInfo(window.localStorage.getItem(storeUser)) : setUserInfo(dojo.cookie(storeUser));
-	} : null;
+	}
 }
 
 
