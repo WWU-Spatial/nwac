@@ -202,17 +202,11 @@ function getSingleObs(kind, id, sym, layer) {
 		handleAs : "json"
 	});
 	request.then(function(data) {
-		appendOb(layer, data, sym);
+		var pt = esri.geometry.geographicToWebMercator(new esri.geometry.Point(data.location.longitude, data.location.latitude));
+		var gr = new esri.Graphic(pt, sym, data);
+		layer.add(gr);
 	}, requestFailed);
 }
-
-function appendOb(layer, data, sym) {
-	var pt = esri.geometry.geographicToWebMercator(new esri.geometry.Point(data.location.longitude, data.location.latitude));
-	var gr = new esri.Graphic(pt, sym, data);
-	layer.add(gr);
-}
-
-
 
 
 function resetForms(form) {
