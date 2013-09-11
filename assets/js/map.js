@@ -51,7 +51,6 @@ var symbol;
 var RegionsBoth;
 var query, queryTask;
 var initExtent;
-var form;
 var basemapGallery;
 var today = formatDate(new Date(), 'display');
 var showObsAttsHandle, showAvyObsAttsHandle;
@@ -161,7 +160,7 @@ function stabFormReturn(response) {
  * Additionally, an appropriate symbol is created for the point and added to the correct
  * layer for the observation type.
  */
-function formResponse(response, form) {
+function formResponse(response, formName) {
 	var layer;
 	var symbol = new esri.symbol.SimpleMarkerSymbol();
 	var endpoint;
@@ -173,21 +172,21 @@ function formResponse(response, form) {
 	switch (addObType) {
 		case 'addObByClick' || 'addObByGeoloc':
 			symbol.setColor(new dojo.Color(SNOWPACK_SYMBOL_COLOR));
-			layer = map.getLayer('obsLayer');
+			layer = 'obsLayer';
 			endpoint = 'observation';
 			askAddStabTest();
 			break;
 		case 'addAvyObByClick' || 'addAvyObByGeoloc':
 			symbol.setColor(new dojo.Color(AVALANCHE_SYMBOL_COLOR));
-			layer = map.getLayer('avyObsLayer');
+			layer = 'avyObsLayer';
 			endpoint = 'avalancheObservation';
 			break;
 	}
-	getSingleObs(endpoint, lastObsAdded, symbol, layer);
+	getObservationById(endpoint, lastObsAdded, symbol, layer);
 	map.graphics.hide();
 	hideAskFillOutForm();
 	updateGraphicHandles();
-	resetForm(form);
+	resetForm(formName);
 	$.mobile.changePage('#mapPage');
 	$.mobile.hidePageLoadingMsg();
 
@@ -210,7 +209,7 @@ function formFail(error) {
  * cross-domain requests, so we use a jsonp callback.  The callback parses the data
  * and adds an appropriate point to the map using the addObservationToMap functoin
  */
-function getObservationById(endpoint, id, symbol, layer) {
+function getObservationById(endpoint, id, symbol, layerName) {
 	var url = NWAC_API + endpoint + '/' + id + '/';
 	$.ajax({
 		url : url,
@@ -219,7 +218,7 @@ function getObservationById(endpoint, id, symbol, layer) {
 		data : {'format' : 'jsonp'},
 		type : 'GET',
 		success : function(data) {
-			addObservationToMap(symbol, layer, data);
+			addObservationToMap(symbol, layerName, data);
 		},
 		error : function(error) {
 			console.log(error);
@@ -233,7 +232,8 @@ function getObservationById(endpoint, id, symbol, layer) {
  * get added to the avyObsLayer using the appropriate symbols and layers passed in with 
  * the symbol and layer parameters
  */
-function addObservationToMap(symbol, layer, data) {
+function addObservationToMap(symbol, layerName, data) {
+	var layer = map.getLayer(layerName);
 	var pt = esri.geometry.geographicToWebMercator(new esri.geometry.Point(data.location.longitude, data.location.latitude));
 	var graphic = new esri.Graphic(pt, symbol, data);
 	layer.add(graphic);
@@ -247,7 +247,7 @@ function addObservationToMap(symbol, layer, data) {
  * from localstorage, if supported, or from a cookie
  */
 function resetForm(formName) {
-	var form = $('[name"' + formName + '"]');
+	var form = $('[name="' + formName + '"]');
 	//reset whole form
 	form[0].reset();
 	
@@ -260,7 +260,7 @@ function resetForm(formName) {
 	//Set the observation form units field back to feet
 	if (formName === 'obsForm') {
 			$('#obs_location-elevation_units').val('feet').selectmenu("refresh", true);
-	};
+	}
 	
 	//Set the avalanche form units field back to feet
 	if (formName === 'avyObsForm') {
@@ -281,75 +281,38 @@ function resetForm(formName) {
 
 
 
-
-
-
-
+/*
+ * This function submits either the snowpack or avalanche observation forms using
+ * the jQuery Form Plugin (http://jquery.malsup.com/form/).  This plugin allows
+ * file attachments to be sent through ajax on older browsers using an iFrame method
+ * or using FormData method on newer browsers.
+ * Additionally, the datetime field has a 12:00 hour appended to it and a location
+ * field is added based on the location where the observation was added (by glick
+ * or GPS)
+ */
 function submitForm(formName) {
-	var form = $('name=' + formName);
+	var form = $('[name="' + formName + '"]');
+	//Append 12:00 to the date to match the NWAC format 
+	var dateField = form.find(':input[name=datetime]');
+	var date = formatDate(new Date(dateField.val())) + " 12:00";
+	dateField.val(date);
 	
-	
-	if (window.FormData !== undefined) {
-		var data = new FormData();
-		$this.serializeArray().forEach(function(field) {
-			switch (field.name) {
-				case 'datetime':
-					var dt = new Date(field.value);
-					field.value = formatDate(dt, 'obs') + ' 12:00';
-					data.append(field.name, field.value);
-					break;
-			}
-			data.append(field.name, field.value);
-		});
-
-		//append region name to FormData
-		data.append('location-region', zone);
-
-		// add image files to FormData if they have been selected
-		$.each($(':file'), function() {
-			var file = this.files[0];
-			var name = $(this).attr('name');
-			if (file) {
-				data.append(name, file);
-			}
-		});
-
-		$.ajax({
-			url : proxyUrl + '?' + $this.attr('action'),
-			data : data,
-			cache : false,
-			contentType : false,
-			processData : false,
-			type : 'POST',
-			success : function(response) {
-				formResponse(response, $this[0].name);
-			},
-			error : function(error) {
-				formFail(error);
-			}
-		});
-	} else {
-		var dtf = $this.find(':input[name=datetime]');
-		dtf.val(formatDate(new Date(dtf.val()), 'obs') + ' 12:00');
-		var options = {
-			url : proxyUrl + '?' + $this.attr('action'),
-			//add location-region
-			data : {
-				'location-region' : zone
-			},
-			cache : false,
-			contentType : false,
-			processData : false,
-			type : 'POST',
-			success : function(response) {
-				formResponse(response, $this);
-			},
-			error : function(error) {
-				formFail(error);
-			}
-		};
-		$this.ajaxSubmit(options);
-	}
+	var options = {
+		url : proxyUrl + '?' + form.attr('action'),
+		data : {
+			'location-region' : zone
+		},
+		type : 'POST',
+		dataType: 'json',
+		success : function(response) {
+			formResponse(response, formName);
+		},
+		error : function(error) {
+			console.log('error', error);
+			formFail(error);
+		}
+	};
+	form.ajaxSubmit(options);
 }
 
 
@@ -1524,9 +1487,7 @@ function onDOMLoad() {
 
 		//show the default loading message while the $.post request is sent
 		$.mobile.showPageLoadingMsg();
-		console.log('submitting');
 		if (formName === 'stabTestForm') {
-			console.log('stabTestForm');
 			if ($(this).valid()) {
 				var obsID = lastObsAdded;
 				var empty = true;
@@ -1580,7 +1541,6 @@ function onDOMLoad() {
 			}
 		} else {
 			if (formName === "obsForm") {
-				console.log('obsForm');
 				if ($('#id_snowpit_profile_image_url').val().length > 0 && $('#id_snowpit_profile_image_url').val().substr(0, 7) !== 'http://') {
 					$('#id_snowpit_profile_image_url').val('http://' + $('#id_snowpit_profile_image_url').val());
 					$(this).validate({
@@ -1592,7 +1552,7 @@ function onDOMLoad() {
 
 				if ($(this).valid()) {
 					refreshUserInfo($('#id_obs_observer-email').val(), $('#id_obs_observer-first_name').val(), $('#id_obs_observer-last_name').val());
-					submitForm($this);
+					submitForm(formName);
 				} else {
 					$.mobile.hidePageLoadingMsg();
 					alert('Please fill out required fields');
@@ -1600,7 +1560,7 @@ function onDOMLoad() {
 			} else {//avyObsForm
 				if ($(this).valid()) {
 					refreshUserInfo($('#id_avyObs_observer-email').val(), $('#id_avyObs_observer-first_name').val(), $('#id_avyObs_observer-last_name').val());
-					submitForm($this);
+					submitForm(formName);
 				} else {
 					$.mobile.hidePageLoadingMsg();
 					alert('Please fill out required fields');
