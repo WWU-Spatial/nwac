@@ -598,9 +598,9 @@ function setDatePicker() {
 	$('#from').html('From:  ' + prevFromDate);
 	$('#to').html('To:  ' + prevToDate);
 
-	$('#fromDate').live('change', function() {
+	$('#fromDate').on('change', function() {
 		var temp = new Date();
-		var diff = parseInt(($('#fromDate').data('datebox').theDate - temp) / (1000 * 60 * 60 * 24 ), 10);
+		var diff = parseInt(($('#fromDate').datebox('getTheDate') - temp) / (1000 * 60 * 60 * 24 ), 10);
 		var diffstrt = (diff * -1) - 1;
 		// If you want a minimum of 1 day between, make this -2 instead of -1
 
@@ -1461,7 +1461,7 @@ function onDOMLoad() {
 
 	// make toolbars not disappear
 	$(document).delegate('[data-role=page]', 'pageinit', function() {
-		$.mobile.fixedToolbars.setTouchToggleEnabled(false);
+		$.mobile.fixedtoolbar({ tapToggle: false });
 	});
 
 	$('#dateLabel').html("NWAC Mobile");

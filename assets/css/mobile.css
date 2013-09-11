@@ -173,50 +173,8 @@ overflow: hidden!important;
 50%;
 }
 
-.ui-btn-inner .ui-btn-text
-{
-  white-space:normal!important;
-}
 
-div.ui-slider-switch a.ui-slider-handle
-{
-  width:100%!important;
-  margin-left:-100%!important;
-}
 
-label.error
-{
-  float:none;
-  color:red;
-  padding-left:.5em;
-  vertical-align:top;
-}
-
-em
-{
-  font-weight:700;
-  padding-right:1em;
-  vertical-align:top;
-}
-
-#sliderLI > div > div.ui-slider-labelbg.ui-slider-labelbg-a.ui-btn-active.ui-btn-corner-left
-{
-  background:#93F!important;
-}
-
-#sliderLI > div > div.ui-slider-labelbg.ui-slider-labelbg-b.ui-btn-down-c.ui-btn-corner-right
-{
-  background:#09F!important;
-}
-
-#sliderLI > div > div > a > span.ui-slider-label.ui-slider-label-b.ui-btn-down-c.ui-btn-corner-right
-{
-  font-weight:700;
-  color:#FFF;
-  cursor:pointer;
-  text-shadow:0 -1px 1px #145072;
-  text-decoration:none;
-}
 
 #mapPage
 {
@@ -281,30 +239,7 @@ em
   top:10px;
 }
 
-.ui-field-contain .ui-select,div.ui-slider
-{
-  width:100%!important;
-}
 
-.ui-datebox-griddate.ui-corner-all.ui-btn-up-c.ui-datebox-griddate-disable
-{
-  color:#111!important;
-  background-image:0!important;
-  background-image:0!important;
-  background-image:0!important;
-  background-image:0!important;
-  background-image:0!important;
-}
-
-.ui-field-contain .ui-input-datebox
-{
-  display:none!important;
-}
-
-.ui-input-datebox.ui-shadow-inset.ui-corner-all.ui-body-c
-{
-  display:none!important;
-}
 
 #footerGroup
 {

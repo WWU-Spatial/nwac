@@ -8,17 +8,24 @@
     
     <title>NWAC Mobile</title>
 	<link rel="shortcut icon" href="images/favicon.ico">
-	<link rel="stylesheet" type="text/css" href="assets/css/mobile.css">
-	<link rel="stylesheet" type="text/css" href="http://serverapi.arcgisonline.com/jsapi/arcgis/3.2/js/esri/css/esri.css" />
+	
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css"/>
+	<link rel="stylesheet" href="http://js.arcgis.com/3.6/js/esri/css/esri.css">
 	<link rel="stylesheet" type="text/css" href="assets/css/jqm-datebox.min.css" /> 
-	
-	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.0.1/jquery.mobile-1.0.1.min.css"/>
-	 
-	
-
-    <script type="text/javascript" src="http://serverapi.arcgisonline.com/jsapi/arcgis/?v=3.2compact"></script>
-	<script type="text/javascript" src="http://code.jquery.com/jquery-1.6.4.min.js"></script>	
+	<link rel="stylesheet" href="assets/css/jquery.mobile.simpledialog.min.css"/>
+	<link rel="stylesheet" type="text/css" href="assets/css/mobile.css">
+    
+	<script type="text/javascript" src="http://code.jquery.com/jquery-1.10.2.min.js"></script>	
+	<script type="text/javascript" src="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js"></script>
 	<script type="text/javascript" src="assets/js/jquery.validate.js"></script>
+    <script type="text/javascript" src="assets/js/jquery.form.js"></script>
+    <script type="text/javascript" src="http://dev.jtsage.com/cdn/datebox/latest/jqm-datebox.core.min.js"></script>
+	<script type="text/javascript" src="http://dev.jtsage.com/cdn/datebox/latest/jqm-datebox.mode.calbox.min.js"></script>
+	<script type="text/javascript" src="http://dev.jtsage.com/cdn/datebox/i18n/jquery.mobile.datebox.i18n.en_US.utf8.js"></script>
+	<script type="text/javascript" src="assets/js/jquery.mobile.simpledialog.min.js"></script>
+	<script src="http://js.arcgis.com/3.6compact/"></script>
+    <script type="text/javascript">var dojoConfig = {parseOnLoad : true};</script>	
+	<script type="text/javascript" src="assets/js/map.js"></script>
 	
 	<script type="text/javascript">
 			(function(){
@@ -28,12 +35,6 @@
 			});
 		})();
 	</script>	
-	<script type="text/javascript">var dojoConfig = {parseOnLoad : true}</script>			
-    <script type="text/javascript" src="http://code.jquery.com/mobile/1.0.1/jquery.mobile-1.0.1.min.js"></script>
-    <script type="text/javascript" src="assets/js/jquery.form.js"></script>
-	<script type="text/javascript" src="assets/js/map.js"></script>
-	<script type="text/javascript" src="assets/js/jquery.mobile.datebox.min.js"></script>
-	<script type="text/javascript" src="assets/js/jquery.mobile.simpledialog.min.js"></script>
 
   </head>
   
@@ -197,11 +198,10 @@
 							</select>
 						</div>	
 					</li>
-					<!--<li><fieldset id="calButtonGroup" data-role="controlgroup" data-type="horizontal"> -->
-							<li><a class="calButton" id="from" data-role="button" href="#" onclick="showCalendar($(this));">Select date from...</a></li>
-							<li><a class="calButton" id="to" data-role="button" href="#" onclick="showCalendar($(this));">Select date to...</a></li>
-								<input name="fromDate" id="fromDate" type="date" data-role="datebox" data-options='{"mode": "calbox", "pickPageButtonTheme": "c", "pickPageTodayButtonTheme": "e", "pickPageHighButtonTheme": "b", "dateFormat": "%m/%d/%Y", "centerWindow": true, "themeDatePick": "b", "hideInput": true, "beforeToday": true}' onchange="changeDates($(this)); $('#from').html('From:  ' + $(this).val() )"/>
-								<input name="toDate" id="toDate" type="date" data-role="datebox" data-options='{"mode": "calbox", "pickPageButtonTheme": "c", "pickPageTodayButtonTheme": "e", "pickPageHighButtonTheme": "b", "dateFormat": "%m/%d/%Y", "centerWindow": true, "themeDatePick": "b", "hideInput": true, "maxDays": 0}' onchange="changeDates($(this)); $('#to').html('To:  ' + $(this).val() );"/>				
+					<li><a class="calButton" id="from" data-role="button" href="#" onclick="showCalendar($(this));">Select date from...</a></li>
+					<li><a class="calButton" id="to" data-role="button" href="#" onclick="showCalendar($(this));">Select date to...</a></li>
+						<input name="fromDate" id="fromDate" type="date" data-role="datebox" data-options='{"mode": "calbox", "theme": "c", "beforeToday": true, "centerHoriz": true, "centerVert":true, "hideInput":true, "useHeader": false}' onchange="changeDates($(this)); $('#from').html('From:  ' + $(this).val() )"/>
+						<input name="toDate" id="toDate" type="date" data-role="datebox" data-options='{"mode": "calbox", "theme": "c", "beforeToday": true, "centerHoriz": true, "centerVert":true, "hideInput":true, "useHeader": false}' onchange="changeDates($(this)); $('#to').html('To:  ' + $(this).val() );"/>				
 					<li><a onClick="$.mobile.changePage('#addObsPage',{changeHash: false})" data-role="button">Add an observation</a></li>
 				</ul>
 			</div>	
