@@ -321,7 +321,6 @@ function submitForm(formName) {
  */
 function toggleObservationLayer(layerName, visibility) {
 	$.mobile.showPageLoadingMsg();
-	
 	if (visibility === 'show') {
 		// disconnect addGraphic handler when showing obs
 		if (addGraphicHandle) {
@@ -379,7 +378,7 @@ function getObs(kind) {
 		// Data format
 		handleAs : "json"
 	});
-	type === 'snowpack' ? request.then(obsRequestSucceeded, requestFailed) : request.then(avyObsRequestSucceeded, requestFailed);
+	type === 'observation' ? request.then(obsRequestSucceeded, requestFailed) : request.then(avyObsRequestSucceeded, requestFailed);
 }
 
 function obsRequestSucceeded(data) {
@@ -404,7 +403,6 @@ function addObsLayer(data) {
 	var obsLayer = new esri.layers.GraphicsLayer();
 	sym.setColor(new dojo.Color(SNOWPACK_SYMBOL_COLOR));
 	obsLayer.id = 'snowpack';
-	obsGotten = true;
 	//Add to map
 	map.addLayer(obsLayer);
 
@@ -426,7 +424,6 @@ function addAvyObsLayer(data) {
 	var avyObsLayer = new esri.layers.GraphicsLayer();
 	sym.setColor(new dojo.Color(AVALANCHE_SYMBOL_COLOR));
 	avyObsLayer.id = 'avalanche';
-	avyObsGotten = true;
 
 	map.addLayer(avyObsLayer);
 	//Add reports to the graphics layer
@@ -1274,8 +1271,8 @@ function disconnectShowAttsHandles() {
 
 function updateGraphicHandles() {
 	!addGraphicHandle ? null : removeAddGraphicHandles();
-	!obsGotten ? null : observationClickHandles['snowpack'] = dojo.connect(map.getLayer('snowpack'), "onClick", showAttributes);
-	!avyObsGotten ? null : observationClickHandles['avalanche'] = dojo.connect(map.getLayer('avalanche'), "onClick", showAttributes);
+	!map.getLayer('snowpack') ? null : observationClickHandles['snowpack'] = dojo.connect(map.getLayer('snowpack'), "onClick", showAttributes);
+	!map.getLayer('avalanche') ? null : observationClickHandles['avalanche'] = dojo.connect(map.getLayer('avalanche'), "onClick", showAttributes);
 }
 
 function buildRegionQuery() {
