@@ -110,7 +110,7 @@ function checkForURLParams() {
 
 		if (urlObject.query.snowpack === 'true') {
 			dojo.connect(map, "onLoad", function() {
-				show_hideObs('showObs');
+				toggleObservationLayer('showObs');
 				$('#obsFlip')[0].selectedIndex = 1;
 			});
 		}
@@ -118,7 +118,7 @@ function checkForURLParams() {
 		if (urlObject.query.avyObs) {
 			if (urlObject.query.avalanche === 'TRUE') {
 				dojo.connect(map, "onLoad", function() {
-					show_hideObs('showAvyObs');
+					toggleObservationLayer('showAvyObs');
 					$('#avyObsFlip')[0].selectedIndex = 1;
 				});
 			}
@@ -317,7 +317,7 @@ function submitForm(formName) {
 
 
 
-function show_hideObs(value) {
+function toggleObservationLayer(value) {
 	$.mobile.showPageLoadingMsg();
 	if (value === 'showObs') {
 		// disconnect addGraphic handler when showing obs
