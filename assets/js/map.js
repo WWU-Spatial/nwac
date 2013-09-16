@@ -171,13 +171,13 @@ function formResponse(response, formName) {
 	switch (addObType) {
 		case 'addObByClick' || 'addObByGeoloc':
 			symbol.setColor(new dojo.Color(SNOWPACK_SYMBOL_COLOR));
-			layer = 'obsLayer';
+			layer = 'snowpack';
 			endpoint = 'observation';
 			askAddStabTest();
 			break;
 		case 'addAvyObByClick' || 'addAvyObByGeoloc':
 			symbol.setColor(new dojo.Color(AVALANCHE_SYMBOL_COLOR));
-			layer = 'avyObsLayer';
+			layer = 'avalanche';
 			endpoint = 'avalancheObservation';
 			break;
 	}
@@ -340,23 +340,23 @@ function toggleObservationLayer(layerName, visibility) {
 			if (!obsGotten) {
 				getObs('observation');
 			} else {
-				map.getLayer('obsLayer').show();
-				observationClickHandles['snowpack'] = dojo.connect(map.getLayer('obsLayer'), "onClick", showAttributes);
+				map.getLayer('snowpack').show();
+				observationClickHandles['snowpack'] = dojo.connect(map.getLayer('snowpack'), "onClick", showAttributes);
 			}
 		} else if (layerName === 'avalanche') {
 			if (!avyObsGotten) {
 				getObs('avalancheObservation');
 			} else {
-				map.getLayer('avyObsLayer').show();
-				observationClickHandles['avalanche'] = dojo.connect(map.getLayer('avObsLayer'), "onClick", showAttributes);	
+				map.getLayer('avalanche').show();
+				observationClickHandles['avalanche'] = dojo.connect(map.getLayer('avalanche'), "onClick", showAttributes);	
 			}
 		}
 		
 	} else if (visibility === 'hide') {
 		if (layerName === 'snowpack') {
-			!map.getLayer('obsLayer') ? null : map.getLayer('obsLayer').hide();
+			!map.getLayer('snowpack') ? null : map.getLayer('snowpack').hide();
 		} else if (layerName === 'avalanche') {
-			!map.getLayer('avyObsLayer') ? null : map.getLayer('avyObsLayer').hide();
+			!map.getLayer('avalanche') ? null : map.getLayer('avalanche').hide();
 		}
 		
 	}
@@ -413,7 +413,7 @@ function addObsLayer(data) {
 	var sym = new esri.symbol.SimpleMarkerSymbol();
 	var obsLayer = new esri.layers.GraphicsLayer();
 	sym.setColor(new dojo.Color(SNOWPACK_SYMBOL_COLOR));
-	obsLayer.id = 'obsLayer';
+	obsLayer.id = 'snowpack';
 	obsGotten = true;
 	//Add to map
 	map.addLayer(obsLayer);
@@ -435,7 +435,7 @@ function addAvyObsLayer(data) {
 	var sym = new esri.symbol.SimpleMarkerSymbol();
 	var avyObsLayer = new esri.layers.GraphicsLayer();
 	sym.setColor(new dojo.Color(AVALANCHE_SYMBOL_COLOR));
-	avyObsLayer.id = 'avyObsLayer';
+	avyObsLayer.id = 'avalanche';
 	avyObsGotten = true;
 
 	map.addLayer(avyObsLayer);
@@ -1284,8 +1284,8 @@ function disconnectShowAttsHandles() {
 
 function updateGraphicHandles() {
 	!addGraphicHandle ? null : removeAddGraphicHandles();
-	!obsGotten ? null : observationClickHandles['snowpack'] = dojo.connect(map.getLayer('obsLayer'), "onClick", showAttributes);
-	!avyObsGotten ? null : observationClickHandles['avalanche'] = dojo.connect(map.getLayer('avObsLayer'), "onClick", showAttributes);
+	!obsGotten ? null : observationClickHandles['snowpack'] = dojo.connect(map.getLayer('snowpack'), "onClick", showAttributes);
+	!avyObsGotten ? null : observationClickHandles['avalanche'] = dojo.connect(map.getLayer('avalanche'), "onClick", showAttributes);
 }
 
 function buildRegionQuery() {
