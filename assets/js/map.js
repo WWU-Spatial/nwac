@@ -315,34 +315,6 @@ function submitForm(formName) {
 }
 
 
-function changeDates (cal) {
-	var id = $(cal).attr('id');
-	var val = $(cal).val();
-
-	//set for next date change...
-	if(id==='fromDate'){
-		prevFromDate=val;
-	}else{
-		prevToDate=val;
-	}
-
-	// clear obs layers and reset sliders if they are showing 
-	if($('#obsFlip')[0].selectedIndex === 1){
-		obsGotten = false;
-		map.getLayer('obsLayer').clear();	
-		$('#obsFlip')[0].selectedIndex = 0;
-		$('#obsFlip').slider('refresh');
-	}
-	
-	if($('#avyObsFlip')[0].selectedIndex === 1){
-		avyObsGotten = false;
-		map.getLayer('avyObsLayer').clear();	
-		$('#avyObsFlip')[0].selectedIndex = 0;
-		$('#avyObsFlip').slider('refresh');
-	}
-	
-	hideGoToAttsDiv();
-}
 
 
 function show_hideObs(value) {
