@@ -37,9 +37,6 @@ var map;
 var basemaps;
 var markup;
 var graphic = null;
-var type;
-var obsGotten = false;
-var avyObsGotten = false;
 var addObType;
 var prevFromDate, prevToDate;
 var storeUser = 'NWACMobileUserInfo';
@@ -339,7 +336,6 @@ function toggleObservationLayer(layerName, visibility) {
 		if (map.getLayer(layerName)) {
 			map.getLayer(layerName).show();
 			observationClickHandles[layerName] = dojo.connect(map.getLayer(layerName), "onClick", showAttributes);
-			
 		} else {
 			getObs(layerName);
 		}
