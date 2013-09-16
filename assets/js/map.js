@@ -42,7 +42,6 @@ var obsGotten = false;
 var avyObsGotten = false;
 var addObType;
 var prevFromDate, prevToDate;
-var datesChanged = false;
 var storeUser = 'NWACMobileUserInfo';
 var useLocalStorage = supports_local_storage();
 var proxyUrl;
@@ -317,7 +316,6 @@ function submitForm(formName) {
 
 
 function changeDates (cal) {
-	datesChanged = true;
 	var id = $(cal).attr('id');
 	var val = $(cal).val();
 
@@ -408,8 +406,6 @@ function getObs(kind) {
 		handleAs : "json"
 	});
 	type === 'observation' ? request.then(obsRequestSucceeded, requestFailed) : request.then(avyObsRequestSucceeded, requestFailed);
-
-	datesChanged = false;
 }
 
 function obsRequestSucceeded(data) {
