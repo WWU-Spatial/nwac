@@ -336,29 +336,18 @@ function toggleObservationLayer(layerName, visibility) {
 			observationClickHandles[layerName] ? dojo.disconnect(observationClickHandles[layerName]) : null;
 		}
 		
-		if (layerName === 'snowpack') {
-			if (!obsGotten) {
-				getObs('observation');
-			} else {
-				map.getLayer('snowpack').show();
-				observationClickHandles['snowpack'] = dojo.connect(map.getLayer('snowpack'), "onClick", showAttributes);
-			}
-		} else if (layerName === 'avalanche') {
-			if (!avyObsGotten) {
-				getObs('avalancheObservation');
-			} else {
-				map.getLayer('avalanche').show();
-				observationClickHandles['avalanche'] = dojo.connect(map.getLayer('avalanche'), "onClick", showAttributes);	
-			}
+		if (map.getLayer(layerName)) {
+			map.getLayer(layerName).show();
+			observationClickHandles[layerName] = dojo.connect(map.getLayer(layerName), "onClick", showAttributes);
+			
+		} else {
+			getObs(layerName);
 		}
 		
 	} else if (visibility === 'hide') {
-		if (layerName === 'snowpack') {
-			!map.getLayer('snowpack') ? null : map.getLayer('snowpack').hide();
-		} else if (layerName === 'avalanche') {
-			!map.getLayer('avalanche') ? null : map.getLayer('avalanche').hide();
+		if (map.getLayer(layerName)) {
+			map.getLayer(layerName).hide();
 		}
-		
 	}
 	
 	$.mobile.hidePageLoadingMsg();
@@ -373,7 +362,12 @@ function removeAddGraphicHandles() {
 }
 
 function getObs(kind) {
-	type = kind;
+	var type;
+	if (kind === "snowpack") {
+		type = 'observation';
+	} else if (kind === 'avalanche') {
+		type = 'avalancheObservation';
+	}
 	// add day so obs request contains the last day in range
 	var plusDay = new Date(new Date(prevToDate).getTime() + DAY_IN_MILLISECONDS);
 	var url = NWAC_API + type + '/';
@@ -389,7 +383,7 @@ function getObs(kind) {
 		// Data format
 		handleAs : "json"
 	});
-	type === 'observation' ? request.then(obsRequestSucceeded, requestFailed) : request.then(avyObsRequestSucceeded, requestFailed);
+	type === 'snowpack' ? request.then(obsRequestSucceeded, requestFailed) : request.then(avyObsRequestSucceeded, requestFailed);
 }
 
 function obsRequestSucceeded(data) {
