@@ -316,6 +316,35 @@ function submitForm(formName) {
 }
 
 
+function changeDates (cal) {
+	datesChanged = true;
+	var id = $(cal).attr('id');
+	var val = $(cal).val();
+
+	//set for next date change...
+	if(id==='fromDate'){
+		prevFromDate=val;
+	}else{
+		prevToDate=val;
+	}
+
+	// clear obs layers and reset sliders if they are showing 
+	if($('#obsFlip')[0].selectedIndex === 1){
+		obsGotten = false;
+		map.getLayer('obsLayer').clear();	
+		$('#obsFlip')[0].selectedIndex = 0;
+		$('#obsFlip').slider('refresh');
+	}
+	
+	if($('#avyObsFlip')[0].selectedIndex === 1){
+		avyObsGotten = false;
+		map.getLayer('avyObsLayer').clear();	
+		$('#avyObsFlip')[0].selectedIndex = 0;
+		$('#avyObsFlip').slider('refresh');
+	}
+	
+	hideGoToAttsDiv();
+}
 
 
 function show_hideObs(value) {
@@ -604,7 +633,9 @@ function setDatePicker() {
 		var diffstrt = (diff * -1) - 1;
 		// If you want a minimum of 1 day between, make this -2 instead of -1
 
-		$('#toDate').data('datebox').options.minDays = diffstrt;
+		$('#toDate').datebox({'minDays': diffstrt});
+		$('#toDate').datebox('applyMinMax');
+		
 
 		var dif = Math.round(((new Date($('#fromDate').val()).getTime() - new Date($('#toDate').val()).getTime())) / DAY_IN_MILLISECONDS);
 		if (dif > 0) {
