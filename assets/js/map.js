@@ -52,7 +52,7 @@ var query, queryTask;
 var initExtent;
 var basemapGallery;
 var today = formatDate(new Date(), 'display');
-var showObsAttsHandle, showAvyObsAttsHandle;
+var observationClickHandles = {};
 var addGraphicHandle;
 var currentLocSymbol;
 var avyObsSymbol;
@@ -110,7 +110,7 @@ function checkForURLParams() {
 
 		if (urlObject.query.snowpack === 'true') {
 			dojo.connect(map, "onLoad", function() {
-				toggleObservationLayer('showObs');
+				toggleObservationLayer('snowpack', 'show');
 				$('#obsFlip')[0].selectedIndex = 1;
 			});
 		}
@@ -118,7 +118,7 @@ function checkForURLParams() {
 		if (urlObject.query.avyObs) {
 			if (urlObject.query.avalanche === 'TRUE') {
 				dojo.connect(map, "onLoad", function() {
-					toggleObservationLayer('showAvyObs');
+					toggleObservationLayer('avalanche', 'show');
 					$('#avyObsFlip')[0].selectedIndex = 1;
 				});
 			}
@@ -316,40 +316,52 @@ function submitForm(formName) {
 
 
 
-
-function toggleObservationLayer(value) {
+/*
+ * This function toggles the visibility of the observation layers.  The two possible
+ * values for layerName are "avalanche" and "snowpack". The visibility variable can
+ * be either "hide" or "show".  This function, depending on the two variables, will
+ * toggle the visibility of the selected layer
+ */
+function toggleObservationLayer(layerName, visibility) {
 	$.mobile.showPageLoadingMsg();
-	if (value === 'showObs') {
+	
+	if (visibility === 'show') {
 		// disconnect addGraphic handler when showing obs
-		!addGraphicHandle ? null : removeAddGraphicHandles();
-		// disconnect first so doesn't repeat
-		showObsAttsHandle ? dojo.disconnect(showObsAttsHandle) : null;
-		if (!obsGotten) {
-			getObs('observation');
-		} else {
-			map.getLayer('obsLayer').show();
-			showObsAttsHandle = dojo.connect(map.getLayer('obsLayer'), "onClick", showAttributes);
-			$.mobile.hidePageLoadingMsg();
+		if (addGraphicHandle) {
+			removeAddGraphicHandles();
 		}
-	} else if (value === 'showAvyObs') {
-		// disconnect addGraphic handler when showing obs
-		!addGraphicHandle ? null : removeAddGraphicHandles();
+		
 		// disconnect first so doesn't repeat
-		showAvyObsAttsHandle ? dojo.disconnect(showAvyObsAttsHandle) : null;
-		if (!avyObsGotten) {
-			getObs('avalancheObservation');
-		} else {
-			map.getLayer('avyObsLayer').show();
-			showAvyObsAttsHandle = dojo.connect(map.getLayer('avObsLayer'), "onClick", showAttributes);
-			$.mobile.hidePageLoadingMsg();
+		if (observationClickHandles[layerName]) {
+			observationClickHandles[layerName] ? dojo.disconnect(observationClickHandles[layerName]) : null;
 		}
-	} else if (value === 'hideObs') {
-		!map.getLayer('obsLayer') ? null : map.getLayer('obsLayer').hide();
-		$.mobile.hidePageLoadingMsg();
-	} else if (value === 'hideAvyObs') {
-		!map.getLayer('avyObsLayer') ? null : map.getLayer('avyObsLayer').hide();
-		$.mobile.hidePageLoadingMsg();
+		
+		if (layerName === 'snowpack') {
+			if (!obsGotten) {
+				getObs('observation');
+			} else {
+				map.getLayer('obsLayer').show();
+				observationClickHandles['snowpack'] = dojo.connect(map.getLayer('obsLayer'), "onClick", showAttributes);
+			}
+		} else if (layerName === 'avalanche') {
+			if (!avyObsGotten) {
+				getObs('avalancheObservation');
+			} else {
+				map.getLayer('avyObsLayer').show();
+				observationClickHandles['avalanche'] = dojo.connect(map.getLayer('avObsLayer'), "onClick", showAttributes);	
+			}
+		}
+		
+	} else if (visibility === 'hide') {
+		if (layerName === 'snowpack') {
+			!map.getLayer('obsLayer') ? null : map.getLayer('obsLayer').hide();
+		} else if (layerName === 'avalanche') {
+			!map.getLayer('avyObsLayer') ? null : map.getLayer('avyObsLayer').hide();
+		}
+		
 	}
+	
+	$.mobile.hidePageLoadingMsg();
 }
 
 function removeAddGraphicHandles() {
@@ -412,7 +424,7 @@ function addObsLayer(data) {
 		var gr = new esri.Graphic(pt, sym, ob);
 		obsLayer.add(gr);
 	});
-	showObsAttsHandle = dojo.connect(obsLayer, "onClick", showAttributes);
+	observationClickHandles['snowpack'] = dojo.connect(obsLayer, "onClick", showAttributes);
 	//    type==='observation'?showObsAttsHandle=dojo.connect(obsLayer, "onClick", showAttributes):showAvyObsAttsHandle=dojo.connect(avyObsLayer, "onClick", showAttributes);
 	obsLayer.show();
 	map.reorderLayer(obsLayer, 1);
@@ -433,7 +445,7 @@ function addAvyObsLayer(data) {
 		var gr = new esri.Graphic(pt, sym, ob);
 		avyObsLayer.add(gr);
 	});
-	showAvyObsAttsHandle = dojo.connect(avyObsLayer, "onClick", showAttributes);
+	observationClickHandles['avalanche'] = dojo.connect(avyObsLayer, "onClick", showAttributes);
 	//    type==='observation'?showObsAttsHandle=dojo.connect(obsLayer, "onClick", showAttributes):showAvyObsAttsHandle=dojo.connect(avyObsLayer, "onClick", showAttributes);
 	avyObsLayer.show();
 	map.reorderLayer(avyObsLayer, 1);
@@ -894,7 +906,7 @@ function changeSymbol(gr, val, id) {
 
 function showAttributes(e) {
 	//some bug makes this neccessary so as not to repeat this handler??
-	showObsAttsHandle ? dojo.disconnect(showObsAttsHandle) : null;
+	observationClickHandles['snowpack'] ? dojo.disconnect(observationClickHandles['snowpack']) : null;
 
 	showGoToAttsDiv();
 
@@ -1266,14 +1278,14 @@ function hideAskFillOutForm() {
 }
 
 function disconnectShowAttsHandles() {
-	showObsAttsHandle ? dojo.disconnect(showObsAttsHandle) : null;
-	showAvyObsAttsHandle ? dojo.disconnect(showAvyObsAttsHandle) : null;
+	observationClickHandles['snowpack'] ? dojo.disconnect(['snowpack']) : null;
+	observationClickHandles['avalanche'] ? dojo.disconnect(observationClickHandles['avalanche']) : null;
 }
 
 function updateGraphicHandles() {
 	!addGraphicHandle ? null : removeAddGraphicHandles();
-	!obsGotten ? null : showObsAttsHandle = dojo.connect(map.getLayer('obsLayer'), "onClick", showAttributes);
-	!avyObsGotten ? null : showAvyObsAttsHandle = dojo.connect(map.getLayer('avObsLayer'), "onClick", showAttributes);
+	!obsGotten ? null : observationClickHandles['snowpack'] = dojo.connect(map.getLayer('obsLayer'), "onClick", showAttributes);
+	!avyObsGotten ? null : observationClickHandles['avalanche'] = dojo.connect(map.getLayer('avObsLayer'), "onClick", showAttributes);
 }
 
 function buildRegionQuery() {
