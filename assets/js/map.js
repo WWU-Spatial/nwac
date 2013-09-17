@@ -512,17 +512,7 @@ function hideSplashScreen() {
 
 
 
-function setDate(db) {
-	$(db).trigger('datebox', {
-		'method' : 'set',
-		'value' : today,
-		'date' : new Date()
-	}).trigger('datebox', {
-		'method' : 'doset'
-	});
-	console.log(db, $(db).val());
-	db === '#avy_Date' ? $('#avy_').html(today + '  Click to change') : $('#obs_').html(today + '  Click to change');
-}
+
 
 function setDatePicker() {
 	console.log("FUNCTION: setDatePicker");
@@ -1420,6 +1410,21 @@ function init() {
 	}
 }
 
+
+function setDate(inputId) {
+	$(inputId).trigger('datebox', {
+		'method' : 'set',
+		'value' : today,
+		'date' : new Date()
+	}).trigger('datebox', {
+		'method' : 'doset'
+	});
+	if (inputId === '#avy_Date') {
+		$('#avy_').html(today + '  Click to change')
+	else {
+		$('#obs_').html(today + '  Click to change');
+	}
+}
 
 
 function onDOMLoad() {
