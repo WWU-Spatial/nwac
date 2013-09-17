@@ -30,6 +30,8 @@ var AVALANCHE_SYMBOL_COLOR = [153, 51, 255, 0.5];
  * will need to be used.
  */
 var NWAC_API = "http://dev.nwac.us/api/v1/";
+var NWAC_SNOWPACK_API = NWAC_API + 'observation/';
+var NWAC_AVALANCHE_API = NWAC_API + 'avalancheObservation/';
 
 
 /******************************** GLOBAL VARIABLES ********************************/
@@ -317,15 +319,13 @@ function submitForm(formName) {
  * This function toggles the visibility of the observation layers.  The two possible
  * values for layerName are "avalanche" and "snowpack". The visibility variable can
  * be either "hide" or "show".  This function, depending on the two variables, will
- * toggle the visibility of the selected layer
+ * toggle the visibility of the selected layer.  The observation data is only requested
+ * from the server the first time the layer is toggled on.  All subsequent requests 
+ * just toggle the layers visibility.
  */
 function toggleObservationLayer(layerName, visibility) {
 	$.mobile.showPageLoadingMsg();
 	if (visibility === 'show') {
-		// disconnect addGraphic handler when showing obs
-		if (addGraphicHandle) {
-			removeAddGraphicHandles();
-		}
 		
 		// disconnect first so doesn't repeat
 		if (observationClickHandles[layerName]) {
@@ -336,7 +336,7 @@ function toggleObservationLayer(layerName, visibility) {
 			map.getLayer(layerName).show();
 			observationClickHandles[layerName] = dojo.connect(map.getLayer(layerName), "onClick", showAttributes);
 		} else {
-			getObs(layerName);
+			getObservationsByLayer(layerName);
 		}
 		
 	} else if (visibility === 'hide') {
@@ -348,94 +348,78 @@ function toggleObservationLayer(layerName, visibility) {
 	$.mobile.hidePageLoadingMsg();
 }
 
-function removeAddGraphicHandles() {
-	//remove map graphic (obs point) if not just location
-	dojo.disconnect(addGraphicHandle);
-	!addObType ? null : graphic.setSymbol(null);
-	addObType = null;
-	addGraphicHandle = null;
-}
 
-function getObs(kind) {
-	var type;
-	if (kind === "snowpack") {
-		type = 'observation';
-	} else if (kind === 'avalanche') {
-		type = 'avalancheObservation';
+/*
+ * Makes a request to the NWAC API to get all observations (either avalanche or snowpack
+ * depending on the layerName) between dates from the date-select controls.  Because the
+ * date returned from the date selectors contains a time unit, we set the datetime to
+ * mignight the following day to be sure all requests from the last day selected are 
+ * returned.  The ESRI request function is used to make the ajax request.  The Huxley
+ * proxy server is used for this request because the NWAC server does not allow cross-
+ * domain requests.
+ */
+function getObservationsByLayer(layerName) {
+	var url;
+	
+	if (layerName === "snowpack") {
+		url = NWAC_SNOWPACK_API;
+	} else if (layerName === 'avalanche') {
+		url = NWAC_AVALANCHE_API;
 	}
+	
 	// add day so obs request contains the last day in range
-	var plusDay = new Date(new Date(prevToDate).getTime() + DAY_IN_MILLISECONDS);
-	var url = NWAC_API + type + '/';
 	var request = esri.request({
 		url : url,
 		// Service parameters if required, sent with URL as key/value pairs
 		content : {
 			format : 'json',
 			datetime__gte : formatDate(new Date(prevFromDate), 'obs'),
-			datetime__lte : formatDate(plusDay, 'obs'),
+			//Set hours to midnight (the next day) so that all points for that day are retreieved
+			datetime__lte : formatDate(new Date(new Date(prevToDate).setHours(24,0,0,0)), 'obs'),
 			time : new Date().getTime()
 		},
 		// Data format
 		handleAs : "json"
 	});
-	type === 'observation' ? request.then(obsRequestSucceeded, requestFailed) : request.then(avyObsRequestSucceeded, requestFailed);
+
+	request.then(function (data) {
+		var json = JSON.stringify(data, null, 2);
+		var parsed = $.parseJSON(json);
+		addLayer(parsed, layerName);
+
+	});
 }
 
-function obsRequestSucceeded(data) {
-	var json = JSON.stringify(data, null, 2);
-	var parsed = $.parseJSON(json);
-	addObsLayer(parsed);
-}
 
-// added this function to handle bug when adding both obs types quickly
-function avyObsRequestSucceeded(data) {
-	var json = JSON.stringify(data, null, 2);
-	var parsed = $.parseJSON(json);
-	addAvyObsLayer(parsed);
-}
-
-function requestFailed(error) {
-	console.log("Error: ", error.message);
-}
-
-function addObsLayer(data) {
-	var sym = new esri.symbol.SimpleMarkerSymbol();
-	var obsLayer = new esri.layers.GraphicsLayer();
-	sym.setColor(new dojo.Color(SNOWPACK_SYMBOL_COLOR));
-	obsLayer.id = 'snowpack';
+/*
+ * Adds the appropriate observation layer to the map requested by the 
+ * getObservationsByLayer function.
+ */
+function addLayer(data, layerName) {
+	var symbol = new esri.symbol.SimpleMarkerSymbol();
+	var layer = new esri.layers.GraphicsLayer();
+	
+	if (layerName === 'snowpack'){
+		symbol.setColor(new dojo.Color(SNOWPACK_SYMBOL_COLOR));
+		layer.id = 'snowpack';
+	} else if (layerName === 'avalanche') {
+		symbol.setColor(new dojo.Color(AVALANCHE_SYMBOL_COLOR));
+		layer.id = 'avalanche';
+	}
+	
 	//Add to map
-	map.addLayer(obsLayer);
+	map.addLayer(layer);
 
 	//Add reports to the graphics layer
-	dojo.forEach(data.objects, function(ob) {
-		var pt = esri.geometry.geographicToWebMercator(new esri.geometry.Point(ob.location.longitude, ob.location.latitude));
-		var gr = new esri.Graphic(pt, sym, ob);
-		obsLayer.add(gr);
+	dojo.forEach(data.objects, function(item) {
+		var pt = esri.geometry.geographicToWebMercator(new esri.geometry.Point(item.location.longitude, item.location.latitude));
+		var graphic = new esri.Graphic(pt, symbol, item);
+		layer.add(graphic);
 	});
-	observationClickHandles['snowpack'] = dojo.connect(obsLayer, "onClick", showAttributes);
-	//    type==='observation'?showObsAttsHandle=dojo.connect(obsLayer, "onClick", showAttributes):showAvyObsAttsHandle=dojo.connect(avyObsLayer, "onClick", showAttributes);
-	obsLayer.show();
-	map.reorderLayer(obsLayer, 1);
-	$.mobile.hidePageLoadingMsg();
-}
+	
+	observationClickHandles[layerName] = dojo.connect(layer, "onClick", showAttributes);
+	layer.show();
 
-function addAvyObsLayer(data) {
-	var sym = new esri.symbol.SimpleMarkerSymbol();
-	var avyObsLayer = new esri.layers.GraphicsLayer();
-	sym.setColor(new dojo.Color(AVALANCHE_SYMBOL_COLOR));
-	avyObsLayer.id = 'avalanche';
-
-	map.addLayer(avyObsLayer);
-	//Add reports to the graphics layer
-	dojo.forEach(data.objects, function(ob) {
-		var pt = esri.geometry.geographicToWebMercator(new esri.geometry.Point(ob.location.longitude, ob.location.latitude));
-		var gr = new esri.Graphic(pt, sym, ob);
-		avyObsLayer.add(gr);
-	});
-	observationClickHandles['avalanche'] = dojo.connect(avyObsLayer, "onClick", showAttributes);
-	//    type==='observation'?showObsAttsHandle=dojo.connect(obsLayer, "onClick", showAttributes):showAvyObsAttsHandle=dojo.connect(avyObsLayer, "onClick", showAttributes);
-	avyObsLayer.show();
-	map.reorderLayer(avyObsLayer, 1);
 	$.mobile.hidePageLoadingMsg();
 }
 
@@ -456,7 +440,7 @@ function getStabTest(gr, id) {
 
 	rq.then(function(data) {
 		stabTestRequestSucceeded(data, gr, id);
-	}, requestFailed);
+	});
 }
 
 function stabTestRequestSucceeded(data, gr, id) {
@@ -490,7 +474,7 @@ function getElevation(lt, lng) {
 		// Data format
 		handleAs : "json"
 	});
-	request.then(elevRequestSucceeded, requestFailed);
+	request.then(elevRequestSucceeded);
 }
 
 function elevRequestSucceeded(data) {
@@ -615,7 +599,9 @@ function setDatePicker() {
 }
 
 function getLocation() {
+	console.log('getting location');
 	if (navigator.geolocation) {
+
 		navigator.geolocation.getCurrentPosition(showLocation, locationError);
 	} else {
 		alert("Your location couldn't be determined...Either your browser doesn't support geolocation, or geolocation is disabled.  Check your browser settings to make sure location services are allowed for this site.");
@@ -623,6 +609,7 @@ function getLocation() {
 }
 
 function locationError(error) {
+	console.log('error: ', error);
 	switch (error.code) {
 		case error.PERMISSION_DENIED:
 			alert("Your location couldn't be determined...Check your browser settings to make sure location services are allowed for this site.");
@@ -658,9 +645,7 @@ function setLongLatInForms(lt, lng) {
 }
 
 function showLocation(location) {
-	if (addGraphicHandle.length > 0) {
-		removeAddGraphicHandles();
-	}
+
 	
 	//move the graphic and reset symbol color
 	var pt = esri.geometry.geographicToWebMercator(new esri.geometry.Point(location.coords.longitude, location.coords.latitude));
@@ -703,8 +688,6 @@ function addGraphicClick(e) {
 
 /// activate adding graphic on click by ob type
 function startAddOb(value) {
-	//remove handler if it exists before adding another...
-	!addGraphicHandle ? null : removeAddGraphicHandles();
 
 	addObType = value;
 	getSymbol();
@@ -1265,12 +1248,11 @@ function hideAskFillOutForm() {
 }
 
 function disconnectShowAttsHandles() {
-	observationClickHandles['snowpack'] ? dojo.disconnect(['snowpack']) : null;
+	observationClickHandles['snowpack'] ? dojo.disconnect(observationClickHandles['snowpack']) : null;
 	observationClickHandles['avalanche'] ? dojo.disconnect(observationClickHandles['avalanche']) : null;
 }
 
 function updateGraphicHandles() {
-	!addGraphicHandle ? null : removeAddGraphicHandles();
 	!map.getLayer('snowpack') ? null : observationClickHandles['snowpack'] = dojo.connect(map.getLayer('snowpack'), "onClick", showAttributes);
 	!map.getLayer('avalanche') ? null : observationClickHandles['avalanche'] = dojo.connect(map.getLayer('avalanche'), "onClick", showAttributes);
 }
