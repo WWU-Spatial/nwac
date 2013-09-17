@@ -444,7 +444,9 @@ function getElevation(latitude, longitude) {
 	});
 }
 
-
+/*
+ * Creates a basemap gallery that contains the selectable basemaps.
+ */
 function createBasemapGallery() {
 	var basemaps = [], basemapTopo, basemapStreets, basemapImagery;
 	basemapTopo = new esri.dijit.Basemap({
@@ -478,15 +480,14 @@ function createBasemapGallery() {
 		map : map
 	});
 	basemapGallery.startup();
-	dojo.connect(basemapGallery, "onError", function(error) {
-		console.log(error);
-	});
 }
 
-function changeBasemap(val) {
-	basemapGallery.select(val);
-
-	$('#basemapSelect').selectmenu("refresh", true);
+/*
+ * Changes the visible basemap.  Uses the basemapGallery created with the 
+ * createBasemapGallery function
+ */
+function changeBasemap(basemap) {
+	basemapGallery.select(basemap);
 }
 
 function hideInfoDiv() {
