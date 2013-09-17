@@ -490,7 +490,12 @@ function changeBasemap(basemap) {
 	basemapGallery.select(basemap);
 }
 
-function hideInfoDiv() {
+/*
+ * Hides the splash screen and activates the other map controls.  This is either fired
+ * by the timeout (default is 5000ms) after load, or by clicking the okay button on 
+ * the splash screen.
+ */
+function hideSplashScreen() {
 	clearTimeout(infoTimeout);
 	$('#infoDiv').fadeOut(1000);
 	$('.esriSimpleSlider').css({
@@ -505,20 +510,7 @@ function hideInfoDiv() {
 	map.enableMapNavigation();
 }
 
-function addDangerOverlay() {
 
-	RegionsBoth = new esri.layers.ArcGISTiledMapServiceLayer("http://140.160.114.190/ArcGIS/rest/services/NWAC/RegionsBoth/MapServer", {
-		"opacity" : 0.55
-	});
-
-	//build query task for region
-	buildRegionQuery();
-
-	map.addLayer(RegionsBoth);
-
-	// set date range for obs
-	setDatePicker();
-}
 
 function setDate(db) {
 	$(db).trigger('datebox', {
@@ -1384,14 +1376,24 @@ function init() {
 	dojo.connect(map, "onLoad", function() {
 		infoTimeout = setTimeout(function() {
 			// hide infoDive after 5 seconds
-			hideInfoDiv();
+			hideSplashScreen();
 		}, 5000);
 		resizeMap();
 		$.mobile.hidePageLoadingMsg();
 		$('#infoDiv div:first').fadeIn(500);
 	});
 
-	addDangerOverlay();
+	RegionsBoth = new esri.layers.ArcGISTiledMapServiceLayer("http://140.160.114.190/ArcGIS/rest/services/NWAC/RegionsBoth/MapServer", {
+		"opacity" : 0.55
+	});
+
+	//build query task for region
+	buildRegionQuery();
+
+	map.addLayer(RegionsBoth);
+
+	// set date range for obs
+	setDatePicker();
 
 	// set symbols colors
 	currentLocSymbol = new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 12, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([210, 150, 50, 0.5]), 8), new dojo.Color([210, 150, 50, 0.9]));
