@@ -32,6 +32,7 @@ var AVALANCHE_SYMBOL_COLOR = [153, 51, 255, 0.5];
 var NWAC_API = "http://dev.nwac.us/api/v1/";
 var NWAC_SNOWPACK_API = NWAC_API + 'observation/';
 var NWAC_AVALANCHE_API = NWAC_API + 'avalancheObservation/';
+var MAPQUEST_ELEVATION_API = 'http://open.mapquestapi.com/elevation/v1/profile?shapeFormat=raw&unit=f&latLngCollection=';
 
 
 /******************************** GLOBAL VARIABLES ********************************/
@@ -424,32 +425,25 @@ function addLayer(data, layerName) {
 }
 
 
-
-
-
-
-////
-function getElevation(lt, lng) {
-	var getURL = 'http://open.mapquestapi.com/elevation/v1/profile?shapeFormat=raw&unit=f&latLngCollection=' + lt + ',' + lng;
-	var request = esri.request({
-		// Location of the data
-		url : getURL,
-		// Service parameters if required, sent with URL as key/value pairs
-		content : {
-		},
-		// Data format
-		handleAs : "json"
+/*
+ * Gets the elevation at a given latitude and longitude using the MapQuest
+ * Elevation Profile API.  This function no longer uses a proxy server.  The
+ * elevation value is truncated at the decimal point and added to the elevation
+ * field in both observation forms.  The returned elevation value is in feet.
+ */
+function getElevation(latitude, longitude) {
+	var url = MAPQUEST_ELEVATION_API + latitude + ',' + longitude;
+	$.ajax({
+		url: url,
+		dataType: 'json',
+		success: function(data){
+			var elevation = data.elevationProfile[0].height.toFixed(0);
+			$('#obs_location-elevation').val(elevation);
+			$('#avy_location-elevation').val(elevation);
+		}
 	});
-	request.then(elevRequestSucceeded);
 }
 
-function elevRequestSucceeded(data) {
-	var json = JSON.stringify(data.elevationProfile[0], null, 2);
-	var parsed = $.parseJSON(json);
-	var elev = Number(parsed.height).toFixed(0);
-	$('#obs_location-elevation').val(elev);
-	$('#avy_location-elevation').val(elev);
-}
 
 function createBasemapGallery() {
 	var basemaps = [], basemapTopo, basemapStreets, basemapImagery;
