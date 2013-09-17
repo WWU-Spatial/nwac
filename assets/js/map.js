@@ -507,7 +507,6 @@ function hideSplashScreen() {
 	});
 	$('#footerGroup').fadeIn(500);
 
-	resizeMap();
 	map.enableMapNavigation();
 }
 
@@ -657,33 +656,7 @@ function addObservation(type, method) {
 
 }
 
-function jQueryReady() {
-	$('#mapPage').bind('pageshow', function() {
-		resizeMap();
-	});
-}
 
-function orientationChanged() {
-	if (map) {
-		resizeMap();
-	}
-}
-
-function resizeMap() {
-	if (map && $.mobile.activePage.data('url') === 'mapPage') {
-		map.reposition();
-		map.resize();
-
-		// - $('#header').height() - $('#footer').height();
-		$('#mapPage').css("height", $('body').height());
-		$('#map').css("height", $('body').height());
-		$('#map').css("width", "auto");
-
-		$('#footer').css("width", '100%');
-		$('#footer').css("bottom", '0');
-		$('#header').css("width", '100%');
-	}
-}
 
 
 function getStabTest(graphic, id) {
@@ -1332,19 +1305,11 @@ function init() {
 	// basemap gallery
 	createBasemapGallery();
 
-	//onorientationchange doesn't always fire in a timely manner in Android so check for both orientationchange and resize
-	var supportsOrientationChange = "onorientationchange" in window, orientationEvent = supportsOrientationChange ? "orientationchange" : "resize";
-
-	window.addEventListener(orientationEvent, function() {
-		orientationChanged();
-	}, false);
-
 	dojo.connect(map, "onLoad", function() {
 		infoTimeout = setTimeout(function() {
 			// hide infoDive after 5 seconds
 			hideSplashScreen();
 		}, 5000);
-		resizeMap();
 		$.mobile.hidePageLoadingMsg();
 		$('#infoDiv div:first').fadeIn(500);
 	});
@@ -1462,7 +1427,6 @@ function onDOMLoad() {
 			!$(this).attr('cx') ? $(this).attr('cx', 0) : null;
 			!$(this).attr('cx') ? $(this).attr('cy', 0) : null;
 		});
-		resizeMap();
 	});
 
 	//add event handler to your form's submit event
