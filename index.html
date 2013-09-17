@@ -141,14 +141,14 @@
       <div data-role="content">		
       	<ul data-role="listview" data-inset="true">
 			<li><h3>Add Snowpack Report</h3></li>
-			<li><select id="addObSelect" name="addObSelect"  onchange="startAddOb(this.value)">
+			<li><select id="addObSelect" name="addObSelect"  onchange="startAddOb('snowpack')">
 					<option value="" >-- Select one --</option>
 					<option value="addObByClick">Tap or click to add</option>
 					<option value="addObByGeoLoc">Add at current location</option>
 				</select>
 			</li>
       		<li><h3>Add Avalanche Report</h3></li>
-      		<li><select id="addAvyObSelect" name="addAvyObSelect"  onchange="startAddOb(this.value)">
+      		<li><select id="addAvyObSelect" name="addAvyObSelect"  onchange="startAddOb('avalanche')">
 					<option value="">-- Select one --</option>
 					<option value="addAvyObByClick">Tap or click to add</option>
 					<option value="addAvyObByGeoLoc">Add at current location</option>

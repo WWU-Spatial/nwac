@@ -39,7 +39,6 @@ var MAPQUEST_ELEVATION_API = 'http://open.mapquestapi.com/elevation/v1/profile?s
 var map;
 var basemaps;
 var markup;
-var graphic = null;
 var addObType;
 var prevFromDate, prevToDate;
 var storeUser = 'NWACMobileUserInfo';
@@ -63,6 +62,8 @@ var prevGraphic = null;
 var lastObsAdded;
 var zone;
 var infoTimeout;
+var symbols = {};
+var currentSymbol;
 
 /********************************** FUNCTIONS *************************************/
 
@@ -161,8 +162,8 @@ function stabFormReturn(response) {
  */
 function formResponse(response, formName) {
 	var layer;
-	var symbol = new esri.symbol.SimpleMarkerSymbol();
 	var endpoint;
+	var symbol;
 	
 	//set for stabTest adds
 	lastObsAdded = response.id;
@@ -170,13 +171,13 @@ function formResponse(response, formName) {
 	// add the graphic to correct graphicsLayer if layer already populated
 	switch (addObType) {
 		case 'addObByClick' || 'addObByGeoloc':
-			symbol.setColor(new dojo.Color(SNOWPACK_SYMBOL_COLOR));
+			symbol = symbols['new-snowpack'];	
 			layer = 'snowpack';
 			endpoint = 'observation';
 			askAddStabTest();
 			break;
 		case 'addAvyObByClick' || 'addAvyObByGeoloc':
-			symbol.setColor(new dojo.Color(AVALANCHE_SYMBOL_COLOR));
+			symbol = symbols['new-avalanche'];
 			layer = 'avalanche';
 			endpoint = 'avalancheObservation';
 			break;
@@ -564,36 +565,39 @@ function zoomToLocation(latitude, longitude) {
 function showCurrentLocation(location) {
 	//move the graphic and reset symbol color
 	var pt = esri.geometry.geographicToWebMercator(new esri.geometry.Point(location.coords.longitude, location.coords.latitude));
-	graphic.setSymbol(getSymbol());
-	graphic.setGeometry(pt);
+	var graphic = new esri.Graphic(pt, symbols['new-' + currentSymbol]);
 	map.graphics.show();
 	zoomToLocation(location.coords.latitude, location.coords.longitude);
 }
 
-/// add graphic
-function addGraphic() {
-	var pt = esri.geometry.geographicToWebMercator(new esri.geometry.Point(0, 90));
-	graphic = new esri.Graphic(pt, getSymbol());
-	map.graphics.add(graphic);
-	map.graphics.hide();
-}
 
 /*
  * Get latitude and longitude from a map point and return as an array
  */
 function getLatLong(mapPoint) {
-	var pt = esri.geometry.webMercatorToGeographic(mp);
+	var pt = esri.geometry.webMercatorToGeographic(mapPoint);
 	var lt = pt.y.toFixed(6);
 	var lng = pt.x.toFixed(6);
 	return ([lt, lng]);
 	
 }
 
-/// add or move point on click
-function addGraphicClick(e) {
+/*
+ * Adds a graphic to the map by clicking.  The symbology is gotten from the symbols
+ * object depending on the type of observation being added (snowpack, avalanche) and is
+ * determeined from the currentSymbol global variable.  This function clears all previous
+ * graphics from the default graphics layer so only the most recent click is shown.
+ * Once the graphic is added, latitude, longitude and elevation are all captured and
+ * the appropriate form fields are auto-populated.  Finally, the add observation and
+ * switch observation type form is displayed.
+ */
+function addObservationByClick(e) {
+	var graphic = new esri.Graphic();
+	map.graphics.clear();
 	map.graphics.show();
-	graphic.setSymbol(getSymbol());
+	graphic.setSymbol(symbols['new-' + currentSymbol]);
 	graphic.setGeometry(e.mapPoint);
+	map.graphics.add(graphic);
 
 	// request elevation and set in form
 	var coords = getLatLong(e.mapPoint);
@@ -613,7 +617,7 @@ function addGraphicClick(e) {
 /// activate adding graphic on click by ob type
 function startAddOb(value) {
 
-	addObType = value;
+	currentSymbol = value;
 	getSymbol();
 
 	//disconnect listeners for obs point clicks to show attributes if adding new ob
@@ -621,7 +625,7 @@ function startAddOb(value) {
 
 	// call appropriate function for adding a point
 	if (value !== 'addAvyObByGeoLoc' && value !== 'addObByGeoLoc') {
-		addGraphicHandle = dojo.connect(map, 'onClick', addGraphicClick);
+		addGraphicHandle = dojo.connect(map, 'onClick', addObservationByClick);
 	} else {
 		getLocation();
 		askFillOutForm();
@@ -643,7 +647,7 @@ function startAddOb(value) {
 	}
 	$('#changeReportSlider').slider("refresh");
 
-	addObType !== null ? changeObs(value) : null;
+	/*addObType !== null ? changeObs(value) : null;*/
 }
 
 function getSymbol() {
@@ -814,12 +818,13 @@ function bookmarkSelect_changeHandler(value) {
 	$.mobile.changePage('#mapPage');
 }
 
+/*
 function changeObs(val) {
 	addObType = val;
 	graphic.setSymbol(getSymbol());
 	val === 'addObByClick' ? $('#changeReportSlider').attr('data-theme', 'b') : $('#changeReportSlider').attr('data-theme', 'd');
 	$('#changeReportSlider').slider('refresh');
-}
+}*/
 
 function changeSymbol(gr, val, id) {
 	var sym = new esri.symbol.SimpleMarkerSymbol();
@@ -1389,13 +1394,13 @@ function init() {
 	});
 
 	// set symbols colors
-	currentLocSymbol = new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 12, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([210, 150, 50, 0.5]), 8), new dojo.Color([210, 150, 50, 0.9]));
-	avyObsSymbol = new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 12, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color(AVALANCHE_SYMBOL_COLOR), 8), new dojo.Color([153, 51, 255, 0.9]));
-	obsSymbol = new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 12, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color(SNOWPACK_SYMBOL_COLOR), 8), new dojo.Color([0, 153, 255, 0.9]));
-	highlighted = new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 20, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([0, 0, 0]), 2), new dojo.Color([245, 7, 189, 0.5]));
+	symbols['current-location'] = new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 12, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([210, 150, 50, 0.5]), 8), new dojo.Color([210, 150, 50, 0.9]));
+	symbols['avalanche'] 		= new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 12, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color(AVALANCHE_SYMBOL_COLOR), 8), new dojo.Color([153, 51, 255, 0.9]));
+	symbols['snowpack'] 		= new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 12, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color(SNOWPACK_SYMBOL_COLOR), 8), new dojo.Color([0, 153, 255, 0.9]));
+	symbols['highlight'] 		= new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 20, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([0, 0, 0]), 2), new dojo.Color([245, 7, 189, 0.5]));
+	symbols['new-snowpack']		= new esri.symbol.SimpleMarkerSymbol().setColor(new dojo.Color(SNOWPACK_SYMBOL_COLOR));
+	symbols['new-avalanche']	= new esri.symbol.SimpleMarkerSymbol().setColor(new dojo.Color(AVALANCHE_SYMBOL_COLOR));
 
-	// preemptively add graphic so it appears at first click when adding an observation	-- hacky but works
-	dojo.connect(map, 'onLoad', addGraphic);
 
 	checkForURLParams();
 
