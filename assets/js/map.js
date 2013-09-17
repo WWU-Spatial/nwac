@@ -614,51 +614,47 @@ function addObservationByClick(e) {
 	askFillOutForm();
 }
 
-/// activate adding graphic on click by ob type
-function startAddOb(value) {
 
-	currentSymbol = value;
-	getSymbol();
+/*
+ * This is the function to call when preparing to add observations by click or geolocation.
+ * This function takes two arguments.  The first is the type of observationbeing added 
+ * (snowpack, avalanche) and the second is the method by which they are being added 
+ * (Click, GeoLocation).  Once set, we return the user to the main map page and set the 
+ * report type slider on the add point confirmation window.
+ */
+function addObservation(type, method) {
 
-	//disconnect listeners for obs point clicks to show attributes if adding new ob
+	currentSymbol = type;
+
+	//Remove onclick listener for point attributes so that attributes are not displayed whil
+	//adding a new point if the points overlap
 	disconnectShowAttsHandles();
 
-	// call appropriate function for adding a point
-	if (value !== 'addAvyObByGeoLoc' && value !== 'addObByGeoLoc') {
+	// Check if point is being added by click, or by GeoLocation
+	if (method === 'Click') {
 		addGraphicHandle = dojo.connect(map, 'onClick', addObservationByClick);
-	} else {
+	} else if (method === 'GeoLocation') {
 		getLocation();
 		askFillOutForm();
 	}
 
+	// Return to map
 	$.mobile.changePage('#mapPage');
-	//,{changeHash: false});
+	
+	// Reset select menus on the add observation page to the default "Select One" option
 	$('#addAvyObSelect option')[0].selected = true;
 	$('#addObSelect option')[0].selected = true;
-
 	$('#addObSelect').selectmenu("refresh", true);
 	$('#addAvyObSelect').selectmenu("refresh", true);
 
 	//set value of slider in askFormDiv
-	if (value === 'addObByGeoLoc' || value === 'addObByClick') {
+	if (type === 'snowpack') {
 		$('#changeReportSlider')[0].selectedIndex = 0;
-	} else {
+	} else if (type = 'avalanche') {
 		$('#changeReportSlider')[0].selectedIndex = 1;
 	}
 	$('#changeReportSlider').slider("refresh");
 
-	/*addObType !== null ? changeObs(value) : null;*/
-}
-
-function getSymbol() {
-	if (!addObType) {
-		symbol = currentLocSymbol;
-	} else if (addObType === 'addAvyObByClick' || addObType === 'addAvyObByGeoLoc') {
-		symbol = avyObsSymbol;
-	} else {
-		symbol = obsSymbol;
-	}
-	return symbol;
 }
 
 function jQueryReady() {
@@ -818,13 +814,7 @@ function bookmarkSelect_changeHandler(value) {
 	$.mobile.changePage('#mapPage');
 }
 
-/*
-function changeObs(val) {
-	addObType = val;
-	graphic.setSymbol(getSymbol());
-	val === 'addObByClick' ? $('#changeReportSlider').attr('data-theme', 'b') : $('#changeReportSlider').attr('data-theme', 'd');
-	$('#changeReportSlider').slider('refresh');
-}*/
+
 
 function changeSymbol(gr, val, id) {
 	var sym = new esri.symbol.SimpleMarkerSymbol();
