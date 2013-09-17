@@ -423,44 +423,10 @@ function addLayer(data, layerName) {
 	$.mobile.hidePageLoadingMsg();
 }
 
-//// stability test
-function getStabTest(gr, id) {
-	var num = gr.attributes.id;
-	// add day so obs request contains the last day in range
-	var url = NWAC_API + 'stabilityTest/';
-	var rq = esri.request({
-		url : url,
-		content : {
-			format : 'json',
-			observation : num,
-			time : new Date().getTime()
-		},
-		handleAs : "json"
-	});
 
-	rq.then(function(data) {
-		stabTestRequestSucceeded(data, gr, id);
-	});
-}
 
-function stabTestRequestSucceeded(data, gr, id) {
-	//	console.log(data.objects);
-	var json = JSON.stringify(data, null, 2);
-	var parsed = $.parseJSON(json);
-	if (parsed.objects) {
-		$.each(parsed.objects, function(num, obj) {
-			//			console.log(num, obj);
-			markup += "<li data-role='list-divider' data-theme='a'>" + 'Stability Test ' + (num + 1) + "</li>";
-			obj.test_type !== '' && obj.test_type !== null ? addToMarkup('Shear quality', obj.test_type) : null;
-			obj.failure_load !== '' && obj.failure_load !== null ? addToMarkup('Shear quality', obj.failure_load) : null;
-			obj.shear_depth !== '' && obj.shear_depth !== null ? addToMarkup("Depth of shear", obj.shear_depth + ' ' + obj.shear_depth_units) : null;
-			obj.shear_quality !== '' && obj.shear_quality !== null ? addToMarkup('Shear quality', 'Q' + obj.shear_quality) : null;
-			obj.observations_comments !== '' && obj.observations_comments !== null ? addToMarkup('Test comments', obj.observations_comments) : null;
-		});
-	}
 
-	makePage(gr, id);
-}
+
 
 ////
 function getElevation(lt, lng) {
@@ -761,6 +727,47 @@ function resizeMap() {
 	}
 }
 
+
+function getStabTest(graphic, id) {
+	console.log(grpahic, id);
+	var num = graphic.attributes.id;
+	var url = NWAC_API + 'stabilityTest/';
+	var rq = esri.request({
+		url : url,
+		content : {
+			format : 'json',
+			observation : num,
+			time : new Date().getTime()
+		},
+		handleAs : "json"
+	});
+
+	rq.then(function(data) {
+		stabTestRequestSucceeded(data, gr, id);
+	});
+}
+
+
+
+function stabTestRequestSucceeded(data, gr, id) {
+	//	console.log(data.objects);
+	var json = JSON.stringify(data, null, 2);
+	var parsed = $.parseJSON(json);
+	if (parsed.objects) {
+		$.each(parsed.objects, function(num, obj) {
+			//			console.log(num, obj);
+			markup += "<li data-role='list-divider' data-theme='a'>" + 'Stability Test ' + (num + 1) + "</li>";
+			obj.test_type !== '' && obj.test_type !== null ? addToMarkup('Shear quality', obj.test_type) : null;
+			obj.failure_load !== '' && obj.failure_load !== null ? addToMarkup('Shear quality', obj.failure_load) : null;
+			obj.shear_depth !== '' && obj.shear_depth !== null ? addToMarkup("Depth of shear", obj.shear_depth + ' ' + obj.shear_depth_units) : null;
+			obj.shear_quality !== '' && obj.shear_quality !== null ? addToMarkup('Shear quality', 'Q' + obj.shear_quality) : null;
+			obj.observations_comments !== '' && obj.observations_comments !== null ? addToMarkup('Test comments', obj.observations_comments) : null;
+		});
+	}
+
+	makePage(gr, id);
+}
+
 // bookmarks
 function bookmarkSelect_changeHandler(value) {
 
@@ -874,7 +881,9 @@ function changeSymbol(gr, val, id) {
 	prevObsLayer = id;
 }
 
+
 function showAttributes(e) {
+	
 	//some bug makes this neccessary so as not to repeat this handler??
 	observationClickHandles['snowpack'] ? dojo.disconnect(observationClickHandles['snowpack']) : null;
 
@@ -933,6 +942,7 @@ function showAttributes(e) {
 
 	//all types get these..
 	var datetimeVAR, first_nameVAR, last_nameVAR, latitudeVAR, longitudeVAR, elevationVAR, slope_angleVAR, slope_aspectVAR, descriptionVAR, elevation_unitsVAR;
+	console.log(datetimeVAR);
 	datetimeVAR !== '' ? addToMarkup('Date', datetimeVAR[5] + datetimeVAR[6] + '/' + datetimeVAR[8] + datetimeVAR[9] + '/' + datetimeVAR[0] + datetimeVAR[1] + datetimeVAR[2] + datetimeVAR[3]) : null;
 	first_nameVAR !== '' ? addToMarkup('Name', first_nameVAR + ' ' + last_nameVAR) : null;
 	latitudeVAR !== '' ? addToMarkup('Latitude', Number(latitudeVAR).toFixed(6)) : null;
