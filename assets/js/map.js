@@ -513,34 +513,6 @@ function hideSplashScreen() {
 
 
 
-
-function setDatePicker() {
-	console.log("FUNCTION: setDatePicker");
-	prevToDate = today;
-	prevFromDate = formatDate(new Date(new Date(prevToDate).getTime() - 10 * DAY_IN_MILLISECONDS), 'display');
-	$('#from').html('From:  ' + prevFromDate);
-	$('#to').html('To:  ' + prevToDate);
-
-	$('#fromDate').on('change', function() {
-		var temp = new Date();
-		var diff = parseInt(($('#fromDate').datebox('getTheDate') - temp) / (1000 * 60 * 60 * 24 ), 10);
-		var diffstrt = (diff * -1) - 1;
-		// If you want a minimum of 1 day between, make this -2 instead of -1
-
-		$('#toDate').datebox({'minDays': diffstrt});
-		$('#toDate').datebox('applyMinMax');
-		
-
-		var dif = Math.round(((new Date($('#fromDate').val()).getTime() - new Date($('#toDate').val()).getTime())) / DAY_IN_MILLISECONDS);
-		if (dif > 0) {
-			var newTo = formatDate(new Date(new Date($('#fromDate').val()).getTime() + DAY_IN_MILLISECONDS), 'display');
-			$('#toDate').val(newTo);
-			$('#to').html('To:  ' + $('#toDate').val());
-			prevToDate = newTo;
-		}
-	});
-}
-
 function getLocation() {
 	console.log('getting location');
 	if (navigator.geolocation) {
@@ -1383,7 +1355,29 @@ function init() {
 	map.addLayer(RegionsBoth);
 
 	// set date range for obs
-	setDatePicker();
+	prevToDate = today;
+	prevFromDate = formatDate(new Date(new Date(prevToDate).getTime() - 10 * DAY_IN_MILLISECONDS), 'display');
+	$('#from').html('From:  ' + prevFromDate);
+	$('#to').html('To:  ' + prevToDate);
+
+	$('#fromDate').on('change', function() {
+		var temp = new Date();
+		var diff = parseInt(($('#fromDate').datebox('getTheDate') - temp) / (1000 * 60 * 60 * 24 ), 10);
+		var diffstrt = (diff * -1) - 1;
+		// If you want a minimum of 1 day between, make this -2 instead of -1
+
+		$('#toDate').datebox({'minDays': diffstrt});
+		$('#toDate').datebox('applyMinMax');
+		
+
+		var dif = Math.round(((new Date($('#fromDate').val()).getTime() - new Date($('#toDate').val()).getTime())) / DAY_IN_MILLISECONDS);
+		if (dif > 0) {
+			var newTo = formatDate(new Date(new Date($('#fromDate').val()).getTime() + DAY_IN_MILLISECONDS), 'display');
+			$('#toDate').val(newTo);
+			$('#to').html('To:  ' + $('#toDate').val());
+			prevToDate = newTo;
+		}
+	});
 
 	// set symbols colors
 	currentLocSymbol = new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 12, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([210, 150, 50, 0.5]), 8), new dojo.Color([210, 150, 50, 0.9]));
