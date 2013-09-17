@@ -512,35 +512,39 @@ function hideSplashScreen() {
 
 
 
-
+/*
+ * Get the current location of the user (via GPS or other browser built-in location service
+ * Only gets location if supported by the browser.  Otherwise pops up an alert error.
+ * See https://developer.mozilla.org/en-US/docs/Web/API/Geolocation.getCurrentPosition
+ */
 function getLocation() {
-	console.log('getting location');
+	var options = {
+		enableHighAccuracy: true,
+		timeout: 8000,
+		maximumAge: 0
+	};
+	
 	if (navigator.geolocation) {
-
-		navigator.geolocation.getCurrentPosition(showLocation, locationError);
+		navigator.geolocation.getCurrentPosition(showLocation, locationError, options);
 	} else {
 		alert("Your location couldn't be determined...Either your browser doesn't support geolocation, or geolocation is disabled.  Check your browser settings to make sure location services are allowed for this site.");
 	}
 }
 
+
+/*
+ * Process error codes and return custom messages if unable to retrieve geoLocation
+ */
 function locationError(error) {
-	console.log('error: ', error);
 	switch (error.code) {
-		case error.PERMISSION_DENIED:
+		case error.PERMISSION_DENIED || error.POSITION_UNAVAILABLE::
 			alert("Your location couldn't be determined...Check your browser settings to make sure location services are allowed for this site.");
-			console.log("Location not provided");
-			break;
-		case error.POSITION_UNAVAILABLE:
-			alert("Your location couldn't be determined...Check your browser settings to make sure location services are allowed for this site.");
-			console.log("Current location not available");
 			break;
 		case error.TIMEOUT:
 			alert("Location request timed out");
-			console.log("Timeout");
 			break;
 		default:
 			alert("Error getting location");
-			console.log("unknown error");
 			break;
 	}
 }
