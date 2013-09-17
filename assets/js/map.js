@@ -525,7 +525,7 @@ function getLocation() {
 	};
 	
 	if (navigator.geolocation) {
-		navigator.geolocation.getCurrentPosition(showLocation, locationError, options);
+		navigator.geolocation.getCurrentPosition(showCurrentLocation, locationError, options);
 	} else {
 		alert("Your location couldn't be determined...Either your browser doesn't support geolocation, or geolocation is disabled.  Check your browser settings to make sure location services are allowed for this site.");
 	}
@@ -537,7 +537,7 @@ function getLocation() {
  */
 function locationError(error) {
 	switch (error.code) {
-		case error.PERMISSION_DENIED || error.POSITION_UNAVAILABLE::
+		case error.PERMISSION_DENIED || error.POSITION_UNAVAILABLE:
 			alert("Your location couldn't be determined...Check your browser settings to make sure location services are allowed for this site.");
 			break;
 		case error.TIMEOUT:
@@ -549,31 +549,25 @@ function locationError(error) {
 	}
 }
 
-function zoomToLocation(location) {
-	var pt = esri.geometry.geographicToWebMercator(new esri.geometry.Point(location.coords.longitude, location.coords.latitude));
-	getLatLongThenGetElev(pt);
-
-	map.centerAndZoom(pt, 16);
+/*
+ * Zoom to a specified latitude and longitude and center on the point
+ */
+function zoomToLocation(latitude, longitude) {
+	var pt = esri.geometry.geographicToWebMercator(new esri.geometry.Point(longitude, latitude));
+	map.centerAndZoom(pt, 14);
 }
 
-function setLongLatInForms(lt, lng) {
-	$('#obs_location-latitude').val(lt);
-	$('#obs_location-longitude').val(lng);
-	$('#avy_location-latitude').val(lt);
-	$('#avy_location-longitude').val(lng);
-}
-
-function showLocation(location) {
-
-	
+/*
+ * Adds a point to the map based on the current location retrieved with the
+ * function getLocation and then zooms to that point.
+ */
+function showCurrentLocation(location) {
 	//move the graphic and reset symbol color
 	var pt = esri.geometry.geographicToWebMercator(new esri.geometry.Point(location.coords.longitude, location.coords.latitude));
 	graphic.setSymbol(getSymbol());
 	graphic.setGeometry(pt);
 	map.graphics.show();
-
-	zoomToLocation(location);
-
+	zoomToLocation(location.coords.latitude, location.coords.longitude);
 }
 
 /// add graphic
@@ -584,13 +578,15 @@ function addGraphic() {
 	map.graphics.hide();
 }
 
-/// add point at current location
-function getLatLongThenGetElev(mp) {
+/*
+ * Get latitude and longitude from a map point and return as an array
+ */
+function getLatLong(mapPoint) {
 	var pt = esri.geometry.webMercatorToGeographic(mp);
 	var lt = pt.y.toFixed(6);
 	var lng = pt.x.toFixed(6);
-	getElevation(lt, lng);
-	setLongLatInForms(lt, lng);
+	return ([lt, lng]);
+	
 }
 
 /// add or move point on click
@@ -600,7 +596,16 @@ function addGraphicClick(e) {
 	graphic.setGeometry(e.mapPoint);
 
 	// request elevation and set in form
-	getLatLongThenGetElev(e.mapPoint);
+	var coords = getLatLong(e.mapPoint);
+	var latitude = coords[0];
+	var longitude = coords[1];
+	getElevation(latitude, longitude);
+	
+	//Set latitude and longitude in form fields
+	$('#obs_location-latitude').val(latitude);
+	$('#obs_location-longitude').val(longitude);
+	$('#avy_location-latitude').val(latitude);
+	$('#avy_location-longitude').val(longitude);
 
 	askFillOutForm();
 }
@@ -1418,8 +1423,8 @@ function setDate(inputId) {
 		'method' : 'doset'
 	});
 	if (inputId === '#avy_Date') {
-		$('#avy_').html(today + '  Click to change')
-	else {
+		$('#avy_').html(today + '  Click to change');
+	} else {
 		$('#obs_').html(today + '  Click to change');
 	}
 }
