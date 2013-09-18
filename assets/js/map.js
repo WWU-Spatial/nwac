@@ -702,96 +702,6 @@ function stabTestRequestSucceeded(data) {
 	makePage();
 }
 
-// bookmarks
-function bookmarkSelect_changeHandler(value) {
-
-	var SR = new esri.SpatialReference({
-		wkid : 102100
-	});
-
-	var OlympicsEXT = new esri.geometry.Extent(-13851000, 6045000, -13687000, 6050000, SR);
-	var MtHoodEXT = new esri.geometry.Extent(-13592300, 5638300, -13510300, 5710600, SR);
-	var StevensPassEXT = new esri.geometry.Extent(-13503992, 6024773, -13455073, 6098152, SR);
-	var SnoqPassEXT = new esri.geometry.Extent(-13542712, 5957299, -13493793, 6030678, SR);
-	var WhitePassEXT = new esri.geometry.Extent(-13536249, 5830776, -13487329, 5904155, SR);
-	var WestStevensNorthEXT = new esri.geometry.Extent(-13603953, 5988709, -13408275, 6282227, SR);
-	var WestStevensToSnoqEXT = new esri.geometry.Extent(-13655625, 5750225, -13459946, 6043743, SR);
-	var WestSnoqToWhiteEXT = new esri.geometry.Extent(-13576436, 5955535, -13478597, 6102294, SR);
-	var WestWhiteSouthEXT = new esri.geometry.Extent(-13674887, 5637557, -13479208, 5931075, SR);
-	var EastStevensNorthEXT = new esri.geometry.Extent(-13497247, 5986263, -13301569, 6279781, SR);
-	var EastStevensToSnoqEXT = new esri.geometry.Extent(-13542039, 5827732, -13346361, 6121250, SR);
-	var EastSnoqToWhiteEXT = new esri.geometry.Extent(-13537501, 5846544, -13439662, 5993303, SR);
-	var EastWhiteSouthEXT = new esri.geometry.Extent(-13569842, 5648857, -13374163, 5942375, SR);
-
-	///
-	var fullPT = {
-		'point' : new esri.geometry.Point(-13521308.650948754, 5826008.784827091, SR),
-		'level' : 6
-	};
-	var OlympicsPT = {
-		'point' : new esri.geometry.Point(-13769917.244339418, 6020431.108485553, SR),
-		'level' : 9
-	};
-	var MtHoodPT = {
-		'point' : new esri.geometry.Point(-13554976.320801608, 5642220.692530684, SR),
-		'level' : 9
-	};
-	var StevensPassPT = {
-		'point' : new esri.geometry.Point(-13480396.74151801, 6043270.487268172, SR),
-		'level' : 10
-	};
-	var SnoqPassPT = {
-		'point' : new esri.geometry.Point(-13516933.64103834, 5987840.391056036, SR),
-		'level' : 10
-	};
-	var WhitePassPT = {
-		'point' : new esri.geometry.Point(-13510818.67877556, 5855936.581646458, SR),
-		'level' : 10
-	};
-	var WestStevensNorthPT = {
-		'point' : new esri.geometry.Point(-13502445.022642313, 6104318.377371862, SR),
-		'level' : 8
-	};
-	var WestStevensToSnoqPT = {
-		'point' : new esri.geometry.Point(-13533631.462262811, 6002457.104711823, SR),
-		'level' : 9
-	};
-	var WestSnoqToWhitePT = {
-		'point' : new esri.geometry.Point(-13562983.281124303, 5891164.79152866, SR),
-		'level' : 9
-	};
-	var WestWhiteSouthPT = {
-		'point' : new esri.geometry.Point(-13585608.641496703, 5771527.591557064, SR),
-		'level' : 9
-	};
-	var EastStevensNorthPT = {
-		'point' : new esri.geometry.Point(-13392681.582105009, 6101572.496190777, SR),
-		'level' : 8
-	};
-	var EastStevensToSnoqPT = {
-		'point' : new esri.geometry.Point(-13440939.23492287, 5991457.104711815, SR),
-		'level' : 9
-	};
-	var EastSnoqToWhitePT = {
-		'point' : new esri.geometry.Point(-13496024.250017693, 5889177.419305798, SR),
-		'level' : 9
-	};
-	var EastWhiteSouthPT = {
-		'point' : new esri.geometry.Point(-13481654.28302891, 5790008.23682748, SR),
-		'level' : 9
-	};
-
-	var extentList = [initExtent, OlympicsEXT, MtHoodEXT, StevensPassEXT, SnoqPassEXT, WhitePassEXT, WestStevensNorthEXT, WestSnoqToWhiteEXT, WestStevensToSnoqEXT, WestWhiteSouthEXT, EastStevensNorthEXT, EastStevensToSnoqEXT, EastSnoqToWhiteEXT, EastWhiteSouthEXT];
-
-	var pointList = [fullPT, OlympicsPT, MtHoodPT, StevensPassPT, SnoqPassPT, WhitePassPT, WestStevensNorthPT, WestSnoqToWhitePT, WestStevensToSnoqPT, WestWhiteSouthPT, EastStevensNorthPT, EastStevensToSnoqPT, EastSnoqToWhitePT, EastWhiteSouthPT];
-	var center = extentList[value].getCenter();
-
-	map.centerAndZoom(center, pointList[value].level);
-	$.mobile.changePage('#mapPage');
-}
-
-
-
 function changeSymbol(gr, val, id) {
 	var sym = new esri.symbol.SimpleMarkerSymbol();
 
@@ -1282,6 +1192,30 @@ function showCalendar (el) {
 
 
 function init() {
+	var SR = new esri.SpatialReference({wkid : 102100});
+	var bookmarks = {};
+	
+	/* LOOKUPS */
+	
+	bookmarks['Full']				= {'extent' : new esri.geometry.Extent(-13937126, 5280024, -13154411, 6454097, SR), 'level' : 6};
+	bookmarks['Olympics'] 			= {'extent' : new esri.geometry.Extent(-13851000, 6045000, -13687000, 6050000, SR), 'level' : 9};
+	bookmarks['MtHood']				= {'extent' : new esri.geometry.Extent(-13592300, 5638300, -13510300, 5710600, SR), 'level' : 9};
+	bookmarks['StevensPass']		= {'extent' : new esri.geometry.Extent(-13503992, 6024773, -13455073, 6098152, SR), 'level' : 10};
+	bookmarks['SnoqualmiePass']		= {'extent' : new esri.geometry.Extent(-13542712, 5957299, -13493793, 6030678, SR), 'level' : 10};
+	bookmarks['WhitePass']			= {'extent' : new esri.geometry.Extent(-13536249, 5830776, -13487329, 5904155, SR), 'level' : 10};
+	bookmarks['WestStevensNorth']	= {'extent' : new esri.geometry.Extent(-13603953, 5988709, -13408275, 6282227, SR), 'level' : 8};
+	bookmarks['WestStevensToSnoq']	= {'extent' : new esri.geometry.Extent(-13655625, 5750225, -13459946, 6043743, SR), 'level' : 9};
+	bookmarks['WestStevensToWhite']	= {'extent' : new esri.geometry.Extent(-13655625, 5750225, -13459946, 6043743, SR), 'level' : 9};
+	bookmarks['WestStoqToWhite']	= {'extent' : new esri.geometry.Extent(-13576436, 5955535, -13478597, 6102294, SR), 'level' : 9};
+	bookmarks['WestWhiteSouth']		= {'extent' : new esri.geometry.Extent(-13674887, 5637557, -13479208, 5931075, SR), 'level' : 9};
+	bookmarks['EastStevensNorth']	= {'extent' : new esri.geometry.Extent(-13497247, 5986263, -13301569, 6279781, SR), 'level' : 8};
+	bookmarks['EastStevensToSnoq']	= {'extent' : new esri.geometry.Extent(-13542039, 5827732, -13346361, 6121250, SR), 'level' : 9};
+	bookmarks['EastSnoqToWhite']	= {'extent' : new esri.geometry.Extent(-13537501, 5846544, -13439662, 5993303, SR), 'level' : 9};
+	bookmarks['EastWhiteSouth']		= {'extent' : new esri.geometry.Extent(-13569842, 5648857, -13374163, 5942375, SR), 'level' : 9};
+	
+	
+	
+	
 	esri.config.defaults.io.proxyUrl = proxyUrl = "http://140.160.114.190/proxy/proxy.ashx";
 	esri.config.defaults.io.alwaysUseProxy = false;
 
@@ -1378,6 +1312,16 @@ function init() {
 	if (userInfoJSON && userInfoJSON !== 'null'/* && userInfoJSON.length > 2*/) {
 		setUserInfo(userInfoJSON);
 	}
+	
+	//Bookmark listener
+	$(".bookmark").on("click", function(e) {
+		var center = bookmarks[e.target.id].extent.getCenter();
+		var level = bookmarks[e.target.id].level;
+		map.centerAndZoom(center, level);
+		$.mobile.changePage('#mapPage');
+	});
+	
+
 }
 
 

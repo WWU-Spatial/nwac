@@ -113,21 +113,21 @@
 		<a onclick="$.mobile.changePage('#mapPage')" class="backToMapButton">Map</a>
       </div>
       <div data-role="content">		
-      	<ul data-role="listview" data-inset="true">
-			<li><a data-role="button" onclick="bookmarkSelect_changeHandler(0);">All regions</a></li>
-			<li><a data-role="button" onclick="bookmarkSelect_changeHandler(1);">Olympics</a></li>
-			<li><a data-role="button" onclick="bookmarkSelect_changeHandler(2);">Mt Hood area</a></li>
-			<li><a data-role="button" onclick="bookmarkSelect_changeHandler(3);">Stevens Pass</a></li>
-			<li><a data-role="button" onclick="bookmarkSelect_changeHandler(4);">Snoqualmie Pass</a></li>
-			<li><a data-role="button" onclick="bookmarkSelect_changeHandler(5);">White Pass</a></li>
-			<li><a data-role="button" onclick="bookmarkSelect_changeHandler(6);">West - north of Stevens Pass</a></li>
-			<li><a data-role="button" onclick="bookmarkSelect_changeHandler(7);">West - between Snoqualmie and White Pass</a></li>
-			<li><a data-role="button" onclick="bookmarkSelect_changeHandler(8);">West - between Stevens and Snoqualmie Pass</a></li>
-			<li><a data-role="button" onclick="bookmarkSelect_changeHandler(9);">West - south of White Pass</a></li>
-			<li><a data-role="button" onclick="bookmarkSelect_changeHandler(10);">East - north of Stevens Pass</a></li>
-			<li><a data-role="button" onclick="bookmarkSelect_changeHandler(11);">East - between Stevens and Snoqualmie Pass</a></li>
-			<li><a data-role="button" onclick="bookmarkSelect_changeHandler(12);">East - between Snoqualmie and White Pass</a></li>
-			<li><a data-role="button" onclick="bookmarkSelect_changeHandler(13);">East - south of White Pass</a></li>
+      	<ul id='bookmarks' data-role="listview" data-inset="true">
+			<li><a id="Full" class='bookmark'>All regions</a></li>
+			<li><a id="Olympics" class='bookmark'>Olympics</a></li>
+			<li><a id="MtHood" class='bookmark'>Mt Hood area</a></li>
+			<li><a id="StevensPass" class='bookmark'>Stevens Pass</a></li>
+			<li><a id="SnoqualmiePass" class='bookmark'>Snoqualmie Pass</a></li>
+			<li><a id="WhitePass" class='bookmark'>White Pass</a></li>
+			<li><a id="WestStevensNorth" class='bookmark'>West - north of Stevens Pass</a></li>
+			<li><a id="WestStevensToWhite" class='bookmark'>West - between Snoqualmie and White Pass</a></li>
+			<li><a id="WestStoqToWhite" class='bookmark'>West - between Stevens and Snoqualmie Pass</a></li>
+			<li><a id="WestWhiteSouth" class='bookmark'>West - south of White Pass</a></li>
+			<li><a id="EastStevensNorth" class='bookmark'>East - north of Stevens Pass</a></li>
+			<li><a id="EastStevensToSnoq" class='bookmark'>East - between Stevens and Snoqualmie Pass</a></li>
+			<li><a id="EastSnoqToWhite" class='bookmark'>East - between Snoqualmie and White Pass</a></li>
+			<li><a id="EastWhiteSouth" class='bookmark'>East - south of White Pass</a></li>
 		</ul>
 	 </div>		
     </div>		
