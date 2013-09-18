@@ -32,6 +32,7 @@ var AVALANCHE_SYMBOL_COLOR = [153, 51, 255, 0.5];
 var NWAC_API = "http://dev.nwac.us/api/v1/";
 var NWAC_SNOWPACK_API = NWAC_API + 'observation/';
 var NWAC_AVALANCHE_API = NWAC_API + 'avalancheObservation/';
+var NWAC_STABILITY_API = NWAC_API + 'stabilityTest/';
 var MAPQUEST_ELEVATION_API = 'http://open.mapquestapi.com/elevation/v1/profile?shapeFormat=raw&unit=f&latLngCollection=';
 
 
@@ -63,7 +64,7 @@ var lastObsAdded;
 var zone;
 var infoTimeout;
 var symbols = {};
-var currentSymbol;
+var currentObservationType;
 
 /********************************** FUNCTIONS *************************************/
 
@@ -169,14 +170,14 @@ function formResponse(response, formName) {
 	lastObsAdded = response.id;
 
 	// add the graphic to correct graphicsLayer if layer already populated
-	switch (addObType) {
-		case 'addObByClick' || 'addObByGeoloc':
+	switch (currentObservationType) {
+		case 'snowpack':
 			symbol = symbols['new-snowpack'];	
 			layer = 'snowpack';
 			endpoint = 'observation';
 			askAddStabTest();
 			break;
-		case 'addAvyObByClick' || 'addAvyObByGeoloc':
+		case 'avalanche':
 			symbol = symbols['new-avalanche'];
 			layer = 'avalanche';
 			endpoint = 'avalancheObservation';
@@ -218,7 +219,12 @@ function getObservationById(endpoint, id, symbol, layerName) {
 		data : {'format' : 'jsonp'},
 		type : 'GET',
 		success : function(data) {
-			addObservationToMap(symbol, layerName, data);
+			//Only add the point to the map if the layer already exists.  Otherwise
+			//the point will be visible when the appropriate observation layer
+			//is toggled on
+			if (map.getLayer(layerName)) {
+				addObservationToMap(symbol, layerName, data);
+			}
 		},
 		error : function(error) {
 			console.log(error);
@@ -331,7 +337,7 @@ function toggleObservationLayer(layerName, visibility) {
 		
 		// disconnect first so doesn't repeat
 		if (observationClickHandles[layerName]) {
-			observationClickHandles[layerName] ? dojo.disconnect(observationClickHandles[layerName]) : null;
+			dojo.disconnect(observationClickHandles[layerName]);
 		}
 		
 		if (map.getLayer(layerName)) {
@@ -564,7 +570,7 @@ function zoomToLocation(latitude, longitude) {
 function showCurrentLocation(location) {
 	//move the graphic and reset symbol color
 	var pt = esri.geometry.geographicToWebMercator(new esri.geometry.Point(location.coords.longitude, location.coords.latitude));
-	var graphic = new esri.Graphic(pt, symbols['new-' + currentSymbol]);
+	var graphic = new esri.Graphic(pt, symbols['new-' + currentObservationType]);
 	map.graphics.show();
 	zoomToLocation(location.coords.latitude, location.coords.longitude);
 }
@@ -584,7 +590,7 @@ function getLatLong(mapPoint) {
 /*
  * Adds a graphic to the map by clicking.  The symbology is gotten from the symbols
  * object depending on the type of observation being added (snowpack, avalanche) and is
- * determeined from the currentSymbol global variable.  This function clears all previous
+ * determeined from the currentObservationType global variable.  This function clears all previous
  * graphics from the default graphics layer so only the most recent click is shown.
  * Once the graphic is added, latitude, longitude and elevation are all captured and
  * the appropriate form fields are auto-populated.  Finally, the add observation and
@@ -594,7 +600,7 @@ function addObservationByClick(e) {
 	var graphic = new esri.Graphic();
 	map.graphics.clear();
 	map.graphics.show();
-	graphic.setSymbol(symbols['new-' + currentSymbol]);
+	graphic.setSymbol(symbols['new-' + currentObservationType]);
 	graphic.setGeometry(e.mapPoint);
 	map.graphics.add(graphic);
 
@@ -623,7 +629,7 @@ function addObservationByClick(e) {
  */
 function addObservation(type, method) {
 
-	currentSymbol = type;
+	currentObservationType = type;
 
 	//Remove onclick listener for point attributes so that attributes are not displayed whil
 	//adding a new point if the points overlap
@@ -658,35 +664,32 @@ function addObservation(type, method) {
 
 
 
-
-function getStabTest(graphic, id) {
-	console.log(grpahic, id);
-	var num = graphic.attributes.id;
-	var url = NWAC_API + 'stabilityTest/';
-	var rq = esri.request({
-		url : url,
+/*
+ * Gets a stability test from the NWAC API given the id number of the associated
+ * observation.  This function uses the esri.request and is routed through the
+ * proxy server since the NWAC api does not support CORS
+ */
+function getStabilityTest(id) {
+	var request = esri.request({
+		url : NWAC_STABILITY_API,
 		content : {
 			format : 'json',
-			observation : num,
+			observation : id,
 			time : new Date().getTime()
 		},
 		handleAs : "json"
 	});
 
-	rq.then(function(data) {
-		stabTestRequestSucceeded(data, gr, id);
+	request.then(function(data) {
+		stabTestRequestSucceeded(data);
 	});
 }
 
 
 
-function stabTestRequestSucceeded(data, gr, id) {
-	//	console.log(data.objects);
-	var json = JSON.stringify(data, null, 2);
-	var parsed = $.parseJSON(json);
-	if (parsed.objects) {
+function stabTestRequestSucceeded(data) {
+	if (data.objects) {
 		$.each(parsed.objects, function(num, obj) {
-			//			console.log(num, obj);
 			markup += "<li data-role='list-divider' data-theme='a'>" + 'Stability Test ' + (num + 1) + "</li>";
 			obj.test_type !== '' && obj.test_type !== null ? addToMarkup('Shear quality', obj.test_type) : null;
 			obj.failure_load !== '' && obj.failure_load !== null ? addToMarkup('Shear quality', obj.failure_load) : null;
@@ -696,7 +699,7 @@ function stabTestRequestSucceeded(data, gr, id) {
 		});
 	}
 
-	makePage(gr, id);
+	makePage();
 }
 
 // bookmarks
@@ -816,6 +819,7 @@ function showAttributes(e) {
 	showGoToAttsDiv();
 
 	var id = e.currentTarget.id;
+	console.log(id);
 	var gr = e.graphic;
 
 	$('#hideGoToAttsDivButton').bind('click', function() {
@@ -867,7 +871,7 @@ function showAttributes(e) {
 	});
 
 	//all types get these..
-	var datetimeVAR, first_nameVAR, last_nameVAR, latitudeVAR, longitudeVAR, elevationVAR, slope_angleVAR, slope_aspectVAR, descriptionVAR, elevation_unitsVAR;
+	datetimeVAR, first_nameVAR, last_nameVAR, latitudeVAR, longitudeVAR, elevationVAR, slope_angleVAR, slope_aspectVAR, descriptionVAR, elevation_unitsVAR;
 	console.log(datetimeVAR);
 	datetimeVAR !== '' ? addToMarkup('Date', datetimeVAR[5] + datetimeVAR[6] + '/' + datetimeVAR[8] + datetimeVAR[9] + '/' + datetimeVAR[0] + datetimeVAR[1] + datetimeVAR[2] + datetimeVAR[3]) : null;
 	first_nameVAR !== '' ? addToMarkup('Name', first_nameVAR + ' ' + last_nameVAR) : null;
@@ -922,7 +926,7 @@ function showAttributes(e) {
 	}
 
 	//add stability tests if obs, if avyobs then just make page
-	id === 'obsLayer_layer' ? getStabTest(gr, id) : makePage(gr, id);
+	id === 'snowpack_layer' ? getStabilityTest(gr.attributes.id) : makePage(gr, id);
 }
 
 function replaceURL(val) {
@@ -1132,6 +1136,9 @@ function hideGoToAttsDiv() {
 }
 
 function askFillOutForm() {
+	//Disconnect addGraphicHandle after we show the form.  If they'd like to add another point, they will have to select it again
+	dojo.disconnect(addGraphicHandle);
+	
 	//show form
 	$('#askObsFormDiv').css({
 		visibility : "visible",
@@ -1391,7 +1398,7 @@ function setDate(inputId) {
 
 
 function onDOMLoad() {
-	$(document).ready(function() { jQueryReady;
+	$(document).ready(function() {
 		$.mobile.showPageLoadingMsg();
 
 		$('#obsForm').validate();
