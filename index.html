@@ -570,7 +570,52 @@
 		<a onclick="$.mobile.changePage('#mapPage')" class="backToMapButton">Map</a>
 	  </div>
 		  <div id="obsAttsContent" data-role="content">
-		  	<ul id="obsAtts" data-role="listview" data-inset="true"></ul>
+		  	<ul id="obsAtts" data-role="listview" data-inset="true">
+		  		<!-- GLOBAL OBSERVATION ATTRIBUTES -->
+		  		<li data-role='list-divider'>Date</li><li class="observation-attribute" id="datetime"></li>
+		  		<li data-role='list-divider'>Name</li><li class="observation-attribute" id="first_name"></li>
+		  		<li data-role='list-divider'>Latitude</li><li class="observation-attribute" id="latitude"></li>
+		  		<li data-role='list-divider'>Longitude</li><li class="observation-attribute" id="longitude"></li>
+		  		<li data-role='list-divider'>Elevation</li><li class="observation-attribute" id="elevation"></li>
+		  		<li data-role='list-divider'>Slope angle</li><li class="observation-attribute" id="slope_angle"></li>
+		  		<li data-role='list-divider'>Slope aspect</li><li class="observation-attribute" id="slope_aspect"></li>
+		  		<li data-role='list-divider'>Location Description</li><li class="observation-attribute" id="description"></li>
+		  		<!-- AVALANCHE OBSERVATION ATTRIBUTES -->
+		  		<li data-role='list-divider'>Slide type</li><li class="observation-attribute" id="slide_type"></li>
+		  		<li data-role='list-divider'>Caused by</li><li class="observation-attribute" id="cause"></li>	
+		  		<li data-role='list-divider'>Slide width</li><li class="observation-attribute" id="slide_width"></li>
+		  		<li data-role='list-divider'>Vertical fall</li><li class="observation-attribute" id="runout_length"></li>
+		  		<li data-role='list-divider'>Crown Depth</li><li class="observation-attribute" id="crown_depth"></li>
+		  		<li data-role='list-divider'>Weak layer</li><li class="observation-attribute" id="weak_layer"></li>
+		  		<li data-role='list-divider'>Bed surface</li><li class="observation-attribute" id="bed_surface"></li>
+		  		<li data-role='list-divider'>Number caught</li><li class="observation-attribute" id="number_caught"></li>
+		  		<li data-role='list-divider'>Number carried</li><li class="observation-attribute" id="number_carried"></li>
+		  		<li data-role='list-divider'>Number buried</li><li class="observation-attribute" id="number_buried"></li>
+		  		<li data-role='list-divider'>Number partially buried</li><li class="observation-attribute" id="number_partially_buried"></li>
+		  		<li data-role='list-divider'>Number injured</li><li class="observation-attribute" id="number_injured"></li>
+		  		<li data-role='list-divider'>Numbered killed</li><li class="observation-attribute" id="number_killed"></li>
+		  		<li data-role='list-divider'>Size/Destructive force</li><li class="observation-attribute" id="avalanche_size_destructive_force"></li>
+		  		<li data-role='list-divider'>Size relative to path</li><li class="observation-attribute" id="avalanche_size_relative"></li>
+		  		<!-- SNOWPACK OBSERVATION ATTRIBUTES -->
+		  		<li data-role='list-divider'>Air temperature</li><li class="observation-attribute" id="air_temp"></li>
+		  		<li data-role='list-divider'>Cloud cover</li><li class="observation-attribute" id="cloud_cover"></li>
+		  		<li data-role='list-divider'>Precipitation type</li><li class="observation-attribute" id="precipitation_type"></li>
+		  		<li data-role='list-divider'>Precipitation intensity</li><li class="observation-attribute" id="precipitation_intensity"></li>
+		  		<li data-role='list-divider'>Wind direction</li><li class="observation-attribute" id="wind_direction"></li>
+		  		<li data-role='list-divider'>Wind speed</li><li class="observation-attribute" id="wind_speed"></li>
+		  		<li data-role='list-divider'>Rapid warming?</li><li class="observation-attribute" id="rapid_warming"></li>
+		  		<li data-role='list-divider'>Recent avalanches?</li><li class="observation-attribute" id="recent_avalanches"></li>
+		  		<li data-role='list-divider'>Recent loading</li><li class="observation-attribute" id="recent_loading"></li>
+		  		<li data-role='list-divider'>Shooting cracks</li><li class="observation-attribute" id="shooting_cracks"></li>
+		  		<li data-role='list-divider'>Signs of collapse?</li><li class="observation-attribute" id="signs_of_collapse"></li>
+		  		<li data-role='list-divider'>Terrain traps</li><li class="observation-attribute" id="terrain_traps"></li>
+		  		<li data-role='list-divider'>weather comments</li><li class="observation-attribute" id="weather_comments"></li>
+		  		<li data-role='list-divider'>Snowpack comments</li><li class="observation-attribute" id="snowpack_comments"></li>
+		  		<li data-role='list-divider'>Observation comments</li><li class="observation-attribute" id="observation_comments"></li>
+		  		<li data-role='list-divider'>Snowpit profile image</li><li class="observation-attribute" id="snowpit_profile_image"><a href="#" target="_blank" >View photo in new window</a></li>
+		  		<li data-role='list-divider'>Snowpit profile image URL</li><li class="observation-attribute" id="snowpit_profile_image_url"></li>
+		  		<li data-role='list-divider'>Photo</li><li class="observation-attribute" id="media"><a href="#" target="_blank" >View photo in new window</a></li>		
+		  	</ul>
 		  </div>
 	  </div>
 	

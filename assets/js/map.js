@@ -65,6 +65,8 @@ var zone;
 var infoTimeout;
 var symbols = {};
 var currentObservationType;
+var activeObservation;
+var activeObservationSymbol;
 
 /********************************** FUNCTIONS *************************************/
 
@@ -702,6 +704,8 @@ function stabTestRequestSucceeded(data) {
 	makePage();
 }
 
+
+
 function changeSymbol(gr, val, id) {
 	var sym = new esri.symbol.SimpleMarkerSymbol();
 
@@ -722,121 +726,172 @@ function changeSymbol(gr, val, id) {
 
 
 function showAttributes(e) {
+	var id = e.currentTarget.id;
+	var gr = e.graphic;
 	
 	//some bug makes this neccessary so as not to repeat this handler??
-	observationClickHandles['snowpack'] ? dojo.disconnect(observationClickHandles['snowpack']) : null;
+	//NOTE: Not a bug, probably just have added multiple click-handlers.  Let's redo
+	//this so the click-handler is only created upon creation of the observation layer
+	//(we can turn it off and back on when need-be)
+	//Why isn't the avalanche click-handler here too?'
+	if (observationClickHandles['snowpack']){
+		dojo.disconnect(observationClickHandles['snowpack']);
+	};
 
-	showGoToAttsDiv();
+	$("#goToAttsDiv").show();
+	hideAskFillOutForm();
 
-	var id = e.currentTarget.id;
-	console.log(id);
-	var gr = e.graphic;
-
-	$('#hideGoToAttsDivButton').bind('click', function() {
+	$('#hideGoToAttsDivButton').on('click', function() {
 		changeSymbol(gr, 'reset', id);
 		hideGoToAttsDiv();
 	});
 
-	//reset symbol then change to highlighted color
-	!prevObsLayer ? null : changeSymbol(prevGraphic, 'reset', prevObsLayer);
-	changeSymbol(gr, 'highlight', id);
+	//If there is currently an activeObservation (an observation that is highlighted)
+	//reset it back to its default symbology
+	if (activeObservation){
+		activeObservation.setSymbol(activeObservationSymbol);
+	}
+	
+	//Store the default symbology for the selected symbol before changing it
+	activeObservationSymbol = gr.symbol;
+	activeObservation = gr;
+	
+	//Highlight the symbol
+	gr.setSymbol(symbols['highlight']);
 
-	$('#obsAttsContent').children().empty();
-	markup = '';
-	$.each(gr.attributes, function(k, v) {
-		// Generate a list item for each item in the category and add it to our markup.
-		if (v !== null && v !== '') {
-			if (k === 'observer') {
-				$.each(v, function(observerK, observerV) {
-					if (observerV !== null && observerV !== '') {
-						if (observerK !== "id" && observerK !== "resource_uri") {
-							window[observerK + "VAR"] = observerV;
+	//Empty values from any previous observations
+	$(".observation-attribute").empty();
+	
+	//Make sure all fields are visible
+	$('#obsAtts li').each(function() {
+		$(this).show();	
+	});
+	
+	$.each(gr.attributes, recurseAttributes);
+		
+	function recurseAttributes(key, value) {
+		if(value==null || value===false){
+			return;
+		}
+		if (value instanceof Object) {
+			$.each(value, recurseAttributes);
+		} else {
+			var elem = $('#' + key);
+			if (elem.hasClass('observation-attribute')){
+				switch(key){
+					//We'll ignore these because they will be joined together with other fields later
+					case 'last_name': // fall through
+					case 'elevation_units': // fall through
+					case 'slide_width_units' : // fall through
+					case 'runout_length_units' : // fall through
+					case 'crown_depth_units' : // fall through
+					case 'air_temp_units' : // fall through
+						break;
+					case "first_name" :
+						elem.html(value + " " + gr.attributes.observer.last_name);
+						break;
+					case 'elevation':
+						if (gr.attributes.elevation_units) {
+							elem.html(value + " " + gr.attributes.elevation_units);
+						} else {
+							elem.html(value);
 						}
-					} else {
-						window[observerK + "VAR"] = '';
-					}
-				});
-			} else if (k === 'location') {
-				$.each(v, function(locationK, locationV) {
-					if (locationV !== null && locationV !== '') {
-						if (locationK !== 'region') {
-							if (locationK !== "id" && locationK !== "resource_uri") {
-								window[locationK + "VAR"] = locationV;
-							}
-						}
-					} else {
-						window[locationK + "VAR"] = '';
-					}
-				});
-			} else {
-				if (k !== "id" && k !== "resource_uri") {
-					if (k !== "id" && k !== "resource_uri"/** && k!=="make_public"*/) {
-						window[k + "VAR"] = v;
-					}
+						break;
+					case 'slope_angle':
+						elem.html(value + " degrees");
+						break;
+					case 'slide_width':
+						elem.html(value + " " + gr.attributes.slide_width_units);
+						break;
+					case 'runout_length':
+						elem.html(value + " " + gr.attributes.runout_length_units);
+						break;
+					case 'crown_depth':
+						elem.html(value + " " + gr.attributes.crown_units);
+						break;
+					case 'air_temp':
+						elem.html(value + " " + gr.attributes.air_temp_units);
+						break;
+					case 'datetime' : 
+						elem.html(formatDate(new Date(value), "display"));
+						break;
+					case 'latitude' : // fall through
+					case 'longitude' : 
+						elem.html(Number(value).toFixed(6));
+						break;
+					case "slide_type" : 
+						elem.html(slide_type_lookup[value]);
+						break;
+					case "cause" : 
+						elem.html(avalanche_cause_lookup[value]);
+						break;
+					case "bed_surface" :
+						elem.html(bed_surface_lookup[value]);
+						break;
+					case "avalanche_side_destructive_force" :
+						elem.html(destructive_force_lookup[value]);
+						break;
+					case "avalanche_size_relative" :
+						elem.html(relative_size_lookup[value]);
+						break;
+					case "rapid_warming" :
+						elem.html(true_false_lookup[value]);
+						break;
+					case "recent_avalanches" :
+						elem.html(true_false_lookup[value]);
+						break;
+					case "recent_loading" :
+						elem.html(true_false_lookup[value]);
+						break;
+					case "shooting_cracks" :
+						elem.html(true_false_lookup[value]);
+						break;
+					case "signs_of_collapse" :
+						elem.html(true_false_lookup[value]);
+						break;
+					case "terrain_traps" :
+						elem.html(true_false_lookup[value]);
+						break;
+					case "weather_comments" :
+						elem.html(replaceURL(value));
+						break;
+					case "snowpack_comments" :
+						elem.html(replaceURL(value));
+						break;
+					case "observation_comments" :
+						elem.html(replaceURL(value));
+						break;
+					case "snowpit_profile_image_url" :
+						elem.html(replaceURL(value));
+						break;
+					default :
+						elem.html(value);
+						break;
 				}
 			}
-		} else {
-			window[k + "VAR"] = '';
 		}
-	});
-
-	//all types get these..
-	datetimeVAR, first_nameVAR, last_nameVAR, latitudeVAR, longitudeVAR, elevationVAR, slope_angleVAR, slope_aspectVAR, descriptionVAR, elevation_unitsVAR;
-	console.log(datetimeVAR);
-	datetimeVAR !== '' ? addToMarkup('Date', datetimeVAR[5] + datetimeVAR[6] + '/' + datetimeVAR[8] + datetimeVAR[9] + '/' + datetimeVAR[0] + datetimeVAR[1] + datetimeVAR[2] + datetimeVAR[3]) : null;
-	first_nameVAR !== '' ? addToMarkup('Name', first_nameVAR + ' ' + last_nameVAR) : null;
-	latitudeVAR !== '' ? addToMarkup('Latitude', Number(latitudeVAR).toFixed(6)) : null;
-	longitudeVAR !== '' ? addToMarkup('Longitude', Number(longitudeVAR).toFixed(6)) : null;
-	elevationVAR !== '' ? addToMarkup('Elevation', elevationVAR + ' ' + elevation_unitsVAR) : null;
-	slope_angleVAR !== '' ? addToMarkup('Slope angle', slope_angleVAR + " degrees") : null;
-	slope_aspectVAR !== '' ? addToMarkup('Slope aspect', slope_aspectVAR) : null;
-	descriptionVAR !== '' ? addToMarkup('Location description', descriptionVAR) : null;
-
-	if (id === 'avyObsLayer_layer') {
-		//avy obs get these
-		var slide_typeVAR, crown_depth_unitsVAR, causeVAR, slide_widthVAR, runout_lengthVAR, runout_length_unitsVAR, crown_depthVAR, slide_width_unitsVAR, weak_layerVAR, bed_surfaceVAR, number_caughtVAR, number_carriedVAR,
-			number_buriedVAR, number_partially_buriedVAR, number_injuredVAR, number_killedVAR, avalanche_size_destructive_forceVAR, avalanche_size_relativeVAR;
-		slide_typeVAR !== '' ? addToMarkup('Slide type', type_Lookup(slide_typeVAR)) : null;
-		causeVAR !== '' ? addToMarkup('Caused by', cause_lookup(causeVAR)) : null;
-		slide_widthVAR !== '' ? addToMarkup('Slide width', slide_widthVAR + ' ' + slide_width_unitsVAR) : null;
-		runout_lengthVAR !== '' ? addToMarkup('Vertical fall', runout_lengthVAR + ' ' + runout_length_unitsVAR) : null;
-		crown_depthVAR !== '' ? addToMarkup('Crown depth', crown_depthVAR + ' ' + crown_depth_unitsVAR) : null;
-		weak_layerVAR !== '' ? weakLayer_lookup('Weak layer', weak_layerVAR) : null;
-		bed_surfaceVAR !== '' ? addToMarkup('Bed surface', bedSurface_lookup(bed_surfaceVAR)) : null;
-		number_caughtVAR !== '' ? addToMarkup('Number caught', number_caughtVAR) : null;
-		number_carriedVAR !== '' ? addToMarkup('Number carried', number_carriedVAR) : null;
-		number_buriedVAR !== '' ? addToMarkup('Number buried', number_buriedVAR) : null;
-		number_partially_buriedVAR !== '' ? addToMarkup('Number partially buried', number_partially_buriedVAR) : null;
-		number_injuredVAR !== '' ? addToMarkup('Number injured', number_injuredVAR) : null;
-		number_killedVAR !== '' ? addToMarkup('Number killed', number_killedVAR) : null;
-		avalanche_size_destructive_forceVAR !== '' ? addToMarkup('Size/Destructive force', sizeDF_lookup(avalanche_size_destructive_forceVAR)) : null;
-		avalanche_size_relativeVAR !== '' ? addToMarkup('Size relative to path', sizeRelative_lookup(avalanche_size_relativeVAR)) : null;
-	} else if (id === 'obsLayer_layer') {
-		//snow and weather obs get these
-		var air_tempVAR, cloud_coverVAR, precipitation_typeVAR, precipitation_intensityVAR, wind_directionVAR, wind_speedVAR, rapid_warmingVAR, recent_avalanchesVAR,
-			recent_loadingVAR, shooting_cracksVAR, signs_of_collapseVAR, terrain_trapsVAR, weather_commentsVAR, snowpack_commentsVAR, observation_commentsVAR, snowpit_profile_imageVAR, snowpit_profile_image_urlVAR, mediaVAR;
-		air_tempVAR !== '' ? addToMarkup('Air temperature', air_tempVAR + air_tempVAR) : null;
-		cloud_coverVAR !== '' ? addToMarkup('Cloud cover', cloud_coverVAR) : null;
-		precipitation_typeVAR !== '' ? addToMarkup('Precipitation type', precipitation_typeVAR) : null;
-		precipitation_intensityVAR !== '' ? addToMarkup('Precipitation intensity', precipitation_intensityVAR) : null;
-		wind_directionVAR !== '' ? addToMarkup('Wind direction', wind_directionVAR) : null;
-		wind_speedVAR !== '' ? addToMarkup('Wind speed', wind_speedVAR) : null;
-		rapid_warmingVAR !== '' ? addToMarkup('Rapid warming?', TF_lookup(rapid_warmingVAR)) : null;
-		recent_avalanchesVAR !== '' ? addToMarkup('Recent avalanches?', TF_lookup(recent_avalanchesVAR)) : null;
-		recent_loadingVAR !== '' ? addToMarkup('Recent loading', TF_lookup(recent_loadingVAR)) : null;
-		shooting_cracksVAR !== '' ? addToMarkup('Shooting cracks', TF_lookup(shooting_cracksVAR)) : null;
-		signs_of_collapseVAR !== '' ? addToMarkup('Signs of collapse?', TF_lookup(signs_of_collapseVAR)) : null;
-		terrain_trapsVAR !== '' ? addToMarkup('Terrain traps', TF_lookup(terrain_trapsVAR)) : null;
-		weather_commentsVAR !== '' ? addToMarkup('Snowpack comments', replaceURL(weather_commentsVAR)) : null;
-		snowpack_commentsVAR !== '' ? addToMarkup('Snowpack comments', replaceURL(snowpack_commentsVAR)) : null;
-		observation_commentsVAR !== '' ? addToMarkup('Observation comments', replaceURL(observation_commentsVAR)) : null;
-		snowpit_profile_imageVAR !== '' ? addImgLinkToMarkup('Snowpit profile image', snowpit_profile_imageVAR) : null;
-		snowpit_profile_image_urlVAR !== '' ? addToMarkup('Snowpit profile image URL', replaceURL(snowpit_profile_image_urlVAR)) : null;
-		mediaVAR !== '' ? addImgLinkToMarkup('Photo', mediaVAR) : null;
 	}
+	
+	//For snowpack observation layers, get any associated stability tests
+	//The stability tests will be appended to the observation page asyncronously 
+	//upon completion of the getStabilityTest ajax request
+	if (id === 'snowpack') {
+		getStabilityTest(gr.attributes.id);
+	}
+	
+	//Hide empty fields and their list-divider element from being displayed
+	$('.observation-attribute').each(function() {
+		if ($(this).html().trim() == '') {
+			$(this).prev().hide();
+			$(this).hide();
+		}		
+	});
+	
+	//Prepare the observation page for viewing
+	//Page won't be viewed until the "view" button is pushed on the goToAttsDiv widget
+	$('#obsAtts').trigger('create');
+	$('#obsAttsPage').page();
 
-	//add stability tests if obs, if avyobs then just make page
-	id === 'snowpack_layer' ? getStabilityTest(gr.attributes.id) : makePage(gr, id);
 }
 
 function replaceURL(val) {
@@ -844,205 +899,96 @@ function replaceURL(val) {
 	return val.replace(exp, "<a href='$1' target='_blank'>$1</a>");
 }
 
-function makePage() {
-	$('#obsAtts').html(markup);
-	$('#obsAtts').listview('refresh');
-	$('#obsAttsPage').page();
-}
 
-function addImgLinkToMarkup(name, value) {
-	markup += "<li data-role='list-divider'>" + name + '</li><li><a href="' + value + '"target="_blank" />View photo in new window</li>';
-	return markup;
-}
+var true_false_lookup = {
+	"true" : "Yes",
+	"on" : "Yes",
+	"false" : "No",
+	"off" : "No"
+};
 
-function addToMarkup(name, value) {
-	markup += "<li data-role='list-divider'>" + name + "</li><li><p>" + value + "</p></li>";
-	return markup;
-}
+var destructive_force_lookup = {
+	"D1" : "(D1) Relatively harmless to people",
+	"D2" : "(D2) Could bury, injure, or kill a person",
+	"D3" : "(D3) Could bury and destroy a car, damage a truck, destroy a wood frame house, or break a few trees",
+	"D4" : "(D4) Could destroy a railway car, large truck, several buildings, or a substantial amount of forest",
+	"D5" : "(D5) Could gouge the landscape. Largest snow avalanche known"
+};
 
-function TF_lookup(val) {
-	var text;
-	val === 'true' || val === 'on' || val === true ? text = 'Yes' : text = "No";
-	return text;
-}
+var relative_size_lookup = {
+	"R1" : "(R1) Very small, relative to the path",
+	"R2" : "(R2) Small, relative to the path",
+	"R3" : "(R3) Medium, relative to the path",
+	"R4" : "(R4) Large, relative to the path",
+	"R5" : "(R5) Major or maximum, relative to the path"
+};
 
-function sizeDF_lookup(df) {
-	var dfText;
-	if (df === "D1") {
-		dfText = "(D1) Relatively harmless to people";
-	} else if (df === "D2") {
-		dfText = "(D2) Could bury, injure, or kill a person.";
-	} else if (df === "D3") {
-		dfText = "(D3) Could bury and destroy a car, damage a truck, destroy a wood frame house, or break a few trees.";
-	} else if (df === "D4") {
-		dfText = "(D4) Could destroy a railway car, large truck, several buildings, or a substantial amount of forest.";
-	} else if (df === "D5") {
-		dfText = "(D5) Could gouge the landscape. Largest snow avalanche known.";
-	}
+var weak_layer_lookup = {
+	"PP" : "Precipitation Particles (New Snow)",
+	"MM" : "Machine Made snow",
+	"DF" : "Decomposing and Fragmented Particles",
+	"RG" : "Rounded Grains",
+	"FC" : "Faceted Crystals",
+	"DH" : "Depth Hoar",
+	"SH" : "Surface Hoar",
+	"MF" : "Melt Forms",
+	"IF" : "Ice Formations"
+};
 
-	return dfText;
-}
+var bed_surface_lookup = {
+	"S" : "The avalanche released within a layer of recent storm snow",
+	"I" : "The avalanche released at the new snow/old snow interface",
+	"O" : "The avalanche released within the old snow",
+	"G" : "The avalanche released at the ground, glacial ice or firn",
+	"U" : "Unknown"
+};
 
-function sizeRelative_lookup(rel) {
-	var relText;
-	if (rel === "R1") {
-		relText = "(R1) Very small, relative to the path.";
-	} else if (rel === "R2") {
-		relText = "(R2) Small, relative to the path.";
-	} else if (rel === "R3") {
-		relText = "(R3) Medium, relative to the path.";
-	} else if (rel === "R4") {
-		relText = "(R4) Large, relative to the path.";
-	} else if (rel === "R5") {
-		relText = "(R5) Major or maximum, relative to the path.";
-	}
+var slide_type_lookup = {
+	"L" : "Loose-snow avalanche",
+	"WL" : "Wet loose-snow avalanche",
+	"SS" : "Soft slab avalanche",
+	"HS" : "Hard slab avalanche",
+	"WS" : "Wet slab avalanche",
+	"I" : "Ice fall or avalanche",
+	"SF" : "Slush flow",
+	"C" : "Cornice fall (w/o additional avalanche)",
+	"R" : "Roof avalanche",
+	"U" : "Unknown"
+};
 
-	return relText;
-}
+var avalanche_cause_lookup = {
+	"AS" : "Skier",
+	"AR" : "Snowboarder",
+	"AI" : "Snowshoer",
+	"AM" : "Snowmobile",
+	"AB" : "An explosive detonated above the snow surface (air blast)",
+	"AO" : "Unclassified artificial trigger (specify in comments)",
+	"AI" : "Unknown artificial trigger",
+	"N" : "Natural trigger",
+	"NC" : "Cornice fall",
+	"NE" : "Earthquake",
+	"NI" : "Ice fall",
+	"AF" : "Foot penetration",
+	"AE" : "An explosive thrown or placed on or under the snow surface by hand",
+	"NL" : "Avalanche triggered by loose snow avalanche",
+	"NS" : "Avalanche triggered by slab avalanche",
+	"NR" : "Rock fall",
+	"NO" : "Unclassified natural trigger (specify in comments)",
+	"AA" : "Artillery",
+	"AL" : "Avalauncher",
+	"AC" : "Cornice fall triggered by human or explosive action",
+	"AX" : "Gas exploder",
+	"AH" : "Explosives placed via helicopter",
+	"AP" : "Pre-placed, remotely detonated explosive charge",
+	"AW" : "Wildlife",
+	"AK" : "Snowcat",
+	"AV" : "Vehicle (specify vehicle type in comments)"
+};
 
-function weakLayer_lookup(wL) {
-	var wLText;
-	if (wL === "PP") {
-		wLText = "Precipitation Particles (New Snow)";
-	} else if (wL === "MM") {
-		wLText = "Machine Made snow";
-	} else if (wL === "DF") {
-		wLText = "Decomposing and Fragmented Particles";
-	} else if (wL === "RG") {
-		wLText = "Rounded Grains";
-	} else if (wL === "FC") {
-		wLText = "Faceted Crystals";
-	} else if (wL === "DH") {
-		wLText = "Depth Hoar";
-	} else if (wL === "SH") {
-		wLText = "Surface Hoar";
-	} else if (wL === "MF") {
-		wLText = "Melt Forms";
-	} else if (wL === "IF") {
-		wLText = "Ice Formations";
-	}
 
-	return wLText;
-}
-
-function bedSurface_lookup(bS) {
-	var bSText;
-	if (bS === "S") {
-		bSText = "The avalanche released within a layer of recent storm snow.";
-	} else if (bS === "I") {
-		bSText = "The avalanche released at the new snow/old snow interface.";
-	} else if (bS === "O") {
-		bSText = "The avalanche released within the old snow.";
-	} else if (bS === "G") {
-		bSText = "The avalanche released at the ground, glacial ice or firn.";
-	} else if (bS === "U") {
-		bSText = "Unknown";
-	}
-
-	return bSText;
-}
-
-function type_Lookup(type) {
-	var typeText;
-	if (type === "L") {
-		typeText = "Loose-snow avalanche";
-	} else if (type === "WL") {
-		typeText = "Wet loose-snow avalanche";
-	} else if (type === "SS") {
-		typeText = "Soft slab avalanche";
-	} else if (type === "HS") {
-		typeText = "Hard slab avalanche";
-	} else if (type === "WS") {
-		typeText = "Wet slab avalanche";
-	} else if (type === "I") {
-		typeText = "Ice fall or avalanche";
-	} else if (type === "SF") {
-		typeText = "Slush flow";
-	} else if (type === "C") {
-		typeText = "Cornice fall (w/o additional avalanche)";
-	} else if (type === "R") {
-		typeText = "Roof avalanche";
-	} else if (type === "U") {
-		typeText = "Unknown";
-	}
-
-	return typeText;
-}
-
-function cause_lookup(cause) {
-	var causeText;
-	if (cause === "AS") {
-		causeText = "Skier";
-	} else if (cause === "AR") {
-		causeText = "Snowboarder";
-	} else if (cause === "AI") {
-		causeText = "Snowshoer";
-	} else if (cause === "AM") {
-		causeText = "Snowmobile";
-	} else if (cause === "AB") {
-		causeText = "An explosive detonated above the snow surface (air blast)";
-	} else if (cause === "AO") {
-		causeText = "Unclassified artificial trigger (specify in comments)";
-	} else if (cause === "AU") {
-		causeText = "Unknown artificial trigger";
-	} else if (cause === "N") {
-		causeText = "Natural trigger";
-	} else if (cause === "NC") {
-		causeText = "Cornice fall";
-	} else if (cause === "NE") {
-		causeText = "Earthquake";
-	} else if (cause === "NI") {
-		causeText = "Ice fall";
-	} else if (cause === "AF") {
-		causeText = "Foot penetration";
-	} else if (cause === "AE") {
-		causeText = "An explosive thrown or placed on or under the snow surface by hand";
-	} else if (cause === "NL") {
-		causeText = "Avalanche triggered by loose snow avalanche";
-	} else if (cause === "NS") {
-		causeText = "Avalanche triggered by slab avalanche";
-	} else if (cause === "NR") {
-		causeText = "Rock fall";
-	} else if (cause === "NO") {
-		causeText = "Unclassified natural trigger (specify in comments)";
-	} else if (cause === "AA") {
-		causeText = "Artillery";
-	} else if (cause === "AL") {
-		causeText = "Avalauncher";
-	} else if (cause === "AC") {
-		causeText = "Cornice fall triggered by human or explosive action";
-	} else if (cause === "AX") {
-		causeText = "Gas exploder";
-	} else if (cause === "AH") {
-		causeText = "Explosives placed via helicopter";
-	} else if (cause === "AP") {
-		causeText = "Pre-placed, remotely detonated explosive charge";
-	} else if (cause === "AW") {
-		causeText = "Wildlife";
-	} else if (cause === "AK") {
-		causeText = "Snowcat";
-	} else if (cause === "AV") {
-		causeText = "Vehicle (specify vehicle type in comments)";
-	}
-
-	return causeText;
-}
-
-function showGoToAttsDiv() {
-	$('#goToAttsDiv').css({
-		visibility : "visible",
-		display : "block"
-	});
-
-	//hide the other div if it's visible
-	hideAskFillOutForm();
-}
 
 function hideGoToAttsDiv() {
-	$('#goToAttsDiv').css({
-		visibility : "hidden",
-		display : "none"
-	});
+	$('#goToAttsDiv').hide();
 }
 
 function askFillOutForm() {
@@ -1090,10 +1036,7 @@ function hideAskAddStabTestDiv() {
 }
 
 function hideAskFillOutForm() {
-	$('#askObsFormDiv').css({
-		visibility : "hidden",
-		display : "none"
-	});
+	$('#askObsFormDiv').hide();
 
 	map.graphics.hide();
 	addObType = null;
