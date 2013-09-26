@@ -1099,10 +1099,7 @@ function getRegion(evt) {
 	});
 }
 
-function upDatePoint(lt, lng) {
-	var pt = esri.geometry.geographicToWebMercator(new esri.geometry.Point(lng, lt));
-	graphic.setGeometry(pt);
-}
+
 
 function supports_local_storage() {
 	try {
