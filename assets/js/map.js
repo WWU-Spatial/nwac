@@ -12,6 +12,16 @@ dojo.require("esri.tasks.geometry");
 
 /**************************** CHECK FOR BROWSER SUPPORT ***************************/
 
+/*
+ * Test if the browser supports local storage and returns either true/false
+ */
+function supports_local_storage() {
+	try {
+		return 'localStorage' in window && window['localStorage'] !== null;
+	} catch( e ) {
+		return false;
+	}
+}
 
 
 /********************************** CONSTANTS *************************************/
@@ -1101,13 +1111,7 @@ function getRegion(evt) {
 
 
 
-function supports_local_storage() {
-	try {
-		return 'localStorage' in window && window['localStorage'] !== null;
-	} catch( e ) {
-		return false;
-	}
-}
+
 
 function refreshUserInfo(email, first_name, last_name) {
 	var user = {
