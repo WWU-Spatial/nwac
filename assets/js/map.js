@@ -1057,14 +1057,28 @@ function hideReportToggle() {
 	updateGraphicHandles();
 }
 
+/*
+ * Turns off the onClick handlers for the snowpack and avalanche observations
+ */
 function disconnectShowAttsHandles() {
-	observationClickHandles['snowpack'] ? dojo.disconnect(observationClickHandles['snowpack']) : null;
-	observationClickHandles['avalanche'] ? dojo.disconnect(observationClickHandles['avalanche']) : null;
+	if (observationClickHandles['snowpack']) {
+		dojo.disconnect(observationClickHandles['snowpack']);
+	};
+	if (observationClickHandles['avalanche']) {
+		dojo.disconnect(observationClickHandles['avalanche']);
+	};
 }
 
+/*
+ * Turns on the onClick handlers for the snowpack and avalanche observations
+ */
 function updateGraphicHandles() {
-	!map.getLayer('snowpack') ? null : observationClickHandles['snowpack'] = dojo.connect(map.getLayer('snowpack'), "onClick", showAttributes);
-	!map.getLayer('avalanche') ? null : observationClickHandles['avalanche'] = dojo.connect(map.getLayer('avalanche'), "onClick", showAttributes);
+	if (map.getLayer('snowpack')) {
+		observationClickHandles['snowpack'] = dojo.connect(map.getLayer('snowpack'), "onClick", showAttributes);
+	};
+	if (map.getLayer('avalanche')) {
+		observationClickHandles['avalanche'] = dojo.connect(map.getLayer('avalanche'), "onClick", showAttributes);
+	}
 }
 
 function buildRegionQuery() {
