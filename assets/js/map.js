@@ -68,6 +68,93 @@ var currentObservationType;
 var activeObservation;
 var activeObservationSymbol;
 
+/********************************* GLOBAL LOOKUPS *********************************/
+
+var true_false_lookup = {
+	"true" : "Yes",
+	"on" : "Yes",
+	"false" : "No",
+	"off" : "No"
+};
+
+var destructive_force_lookup = {
+	"D1" : "(D1) Relatively harmless to people",
+	"D2" : "(D2) Could bury, injure, or kill a person",
+	"D3" : "(D3) Could bury and destroy a car, damage a truck, destroy a wood frame house, or break a few trees",
+	"D4" : "(D4) Could destroy a railway car, large truck, several buildings, or a substantial amount of forest",
+	"D5" : "(D5) Could gouge the landscape. Largest snow avalanche known"
+};
+
+var relative_size_lookup = {
+	"R1" : "(R1) Very small, relative to the path",
+	"R2" : "(R2) Small, relative to the path",
+	"R3" : "(R3) Medium, relative to the path",
+	"R4" : "(R4) Large, relative to the path",
+	"R5" : "(R5) Major or maximum, relative to the path"
+};
+
+var weak_layer_lookup = {
+	"PP" : "Precipitation Particles (New Snow)",
+	"MM" : "Machine Made snow",
+	"DF" : "Decomposing and Fragmented Particles",
+	"RG" : "Rounded Grains",
+	"FC" : "Faceted Crystals",
+	"DH" : "Depth Hoar",
+	"SH" : "Surface Hoar",
+	"MF" : "Melt Forms",
+	"IF" : "Ice Formations"
+};
+
+var bed_surface_lookup = {
+	"S" : "The avalanche released within a layer of recent storm snow",
+	"I" : "The avalanche released at the new snow/old snow interface",
+	"O" : "The avalanche released within the old snow",
+	"G" : "The avalanche released at the ground, glacial ice or firn",
+	"U" : "Unknown"
+};
+
+var slide_type_lookup = {
+	"L" : "Loose-snow avalanche",
+	"WL" : "Wet loose-snow avalanche",
+	"SS" : "Soft slab avalanche",
+	"HS" : "Hard slab avalanche",
+	"WS" : "Wet slab avalanche",
+	"I" : "Ice fall or avalanche",
+	"SF" : "Slush flow",
+	"C" : "Cornice fall (w/o additional avalanche)",
+	"R" : "Roof avalanche",
+	"U" : "Unknown"
+};
+
+var avalanche_cause_lookup = {
+	"AS" : "Skier",
+	"AR" : "Snowboarder",
+	"AI" : "Snowshoer",
+	"AM" : "Snowmobile",
+	"AB" : "An explosive detonated above the snow surface (air blast)",
+	"AO" : "Unclassified artificial trigger (specify in comments)",
+	"AI" : "Unknown artificial trigger",
+	"N" : "Natural trigger",
+	"NC" : "Cornice fall",
+	"NE" : "Earthquake",
+	"NI" : "Ice fall",
+	"AF" : "Foot penetration",
+	"AE" : "An explosive thrown or placed on or under the snow surface by hand",
+	"NL" : "Avalanche triggered by loose snow avalanche",
+	"NS" : "Avalanche triggered by slab avalanche",
+	"NR" : "Rock fall",
+	"NO" : "Unclassified natural trigger (specify in comments)",
+	"AA" : "Artillery",
+	"AL" : "Avalauncher",
+	"AC" : "Cornice fall triggered by human or explosive action",
+	"AX" : "Gas exploder",
+	"AH" : "Explosives placed via helicopter",
+	"AP" : "Pre-placed, remotely detonated explosive charge",
+	"AW" : "Wildlife",
+	"AK" : "Snowcat",
+	"AV" : "Vehicle (specify vehicle type in comments)"
+};
+
 /********************************** FUNCTIONS *************************************/
 
 /*
@@ -922,90 +1009,7 @@ function replaceURL(val) {
 }
 
 
-var true_false_lookup = {
-	"true" : "Yes",
-	"on" : "Yes",
-	"false" : "No",
-	"off" : "No"
-};
 
-var destructive_force_lookup = {
-	"D1" : "(D1) Relatively harmless to people",
-	"D2" : "(D2) Could bury, injure, or kill a person",
-	"D3" : "(D3) Could bury and destroy a car, damage a truck, destroy a wood frame house, or break a few trees",
-	"D4" : "(D4) Could destroy a railway car, large truck, several buildings, or a substantial amount of forest",
-	"D5" : "(D5) Could gouge the landscape. Largest snow avalanche known"
-};
-
-var relative_size_lookup = {
-	"R1" : "(R1) Very small, relative to the path",
-	"R2" : "(R2) Small, relative to the path",
-	"R3" : "(R3) Medium, relative to the path",
-	"R4" : "(R4) Large, relative to the path",
-	"R5" : "(R5) Major or maximum, relative to the path"
-};
-
-var weak_layer_lookup = {
-	"PP" : "Precipitation Particles (New Snow)",
-	"MM" : "Machine Made snow",
-	"DF" : "Decomposing and Fragmented Particles",
-	"RG" : "Rounded Grains",
-	"FC" : "Faceted Crystals",
-	"DH" : "Depth Hoar",
-	"SH" : "Surface Hoar",
-	"MF" : "Melt Forms",
-	"IF" : "Ice Formations"
-};
-
-var bed_surface_lookup = {
-	"S" : "The avalanche released within a layer of recent storm snow",
-	"I" : "The avalanche released at the new snow/old snow interface",
-	"O" : "The avalanche released within the old snow",
-	"G" : "The avalanche released at the ground, glacial ice or firn",
-	"U" : "Unknown"
-};
-
-var slide_type_lookup = {
-	"L" : "Loose-snow avalanche",
-	"WL" : "Wet loose-snow avalanche",
-	"SS" : "Soft slab avalanche",
-	"HS" : "Hard slab avalanche",
-	"WS" : "Wet slab avalanche",
-	"I" : "Ice fall or avalanche",
-	"SF" : "Slush flow",
-	"C" : "Cornice fall (w/o additional avalanche)",
-	"R" : "Roof avalanche",
-	"U" : "Unknown"
-};
-
-var avalanche_cause_lookup = {
-	"AS" : "Skier",
-	"AR" : "Snowboarder",
-	"AI" : "Snowshoer",
-	"AM" : "Snowmobile",
-	"AB" : "An explosive detonated above the snow surface (air blast)",
-	"AO" : "Unclassified artificial trigger (specify in comments)",
-	"AI" : "Unknown artificial trigger",
-	"N" : "Natural trigger",
-	"NC" : "Cornice fall",
-	"NE" : "Earthquake",
-	"NI" : "Ice fall",
-	"AF" : "Foot penetration",
-	"AE" : "An explosive thrown or placed on or under the snow surface by hand",
-	"NL" : "Avalanche triggered by loose snow avalanche",
-	"NS" : "Avalanche triggered by slab avalanche",
-	"NR" : "Rock fall",
-	"NO" : "Unclassified natural trigger (specify in comments)",
-	"AA" : "Artillery",
-	"AL" : "Avalauncher",
-	"AC" : "Cornice fall triggered by human or explosive action",
-	"AX" : "Gas exploder",
-	"AH" : "Explosives placed via helicopter",
-	"AP" : "Pre-placed, remotely detonated explosive charge",
-	"AW" : "Wildlife",
-	"AK" : "Snowcat",
-	"AV" : "Vehicle (specify vehicle type in comments)"
-};
 
 
 
