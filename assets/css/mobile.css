@@ -132,7 +132,7 @@ overflow: hidden!important;
   -moz-box-shadow:5px 8px 8px rgba(0,0,0,0.8);
 }
 
-#goToAttsDiv
+#observation-view-toggle
 {
   text-align:center;
   display:none;

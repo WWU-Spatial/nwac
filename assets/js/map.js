@@ -842,12 +842,12 @@ function showAttributes(e) {
 		dojo.disconnect(observationClickHandles['snowpack']);
 	};
 
-	$("#goToAttsDiv").show();
+	$("#observation-view-toggle").show();
 	hideAskFillOutForm();
 
-	$('#hideGoToAttsDivButton').on('click', function() {
+	$('#hideobservation-view-toggleButton').on('click', function() {
 		changeSymbol(gr, 'reset', id);
-		hideGoToAttsDiv();
+		$('#observation-view-toggle').hide();
 	});
 
 	//If there is currently an activeObservation (an observation that is highlighted)
@@ -865,7 +865,7 @@ function showAttributes(e) {
 
 	//Empty values from any previous observations
 	$(".observation-attribute").empty();
-	
+	goToAttsDiv
 	//Make sure all fields are visible
 	$('#obsAtts li').each(function() {
 		$(this).show();	
@@ -992,7 +992,7 @@ function showAttributes(e) {
 	});
 	
 	//Prepare the observation page for viewing
-	//Page won't be viewed until the "view" button is pushed on the goToAttsDiv widget
+	//Page won't be viewed until the "view" button is pushed on the observation-view-toggle widget
 	$('#obsAtts').trigger('create');
 	$('#obsAttsPage').page();
 
@@ -1013,9 +1013,7 @@ function replaceURL(val) {
 
 
 
-function hideGoToAttsDiv() {
-	$('#goToAttsDiv').hide();
-}
+
 
 function askFillOutForm() {
 	//Disconnect addGraphicHandle after we show the form.  If they'd like to add another point, they will have to select it again
@@ -1043,7 +1041,7 @@ function askFillOutForm() {
 	//reset symbols if any obs are highlighted
 	!prevObsLayer ? null : changeSymbol(prevGraphic, 'reset', prevObsLayer);
 	//hide the other div if it's visible
-	hideGoToAttsDiv();
+	$('#observation-view-toggle').hide();
 }
 
 function askAddStabTest() {
