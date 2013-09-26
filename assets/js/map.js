@@ -1019,13 +1019,13 @@ function askFillOutForm() {
 	dojo.disconnect(addGraphicHandle);
 	
 	//show form
-	$('#askObsFormDiv').css({
+	$('#add-report-toggle').css({
 		visibility : "visible",
 		display : "block"
 	});
 
 	//set slider switch
-	$('#askObsFormDivButton').bind('click', function() {
+	$('#add-report-toggleButton').bind('click', function() {
 		if (addObType === 'addObByClick' || addObType === 'addObByGeoLoc') {
 			$.mobile.changePage('#obsReport');
 			//, {changeHash: false});
@@ -1059,7 +1059,7 @@ function hideAskAddStabTestDiv() {
 }
 
 function hideAskFillOutForm() {
-	$('#askObsFormDiv').hide();
+	$('#add-report-toggle').hide();
 
 	map.graphics.hide();
 	addObType = null;
