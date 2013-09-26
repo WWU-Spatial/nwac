@@ -865,7 +865,6 @@ function showAttributes(e) {
 
 	//Empty values from any previous observations
 	$(".observation-attribute").empty();
-	goToAttsDiv
 	//Make sure all fields are visible
 	$('#obsAtts li').each(function() {
 		$(this).show();	
