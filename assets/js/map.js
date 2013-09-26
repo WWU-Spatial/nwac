@@ -1112,7 +1112,12 @@ function getRegion(evt) {
 
 
 
-
+/*
+ * Stores the email, first and last name of the user between browser sessions
+ * to speed the data entry process by pre-populating those fields.  The function
+ * preferably stores the data in local storage when supported, otherwise the data
+ * will be stored in a cookie
+ */
 function refreshUserInfo(email, first_name, last_name) {
 	var user = {
 		'email' : email,
@@ -1122,14 +1127,20 @@ function refreshUserInfo(email, first_name, last_name) {
 	if (useLocalStorage) {
 		window.localStorage.setItem(storeUser, dojo.toJson(user));
 	} else {
-		var exp = 7;
 		// number of days to persist the cookie
+		var exp = 7;	
 		dojo.cookie(storeUser, dojo.toJson(user), {
 			expires : exp
 		});
 	}
 }
 
+/*
+ * Sets the first and last name as well as email address in the avalanche and
+ * observation forms.  The expected format passed to this function is JSON.
+ * This isn't really neccessary and reduces browser compatibility.  Functions
+ * should be reworked to just store these as objects.
+ */
 function setUserInfo(item) {
 	var json = $.parseJSON(item);
 	//obsForm
