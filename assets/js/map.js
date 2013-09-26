@@ -911,6 +911,11 @@ function showAttributes(e) {
 
 }
 
+/*
+ * takes an html link adn returns an <a> element for that link.
+ * Can be used to make html links in the attributes of an ajax request clickable.
+ * Defaults to opening html links in a blank window
+ */
 function replaceURL(val) {
 	var exp = /(\b(https?|http|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
 	return val.replace(exp, "<a href='$1' target='_blank'>$1</a>");
