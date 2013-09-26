@@ -1081,35 +1081,20 @@ function updateGraphicHandles() {
 	}
 }
 
-function buildRegionQuery() {
-	console.log("FUNCTION: buldRegionQuery");
-	dojo.connect(map, "onClick", getRegion);
-	queryTask = new esri.tasks.QueryTask("http://140.160.114.190/ArcGIS/rest/services/NWAC/RegionsBoth/MapServer/0");
-	dojo.connect(queryTask, "onError", noRegion);
-	query = new esri.tasks.Query();
-	query.spatialRelationship = esri.tasks.Query.SPATIAL_REL_INTERSECTS;
-	query.returnGeometry = true;
-	query.outFields = ["name", "region_num"];
-	query.outSpatialReference = {
-		"wkid" : 102100
-	};
-}
 
-function noRegion() {
-	console.log('not in a region - selecting region 1 for now, until there is a 14/other avalailable');
-	zone = 1;
-}
-
+/*
+ * Gets the NWAC Region from a click event geometry by passing the geometry to a 
+ * query task that queries the server for the correct geometry
+ * (Currently this gets run on every click.  It only needs to be run when adding
+ * 	a point (or when submitting a point to the NWAC API))
+ */
 function getRegion(evt) {
 	query.geometry = evt.mapPoint;
 	queryTask.execute(query, function updateRegion(result) {
-		var json = JSON.stringify(result, null, 2);
-		var parsed = $.parseJSON(json);
-		if (!parsed.features[0]) {
-			noRegion('filler');
+		if (result.features[0]) {
+			zone = result.features[0].attributes.region_num;
 		} else {
-			var regionNum = parsed.features[0].attributes.region_num;
-			zone = regionNum;
+			zone = 1;
 		}
 	});
 }
@@ -1231,7 +1216,22 @@ function init() {
 	});
 
 	//build query task for region
-	buildRegionQuery();
+	dojo.connect(map, "onClick", getRegion);
+	queryTask = new esri.tasks.QueryTask("http://140.160.114.190/ArcGIS/rest/services/NWAC/RegionsBoth/MapServer/0");
+	dojo.connect(queryTask, "onError", function(){
+		zone=1;
+	});
+	query = new esri.tasks.Query();
+	query.spatialRelationship = esri.tasks.Query.SPATIAL_REL_INTERSECTS;
+	query.returnGeometry = true;
+	query.outFields = ["name", "region_num"];
+	query.outSpatialReference = {
+		"wkid" : 102100
+	};
+
+
+
+
 
 	map.addLayer(RegionsBoth);
 
