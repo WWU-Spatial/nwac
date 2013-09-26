@@ -40,7 +40,6 @@ var MAPQUEST_ELEVATION_API = 'http://open.mapquestapi.com/elevation/v1/profile?s
 var map;
 var basemaps;
 var markup;
-var addObType;
 var prevFromDate, prevToDate;
 var storeUser = 'NWACMobileUserInfo';
 var useLocalStorage = supports_local_storage();
@@ -705,7 +704,7 @@ function addObservationByClick(e) {
 	$('#avy_location-latitude').val(latitude);
 	$('#avy_location-longitude').val(longitude);
 
-	askFillOutForm();
+	activateReportToggle();
 }
 
 
@@ -729,7 +728,7 @@ function addObservation(type, method) {
 		addGraphicHandle = dojo.connect(map, 'onClick', addObservationByClick);
 	} else if (method === 'GeoLocation') {
 		getLocation();
-		askFillOutForm();
+		activateReportToggle();
 	}
 
 	// Return to map
@@ -1008,39 +1007,42 @@ function replaceURL(val) {
 }
 
 
-
-
-
-
-
-
-function askFillOutForm() {
+/*
+ * Turns on the add-report-toggle.  This allows the user to switch between avalanche and
+ * snowpack reports.  Pressing the add button will set the current date in the avalance/snowpack
+ * date field and open up the report form.  Pressing no will cancel the reporting process and
+ * return the highlighted graphic back to its default symbology
+ */
+function activateReportToggle() {
 	//Disconnect addGraphicHandle after we show the form.  If they'd like to add another point, they will have to select it again
 	dojo.disconnect(addGraphicHandle);
 	
-	//show form
-	$('#add-report-toggle').css({
-		visibility : "visible",
-		display : "block"
-	});
+	//show add report toggle
+	$('#add-report-toggle').show();
+	
+	//hide the observation-view-toggle div
+	$('#observation-view-toggle').hide();
 
 	//set slider switch
-	$('#add-report-toggleButton').bind('click', function() {
-		if (addObType === 'addObByClick' || addObType === 'addObByGeoLoc') {
+	$('#add-report-toggleButton').on('click', function() {
+		if ($('#changeReportSlider').val() === 'snowpack') {
 			$.mobile.changePage('#obsReport');
-			//, {changeHash: false});
-			!$('#obs_Date').val() ? setDate('#obs_Date') : null;
+			if ($('#obs_Date').val()) {
+				setDate('#obs_Date');
+			}
 		} else {
 			$.mobile.changePage('#avyReport');
-			//, {changeHash: false});
-			!$('#avy_Date').val() ? setDate('#avy_Date') : null;
+			if ($('#avy_Date').val()) {
+				setDate('#avy_Date');
+			}
 		}
 	});
 
-	//reset symbols if any obs are highlighted
-	!prevObsLayer ? null : changeSymbol(prevGraphic, 'reset', prevObsLayer);
-	//hide the other div if it's visible
-	$('#observation-view-toggle').hide();
+	//If there is currently an activeObservation (an observation that is highlighted)
+	//reset it back to its default symbology
+	if (activeObservation){
+		activeObservation.setSymbol(activeObservationSymbol);
+	}
 }
 
 function askAddStabTest() {
