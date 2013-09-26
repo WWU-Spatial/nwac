@@ -263,7 +263,7 @@ function formResponse(response, formName) {
 			symbol = symbols['new-snowpack'];	
 			layer = 'snowpack';
 			endpoint = 'observation';
-			askAddStabTest();
+			$("#askAddStabTestDiv").show();
 			break;
 		case 'avalanche':
 			symbol = symbols['new-avalanche'];
@@ -273,7 +273,7 @@ function formResponse(response, formName) {
 	}
 	getObservationById(endpoint, lastObsAdded, symbol, layer);
 	map.graphics.hide();
-	hideAskFillOutForm();
+	hideReportToggle();
 	updateGraphicHandles();
 	resetForm(formName);
 	$.mobile.changePage('#mapPage');
@@ -842,7 +842,7 @@ function showAttributes(e) {
 	};
 
 	$("#observation-view-toggle").show();
-	hideAskFillOutForm();
+	hideReportToggle();
 
 	$('#hideobservation-view-toggleButton').on('click', function() {
 		changeSymbol(gr, 'reset', id);
@@ -1045,26 +1045,15 @@ function activateReportToggle() {
 	}
 }
 
-function askAddStabTest() {
-	$('#askAddStabTestDiv').css({
-		visibility : "visible",
-		display : "block"
-	});
-}
 
-function hideAskAddStabTestDiv() {
-	$('#askAddStabTestDiv').css({
-		visibility : "hidden",
-		display : "none"
-	});
-	$('#stabTestDivLabel').html('Add stability test with observation?');
-}
-
-function hideAskFillOutForm() {
+/*
+ * Hides the add-report-toggle div, hides any map graphics not part of the observation
+ * or avalanche graphics layer (i.e. hides any new observation being created) and
+ * turns back on the onClick handlers for the snowpack and avalanche observation layers
+ */
+function hideReportToggle() {
 	$('#add-report-toggle').hide();
-
 	map.graphics.hide();
-	addObType = null;
 	updateGraphicHandles();
 }
 
