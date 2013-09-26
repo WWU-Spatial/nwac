@@ -66,6 +66,7 @@ var infoTimeout;
 var symbols = {};
 var currentObservationType;
 var activeObservation;
+var activeObservationSymbol;
 
 /********************************** FUNCTIONS *************************************/
 
@@ -682,25 +683,31 @@ function getStabilityTest(id) {
 	});
 
 	request.then(function(data) {
-		stabTestRequestSucceeded(data);
+		processStabilityTest(data);
 	});
 }
 
 
-
-function stabTestRequestSucceeded(data) {
+/*
+ * Takes a successful ajax response from the getStabilityTest function and appends
+ * it to the observation view after removing any previous stability tests from the
+ * DOM
+ */
+function processStabilityTest(data) {
+	$('.stability-attribute').remove();
+	var html = '';
 	if (data.objects) {
-		$.each(parsed.objects, function(num, obj) {
-			markup += "<li data-role='list-divider' data-theme='a'>" + 'Stability Test ' + (num + 1) + "</li>";
-			obj.test_type !== '' && obj.test_type !== null ? addToMarkup('Shear quality', obj.test_type) : null;
-			obj.failure_load !== '' && obj.failure_load !== null ? addToMarkup('Shear quality', obj.failure_load) : null;
-			obj.shear_depth !== '' && obj.shear_depth !== null ? addToMarkup("Depth of shear", obj.shear_depth + ' ' + obj.shear_depth_units) : null;
-			obj.shear_quality !== '' && obj.shear_quality !== null ? addToMarkup('Shear quality', 'Q' + obj.shear_quality) : null;
-			obj.observations_comments !== '' && obj.observations_comments !== null ? addToMarkup('Test comments', obj.observations_comments) : null;
+		$.each(data.objects, function(num, obj) {
+			html += "<li class='stability-attribute' data-role='list-divider' data-theme='a'>" + 'Stability Test ' + (num + 1) + "</li>";
+			html += "<li class='stability-attribute' data-role='list-divider'>Test Type</li><li class='observation-attribute stability-attribute' id='datetime'>" + obj.test_type + "</li>";
+			html += "<li class='stability-attribute' data-role='list-divider'>Shear quality</li><li class='observation-attribute stability-attribute' id='datetime'>" + obj.failure_load + "</li>";
+			html += "<li class='stability-attribute' data-role='list-divider'>Depth of shear</li><li class='observation-attribute stability-attribute' id='datetime'>" + obj.shear_depth + " " + obj.shear_depth_units + "</li>";
+			html += "<li class='stability-attribute' data-role='list-divider'>Shear quality</li><li class='observation-attribute stability-attribute' id='datetime'>" + obj.shear_quality + "</li>";
+			html += "<li class='stability-attribute' data-role='list-divider'>Test comments</li><li class='observation-attribute stability-attribute' id='datetime'>" + obj.observations_comments + "</li>";
 		});
 	}
-
-	makePage();
+	$("#obsAtts").append(html);
+	$('#obsAtts').listview('refresh');
 }
 
 
@@ -724,6 +731,17 @@ function changeSymbol(gr, val, id) {
 }
 
 
+/*
+ * Takes the click attributes when an observation has been clicked on.  Stores the
+ * graphic and symbology to a global variable to facilitate reseting that graphic to
+ * its default later.  Changes the symbology of the clicked symbol to the highlighted
+ * symbology.  Parses the attributes of the object and adds them to the DOM on the view
+ * attribute page.  Does this through a recursive iteration of the graphic.attributes
+ * and matching that to the element in the DOM whose id matches the key of the object.
+ * Appropriate lookups are performed as needed and multiple attributes are combined into
+ * a single field as appropriate.  Any empty fields ar e hidden.  Finally, if a snowpack 
+ * observation, Stability tests are retrieved from the NWAC API and appended.
+ */
 function showAttributes(e) {
 	var id = e.currentTarget.id;
 	var gr = e.graphic;
@@ -748,10 +766,11 @@ function showAttributes(e) {
 	//If there is currently an activeObservation (an observation that is highlighted)
 	//reset it back to its default symbology
 	if (activeObservation){
-		activeObservation.setSymbol(activeObservation.symbol);
+		activeObservation.setSymbol(activeObservationSymbol);
 	}
 	
 	//Store the default symbology for the selected symbol before changing it
+	activeObservationSymbol = gr.symbol;
 	activeObservation = gr;
 	
 	//Highlight the symbol
@@ -873,7 +892,7 @@ function showAttributes(e) {
 	//For snowpack observation layers, get any associated stability tests
 	//The stability tests will be appended to the observation page asyncronously 
 	//upon completion of the getStabilityTest ajax request
-	if (id === 'snowpack') {
+	if (id === 'snowpack_layer') {
 		getStabilityTest(gr.attributes.id);
 	}
 	
