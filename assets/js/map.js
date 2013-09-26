@@ -1153,6 +1153,9 @@ function setUserInfo(item) {
 	$('#id_avyObs_observer-last_name').val(json.last_name);
 }
 
+/*
+ * Opens the calendar widget when selecting dates
+ */
 function showCalendar (el) {
 	$thisCalendar = $(el).attr('id');
 	$('#'+$thisCalendar+'Date').datebox('open');
