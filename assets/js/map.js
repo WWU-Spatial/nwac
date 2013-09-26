@@ -66,7 +66,6 @@ var infoTimeout;
 var symbols = {};
 var currentObservationType;
 var activeObservation;
-var activeObservationSymbol;
 
 /********************************** FUNCTIONS *************************************/
 
@@ -749,11 +748,10 @@ function showAttributes(e) {
 	//If there is currently an activeObservation (an observation that is highlighted)
 	//reset it back to its default symbology
 	if (activeObservation){
-		activeObservation.setSymbol(activeObservationSymbol);
+		activeObservation.setSymbol(activeObservation.symbol);
 	}
 	
 	//Store the default symbology for the selected symbol before changing it
-	activeObservationSymbol = gr.symbol;
 	activeObservation = gr;
 	
 	//Highlight the symbol
