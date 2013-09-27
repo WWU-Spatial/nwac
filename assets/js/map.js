@@ -1308,7 +1308,10 @@ function init() {
 
 }
 
-
+/*
+ * sets the date of the input elemnt (by id) to the current date
+ * This function should go away.
+ */
 function setDate(inputId) {
 	$(inputId).trigger('datebox', {
 		'method' : 'set',
