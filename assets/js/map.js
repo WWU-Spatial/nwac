@@ -479,9 +479,9 @@ function getObservationsByLayer(layerName) {
 		// Service parameters if required, sent with URL as key/value pairs
 		content : {
 			format : 'json',
-			datetime__gte : formatDate(new Date(fromDate), 'obs'),
+			datetime__gte : formatDate($('#fromDate').datebox('getTheDate'), 'obs'),
 			//Set hours to midnight (the next day) so that all points for that day are retreieved
-			datetime__lte : formatDate(new Date(new Date(prevToDate).setHours(24,0,0,0)), 'obs'),
+			datetime__lte : formatDate(new Date(new Date($('#toDate').datebox('getTheDate')).setHours(24,0,0,0)), 'obs'),
 			time : new Date().getTime()
 		},
 		// Data format
@@ -974,7 +974,14 @@ function showAttributes(e) {
 						elem.html(replaceURL(value));
 						break;
 					case "snowpit_profile_image_url" :
-						elem.html(replaceURL(value));
+						if(value){
+							elem.html('<a href="' + value + '" target="_blank" >View photo in new window</a>');
+						}
+						break;
+					case "media" :
+						if (value) {
+							elem.html('<a href="' + value + '" target="_blank" >View photo in new window</a>');
+						}
 						break;
 					default :
 						elem.html(value);
