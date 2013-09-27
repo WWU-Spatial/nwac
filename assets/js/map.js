@@ -50,7 +50,7 @@ var MAPQUEST_ELEVATION_API = 'http://open.mapquestapi.com/elevation/v1/profile?s
 var map;
 var basemaps;
 var markup;
-var prevFromDate, prevToDate;
+var fromDate, prevToDate;
 var storeUser = 'NWACMobileUserInfo';
 var useLocalStorage = supports_local_storage();
 var proxyUrl;
@@ -60,7 +60,7 @@ var RegionsBoth;
 var query, queryTask;
 var initExtent;
 var basemapGallery;
-var today = formatDate(new Date(), 'display');
+var today = new Date();
 var observationClickHandles = {};
 var addGraphicHandle;
 var currentLocSymbol;
@@ -479,7 +479,7 @@ function getObservationsByLayer(layerName) {
 		// Service parameters if required, sent with URL as key/value pairs
 		content : {
 			format : 'json',
-			datetime__gte : formatDate(new Date(prevFromDate), 'obs'),
+			datetime__gte : formatDate(new Date(fromDate), 'obs'),
 			//Set hours to midnight (the next day) so that all points for that day are retreieved
 			datetime__lte : formatDate(new Date(new Date(prevToDate).setHours(24,0,0,0)), 'obs'),
 			time : new Date().getTime()
@@ -1161,13 +1161,21 @@ function showCalendar (el) {
 	$('#'+$thisCalendar+'Date').datebox('open');
 }
 
-
+/*
+ * Inits the mapping capability
+ * Defines some constants, such as bookmarks and symbols
+ * Sets default esri values
+ * Loads the map object with map properties and disables navigation until splash screen dissapears
+ * Adds the basemaps
+ * Prepares the query to determine the clicked region
+ * Prepares the calendar widgets on the options pages
+ * Loads user data from LocalStorage or a cookie
+ */
 function init() {
 	var SR = new esri.SpatialReference({wkid : 102100});
 	var bookmarks = {};
 	
-	/* LOOKUPS */
-	
+	// Bookmarks
 	bookmarks['Full']				= {'extent' : new esri.geometry.Extent(-13937126, 5280024, -13154411, 6454097, SR), 'level' : 6};
 	bookmarks['Olympics'] 			= {'extent' : new esri.geometry.Extent(-13851000, 6045000, -13687000, 6050000, SR), 'level' : 9};
 	bookmarks['MtHood']				= {'extent' : new esri.geometry.Extent(-13592300, 5638300, -13510300, 5710600, SR), 'level' : 9};
@@ -1184,21 +1192,22 @@ function init() {
 	bookmarks['EastSnoqToWhite']	= {'extent' : new esri.geometry.Extent(-13537501, 5846544, -13439662, 5993303, SR), 'level' : 9};
 	bookmarks['EastWhiteSouth']		= {'extent' : new esri.geometry.Extent(-13569842, 5648857, -13374163, 5942375, SR), 'level' : 9};
 	
+	// Symbols
+	symbols['current-location'] = new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 12, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([210, 150, 50, 0.5]), 8), new dojo.Color([210, 150, 50, 0.9]));
+	symbols['avalanche'] 		= new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 12, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color(AVALANCHE_SYMBOL_COLOR), 8), new dojo.Color([153, 51, 255, 0.9]));
+	symbols['snowpack'] 		= new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 12, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color(SNOWPACK_SYMBOL_COLOR), 8), new dojo.Color([0, 153, 255, 0.9]));
+	symbols['highlight'] 		= new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 20, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([0, 0, 0]), 2), new dojo.Color([245, 7, 189, 0.5]));
+	symbols['new-snowpack']		= new esri.symbol.SimpleMarkerSymbol().setColor(new dojo.Color(SNOWPACK_SYMBOL_COLOR));
+	symbols['new-avalanche']	= new esri.symbol.SimpleMarkerSymbol().setColor(new dojo.Color(AVALANCHE_SYMBOL_COLOR));
 	
-	
-	
+	//ESRI Configurations
 	esri.config.defaults.io.proxyUrl = proxyUrl = "http://140.160.114.190/proxy/proxy.ashx";
 	esri.config.defaults.io.alwaysUseProxy = false;
+	esri.config.defaults.map.slider = {top : "100px"};
 
-	esri.config.defaults.map.slider = {
-		top : "100px" // lower zoomSlider from default
-	};
-
-	initExtent = new esri.geometry.Extent(-13937126, 5280024, -13154411, 6454097, new esri.SpatialReference({
-		wkid : 102100
-	}));
+	// Create the map object
 	map = new esri.Map("map", {
-		extent : initExtent,
+		extent : bookmarks.Full.extent,
 		logo : false,
 		wrapAround180 : true,
 		fadeOnZoom : true,
@@ -1208,18 +1217,18 @@ function init() {
 
 	// disable map navigation until infoDiv is hidden
 	map.disableMapNavigation();
-	//	map.hideZoomSlider();
 
 	//add the world topomap from arcgis online
 	var basemap = new esri.layers.ArcGISTiledMapServiceLayer("http://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer");
 	map.addLayer(basemap);
 
-	// basemap gallery
+	// Create basemap gallery to facilitate changing basemaps
 	createBasemapGallery();
 
+	// On the map load, hide the splash screen after 5 seconds and
+	// fade in the controls toolbar
 	dojo.connect(map, "onLoad", function() {
 		infoTimeout = setTimeout(function() {
-			// hide infoDive after 5 seconds
 			hideSplashScreen();
 		}, 5000);
 		$.mobile.hidePageLoadingMsg();
@@ -1244,46 +1253,35 @@ function init() {
 		"wkid" : 102100
 	};
 
-
-
-
-
 	map.addLayer(RegionsBoth);
 
 	// set date range for obs
-	prevToDate = today;
-	prevFromDate = formatDate(new Date(new Date(prevToDate).getTime() - 10 * DAY_IN_MILLISECONDS), 'display');
-	$('#from').html('From:  ' + prevFromDate);
-	$('#to').html('To:  ' + prevToDate);
+	//prevToDate = formatDate(today, 'display');
+	fromDate = new Date(today.getTime()); //Copy today's date
+	fromDate.setDate(fromDate.getDate() - 10); //Subtract 10 days
+	
+	//Set date selector labels
+	$('#from').html('From:  ' + formatDate(fromDate, 'display'));
+	$('#to').html('To:  ' + formatDate(today, 'display'));
 
+	//Prevent the to date from being earlier than the from date
 	$('#fromDate').on('change', function() {
-		var temp = new Date();
-		var diff = parseInt(($('#fromDate').datebox('getTheDate') - temp) / (1000 * 60 * 60 * 24 ), 10);
-		var diffstrt = (diff * -1) - 1;
-		// If you want a minimum of 1 day between, make this -2 instead of -1
-
-		$('#toDate').datebox({'minDays': diffstrt});
+		//We subtract one at the end to make sure at least one day is always shown.  To have a greater
+		//minimum days shown, change the 1 value as appropriate
+		var minDays = Math.round((today - $('#fromDate').datebox('getTheDate')) / DAY_IN_MILLISECONDS) - 1;
+		$('#toDate').datebox({'minDays': minDays});
 		$('#toDate').datebox('applyMinMax');
 		
-
-		var dif = Math.round(((new Date($('#fromDate').val()).getTime() - new Date($('#toDate').val()).getTime())) / DAY_IN_MILLISECONDS);
-		if (dif > 0) {
-			var newTo = formatDate(new Date(new Date($('#fromDate').val()).getTime() + DAY_IN_MILLISECONDS), 'display');
-			$('#toDate').val(newTo);
+		//If the new from date is later than the to date, set the to date to one day ahead of the new
+		//from date
+		if (new Date($('#fromDate').val()) >= new Date($('#toDate').val())) {
+			var toDate = new Date(new Date().setDate($('#fromDate').datebox('getTheDate').getDate() + 1));
+			$('#toDate').val(formatDate(toDate, 'display'));
 			$('#to').html('To:  ' + $('#toDate').val());
-			prevToDate = newTo;
 		}
 	});
 
-	// set symbols colors
-	symbols['current-location'] = new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 12, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([210, 150, 50, 0.5]), 8), new dojo.Color([210, 150, 50, 0.9]));
-	symbols['avalanche'] 		= new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 12, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color(AVALANCHE_SYMBOL_COLOR), 8), new dojo.Color([153, 51, 255, 0.9]));
-	symbols['snowpack'] 		= new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 12, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color(SNOWPACK_SYMBOL_COLOR), 8), new dojo.Color([0, 153, 255, 0.9]));
-	symbols['highlight'] 		= new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 20, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([0, 0, 0]), 2), new dojo.Color([245, 7, 189, 0.5]));
-	symbols['new-snowpack']		= new esri.symbol.SimpleMarkerSymbol().setColor(new dojo.Color(SNOWPACK_SYMBOL_COLOR));
-	symbols['new-avalanche']	= new esri.symbol.SimpleMarkerSymbol().setColor(new dojo.Color(AVALANCHE_SYMBOL_COLOR));
-
-
+	//Load url parameters and set map defaults
 	checkForURLParams();
 
 	// Look for stored user info and use it for forms
@@ -1314,15 +1312,15 @@ function init() {
 function setDate(inputId) {
 	$(inputId).trigger('datebox', {
 		'method' : 'set',
-		'value' : today,
+		'value' : formatDate(today, 'display'),
 		'date' : new Date()
 	}).trigger('datebox', {
 		'method' : 'doset'
 	});
 	if (inputId === '#avy_Date') {
-		$('#avy_').html(today + '  Click to change');
+		$('#avy_').html(formatDate(today, 'display') + '  Click to change');
 	} else {
-		$('#obs_').html(today + '  Click to change');
+		$('#obs_').html(formatDate(today, 'display') + '  Click to change');
 	}
 }
 
