@@ -1018,6 +1018,25 @@ function replaceURL(val) {
 
 
 /*
+ * sets the date of the input elemnt (by id) to the current date
+ * This function should go away.
+ */
+function setDate(inputId) {
+	$(inputId).trigger('datebox', {
+		'method' : 'set',
+		'value' : formatDate(today, 'display'),
+		'date' : new Date()
+	}).trigger('datebox', {
+		'method' : 'doset'
+	});
+	if (inputId === '#avy_Date') {
+		$('#avy_').html(formatDate(today, 'display') + '  Click to change');
+	} else {
+		$('#obs_').html(formatDate(today, 'display') + '  Click to change');
+	}
+}
+
+/*
  * Turns on the add-report-toggle.  This allows the user to switch between avalanche and
  * snowpack reports.  Pressing the add button will set the current date in the avalance/snowpack
  * date field and open up the report form.  Pressing no will cancel the reporting process and
@@ -1306,25 +1325,6 @@ function init() {
 	});
 	
 
-}
-
-/*
- * sets the date of the input elemnt (by id) to the current date
- * This function should go away.
- */
-function setDate(inputId) {
-	$(inputId).trigger('datebox', {
-		'method' : 'set',
-		'value' : formatDate(today, 'display'),
-		'date' : new Date()
-	}).trigger('datebox', {
-		'method' : 'doset'
-	});
-	if (inputId === '#avy_Date') {
-		$('#avy_').html(formatDate(today, 'display') + '  Click to change');
-	} else {
-		$('#obs_').html(formatDate(today, 'display') + '  Click to change');
-	}
 }
 
 
