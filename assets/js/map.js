@@ -1328,6 +1328,10 @@ function init() {
 }
 
 
+/*
+ * Initializes the forms once the document is laoded and then runs the map init.
+ * Add's a few listeners as well.
+ */
 function onDOMLoad() {
 	$(document).ready(function() {
 		$.mobile.showPageLoadingMsg();
@@ -1336,9 +1340,10 @@ function onDOMLoad() {
 		$("#avyObsForm").validate();
 		$("#stabTestForm").validate();
 
+		// Prevent typing in dates in the date fields.  Must use calendars
+		// Not sure this code is needed, but don't feel like checking right now
 		var datePickers = ['#fromDate', '#toDate', '#avy_Date', '#obs_Date'];
 		dojo.forEach(datePickers, function(v) {
-			//code to not allow any changes to be made to input field
 			$(v).keydown(function() {
 				return false;
 			});
@@ -1348,7 +1353,6 @@ function onDOMLoad() {
 
 	// set validator defaults
 	jQuery.validator.setDefaults({
-		debug : true,
 		success : "valid"
 	});
 
@@ -1357,7 +1361,6 @@ function onDOMLoad() {
 		$.mobile.fixedtoolbar({ tapToggle: false });
 	});
 
-	$('#dateLabel').html("NWAC Mobile");
 
 	//resize map on pagechange to mapPage - to handle error...
 	$(document).delegate('#mapPage', 'pageshow', function() {
@@ -1378,6 +1381,8 @@ function onDOMLoad() {
 		var formName = $(this).attr("name");
 
 		//show the default loading message while the $.post request is sent
+		//I really don't feel like parsing through this right now.  If problems
+		//arise then I will do it/clean it/document it
 		$.mobile.showPageLoadingMsg();
 		if (formName === 'stabTestForm') {
 			if ($(this).valid()) {
