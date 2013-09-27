@@ -259,6 +259,10 @@ overflow: hidden!important;
   width:100%;
 }
 
+.ui-controlgroup-controls {
+	width: 100%;
+}
+
 .halfBTN
 {
   width:49%;
