@@ -1179,6 +1179,27 @@ function setUserInfo(item) {
 	$('#id_avyObs_observer-last_name').val(json.last_name);
 }
 
+
+/*
+ * Using mobile frameworks that create new pages (jQuery Mobile) causes the map
+ * resize to fire when the map isn't showing.  This causes certain width/height
+ * attributes to display as NaN corrupting the map when returning to that page.
+ * To fix this, we prevent the API from autoreszing the map (see the map constructor)
+ * and handle resizing ourselves by checking to see if the map is visible.
+ */
+function resizeMap() {
+    if (map && $.mobile.activePage.data('url')==='mapPage') {
+        
+        $('#mapPage').css("height", $('body').height());
+        $('#map').css("height", $('body').height());
+        $('#map').css("width", "auto");
+        
+        map.reposition();
+        map.resize();
+	
+    }
+}
+
 /*
  * Opens the calendar widget when selecting dates
  */
@@ -1186,6 +1207,7 @@ function showCalendar (el) {
 	$thisCalendar = $(el).attr('id');
 	$('#'+$thisCalendar+'Date').datebox('open');
 }
+
 
 /*
  * Inits the mapping capability
@@ -1231,6 +1253,8 @@ function init() {
 	esri.config.defaults.io.alwaysUseProxy = false;
 	esri.config.defaults.map.slider = {top : "100px"};
 
+	
+	
 	// Create the map object
 	map = new esri.Map("map", {
 		extent : bookmarks.Full.extent,
@@ -1238,8 +1262,24 @@ function init() {
 		wrapAround180 : true,
 		fadeOnZoom : true,
 		force3DTransforms : true,
-		navigationMode : "css-transforms"
+		navigationMode : "css-transforms",
+		autoResize: false
 	});
+	
+	
+	var timer;
+
+	
+	  //We have overridden the default autoresize functionality of the map
+	  //and implemented are own that only fires when the map is visible
+	  dojo.connect(window, "resize", function() {
+	  	if ($.mobile.activePage.data('url')==='mapPage') {
+		    //clear any existing resize timer
+		    clearTimeout(timer);
+		    //create new resize timer with delay of 500 milliseconds
+		    timer = setTimeout(function() { resizeMap(); }, 500);
+	  	}
+	  });
 
 	// disable map navigation until infoDiv is hidden
 	map.disableMapNavigation();
@@ -1371,6 +1411,14 @@ function onDOMLoad() {
 
 	//resize map on pagechange to mapPage - to handle error...
 	$(document).delegate('#mapPage', 'pageshow', function() {
+		console.log('pageshow fired');
+		console.log($('circle'));
+		
+		$('#mapPage').css("height", $('body').height());
+        $('#map').css("height", $('body').height());
+        $('#map').css("width", "auto");
+        map.resize();
+        map.reposition();
 		$('circle').each(function() {
 			!$(this).attr('cx') ? $(this).attr('cx', 0) : null;
 			!$(this).attr('cx') ? $(this).attr('cy', 0) : null;
