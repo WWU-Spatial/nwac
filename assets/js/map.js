@@ -1316,9 +1316,6 @@ function init() {
 	query.spatialRelationship = esri.tasks.Query.SPATIAL_REL_INTERSECTS;
 	query.returnGeometry = false;
 	query.outFields = ["name", "region_num"];
-	query.outSpatialReference = {
-		"wkid" : 102100
-	};
 
 	map.addLayer(RegionsBoth);
 
