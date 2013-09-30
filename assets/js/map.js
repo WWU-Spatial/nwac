@@ -424,30 +424,18 @@ function submitForm(formName) {
 /*
  * This function toggles the visibility of the observation layers.  The two possible
  * values for layerName are "avalanche" and "snowpack". The visibility variable can
- * be either "hide" or "show".  This function, depending on the two variables, will
- * toggle the visibility of the selected layer.  The observation data is only requested
- * from the server the first time the layer is toggled on.  All subsequent requests 
- * just toggle the layers visibility.
+ * be either "hide" or "show".  When the layer is turned off, it is actually removed
+ * from the map.  When it is re-enabled, it retreives the data (again) from the NWAC
+ * API.  A more ideal solution would be to hide the layer and only update the data
+ * from the server when the date variables change.
  */
 function toggleObservationLayer(layerName, visibility) {
 	$.mobile.showPageLoadingMsg();
 	if (visibility === 'show') {
-		
-		// disconnect first so doesn't repeat
-		if (observationClickHandles[layerName]) {
-			dojo.disconnect(observationClickHandles[layerName]);
-		}
-		
-		if (map.getLayer(layerName)) {
-			map.getLayer(layerName).show();
-			observationClickHandles[layerName] = dojo.connect(map.getLayer(layerName), "onClick", showAttributes);
-		} else {
-			getObservationsByLayer(layerName);
-		}
-		
+		getObservationsByLayer(layerName);
 	} else if (visibility === 'hide') {
 		if (map.getLayer(layerName)) {
-			map.getLayer(layerName).hide();
+			map.removeLayer(map.getLayer(layerName));
 		}
 	}
 	
