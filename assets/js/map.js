@@ -728,7 +728,7 @@ function addObservationByClick(e) {
  * report type slider on the add point confirmation window.
  */
 function addObservation(type, method) {
-
+	console.log(type, method);
 	currentObservationType = type;
 
 	//Remove onclick listener for point attributes so that attributes are not displayed whil
@@ -755,7 +755,7 @@ function addObservation(type, method) {
 	//set value of slider in askFormDiv
 	if (type === 'snowpack') {
 		$('#changeReportSlider')[0].selectedIndex = 0;
-	} else if (type = 'avalanche') {
+	} else if (type === 'avalanche') {
 		$('#changeReportSlider')[0].selectedIndex = 1;
 	}
 	$('#changeReportSlider').slider("refresh");
