@@ -775,11 +775,9 @@ function getStabilityTest(id) {
 
 /*
  * Takes a successful ajax response from the getStabilityTest function and appends
- * it to the observation view after removing any previous stability tests from the
- * DOM
+ * it to the observation view
  */
 function processStabilityTest(data) {
-	$('.stability-attribute').remove();
 	var html = '';
 	if (data.objects) {
 		$.each(data.objects, function(num, obj) {
@@ -819,16 +817,17 @@ function showAttributes(e) {
 	if (observationClickHandles['snowpack']){
 		dojo.disconnect(observationClickHandles['snowpack']);
 	};
+	if (observationClickHandles['avalanche']){
+		dojo.disconnect(observationClickHandles['avalanche']);
+	};
+	
+	
+	//Remove any stability tests from previous views
+	$('.stability-attribute').remove();
 
 	$("#observation-view-toggle").show();
 	hideReportToggle();
 
-	$('#hideobservation-view-toggleButton').on('click', function() {
-		$('#observation-view-toggle').hide();
-		if (activeObservation){
-			activeObservation.setSymbol(activeObservationSymbol);
-		}
-	});
 
 	//If there is currently an activeObservation (an observation that is highlighted)
 	//reset it back to its default symbology
@@ -874,8 +873,8 @@ function showAttributes(e) {
 						elem.html(value + " " + gr.attributes.observer.last_name);
 						break;
 					case 'elevation':
-						if (gr.attributes.elevation_units) {
-							elem.html(value + " " + gr.attributes.elevation_units);
+						if (gr.attributes.location.elevation_units) {
+							elem.html(value + " " + gr.attributes.location.elevation_units);
 						} else {
 							elem.html(value);
 						}
@@ -1382,7 +1381,14 @@ function init() {
 		};
 	});
 	
-
+	//Hide obseravation-view-toggleButton listner
+	$('#hideobservation-view-toggleButton').on('click', function() {
+		$('#observation-view-toggle').hide();
+		if (activeObservation){
+			activeObservation.setSymbol(activeObservationSymbol);
+		}
+	});
+	
 }
 
 
