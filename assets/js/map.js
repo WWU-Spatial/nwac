@@ -728,7 +728,6 @@ function addObservationByClick(e) {
  * report type slider on the add point confirmation window.
  */
 function addObservation(type, method) {
-	console.log(type, method);
 	currentObservationType = type;
 
 	//Remove onclick listener for point attributes so that attributes are not displayed whil
