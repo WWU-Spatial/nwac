@@ -265,7 +265,18 @@ overflow: hidden!important;
 
 .halfBTN
 {
-  width:49%;
+  position: absolute;
+  bottom: 0px;
+}
+
+#optionsBTN {
+	left: 0px;
+	right: 50%;
+}
+
+#infoBTN {
+	right: 0px;
+	left: 50%;	
 }
 
 /* wrap text in li */
