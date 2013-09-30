@@ -1409,8 +1409,6 @@ function onDOMLoad() {
 
 	//resize map on pagechange to mapPage - to handle error...
 	$(document).delegate('#mapPage', 'pageshow', function() {
-		console.log('pageshow fired');
-		console.log($('circle'));
 		
 		$('#mapPage').css("height", $('body').height());
         $('#map').css("height", $('body').height());
