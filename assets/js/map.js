@@ -1358,6 +1358,30 @@ function init() {
 		}
 	});
 	
+	//Calendar Listners
+	$("#fromDate").on("change", function() {
+		$('#from').html('From: ' + $(this).val());
+		if (map.getLayer('snowpack')) {
+			toggleObservationLayer('snowpack', 'hide');
+			toggleObservationLayer('snowpack', 'show');
+		};
+		if (map.getLayer('avalanche')) {
+			toggleObservationLayer('avalanche', 'hide');
+			toggleObservationLayer('snowpack', 'show');
+		};
+	});
+	$("#toDate").on("change", function() {
+		$('#to').html('To: ' + $(this).val());
+		if (map.getLayer('snowpack')) {
+			toggleObservationLayer('snowpack', 'hide');
+			toggleObservationLayer('snowpack', 'show');
+		};
+		if (map.getLayer('avalanche')) {
+			toggleObservationLayer('avalanche', 'hide');
+			toggleObservationLayer('snowpack', 'show');
+		};
+	});
+	
 
 }
 

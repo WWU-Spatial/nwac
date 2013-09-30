@@ -200,8 +200,8 @@
 					</li>
 					<li><a class="calButton" id="from" data-role="button" href="#" onclick="showCalendar($(this));">Select date from...</a></li>
 					<li><a class="calButton" id="to" data-role="button" href="#" onclick="showCalendar($(this));">Select date to...</a></li>
-						<input name="fromDate" id="fromDate" type="date" data-role="datebox" data-options='{"mode": "calbox", "theme": "c", "beforeToday": true, "centerHoriz": true, "centerVert":true, "hideInput":true, "useHeader": false}' onchange="$('#from').html('From:  ' + $(this).val() )"/>
-						<input name="toDate" id="toDate" type="date" data-role="datebox" data-options='{"mode": "calbox", "theme": "c", "beforeToday": true, "centerHoriz": true, "centerVert":true, "hideInput":true, "useHeader": false}' onchange="$('#to').html('To:  ' + $(this).val() );"/>				
+						<input name="fromDate" id="fromDate" type="date" data-role="datebox" data-options='{"mode": "calbox", "theme": "c", "beforeToday": true, "centerHoriz": true, "centerVert":true, "hideInput":true, "useHeader": false}'/>
+						<input name="toDate" id="toDate" type="date" data-role="datebox" data-options='{"mode": "calbox", "theme": "c", "beforeToday": true, "centerHoriz": true, "centerVert":true, "hideInput":true, "useHeader": false}'/>				
 					<li><a onClick="$.mobile.changePage('#addObsPage',{changeHash: false})" data-role="button">Add an observation</a></li>
 				</ul>
 			</div>	
