@@ -1351,6 +1351,20 @@ function init() {
 		$.mobile.changePage('#mapPage');
 	});
 	
+	//Change Report Type listener
+	//Change the symbology of the new point if the report type toggle is changed
+	//Since there should only ever be one graphic in the graphics layer on the map
+	//(observations are kept in their own layer) we just modify the first graphic
+	//in the graphics array
+	$("#changeReportSlider").on("change", function() {
+		var observationType = $("#changeReportSlider").val();
+		if (observationType ==='snowpack') {
+			map.graphics.graphics[0].setSymbol(symbols['new-snowpack']);
+		} else if (observationType ==='avalanche') {
+			map.graphics.graphics[0].setSymbol(symbols['new-avalanche']);
+		}
+	});
+	
 
 }
 
