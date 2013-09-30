@@ -1366,7 +1366,7 @@ function init() {
 		};
 		if (map.getLayer('avalanche')) {
 			toggleObservationLayer('avalanche', 'hide');
-			toggleObservationLayer('snowpack', 'show');
+			toggleObservationLayer('avalanche', 'show');
 		};
 	});
 	$("#toDate").on("change", function() {
@@ -1377,7 +1377,7 @@ function init() {
 		};
 		if (map.getLayer('avalanche')) {
 			toggleObservationLayer('avalanche', 'hide');
-			toggleObservationLayer('snowpack', 'show');
+			toggleObservationLayer('avalanche', 'show');
 		};
 	});
 	
