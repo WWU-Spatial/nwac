@@ -238,7 +238,12 @@ body
 	left: 50%;	
 }
 
-/* wrap text in li */
+.ui-field-contain div.ui-slider-switch, .ui-field-contain.ui-hide-label div.ui-slider-switch {
+	width:100%;
+}
+
+
+
 p.ui-li-desc
 {
   white-space:normal!important;
