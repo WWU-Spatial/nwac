@@ -1,9 +1,5 @@
 body
 {
-/*
-overflow: hidden!important;
-    
-*/
   bottom:0;
   top:0;
 }
@@ -165,10 +161,7 @@ overflow: hidden!important;
   position:absolute;
   width:300px;
   margin-right:-150px;
-  right:/*;
-    left: 50%;
-    */
-50%;
+  right: 50%;
 }
 
 
@@ -201,26 +194,6 @@ overflow: hidden!important;
   text-shadow:3px 2px 6px white;
 }
 
-/*
-#dateLabel {
-    text-align: center;
-    position: fixed;
-    top: 32px;
-    width: 100%;
-    margin: 0 auto;
-    font-weight:  bolder;
-    text-shadow:  3px 2px 6px white;
-}
-
-#dateDiv {
-    position: fixed;
-    top: 32px;
-    width: 100%;
-    margin: 0 auto;
-    background-color: rgba(0, 0, 0, .5);
-}
-
-*/
 #minusDayBtn
 {
   visibility:hidden;
@@ -245,10 +218,6 @@ overflow: hidden!important;
   bottom:0;
   margin:0 .5em .1em;
   display:none;
-/*padding-left: 10px;
-     margin-bottom:  4px;
-    margin-top:  4px;
-    */
 }
 
 #footer
@@ -286,14 +255,7 @@ p.ui-li-desc
 }
 
 
-/**
-*SPECIFIC MOBILE STYLE
-#infoDiv {
-    position: relative;
-    top: 0;
-    bottom: 0;
-}
-**/
+
 @media only screen and max-width 721px {
   .ui-br
   {
