@@ -707,6 +707,8 @@ function addObservationByClick(e) {
 	var latitude = coords[0];
 	var longitude = coords[1];
 	getElevation(latitude, longitude);
+	getRegion(e.mapPoint);
+	//Put get zone function here
 	
 	//Set latitude and longitude in form fields
 	$('#obs_location-latitude').val(latitude);
@@ -1124,8 +1126,8 @@ function updateGraphicHandles() {
  * (Currently this gets run on every click.  It only needs to be run when adding
  * 	a point (or when submitting a point to the NWAC API))
  */
-function getRegion(evt) {
-	query.geometry = evt.mapPoint;
+function getRegion(mapPoint) {
+	query.geometry = mapPoint;
 	queryTask.execute(query, function updateRegion(result) {
 		if (result.features[0]) {
 			zone = result.features[0].attributes.region_num;
@@ -1306,14 +1308,13 @@ function init() {
 	});
 
 	//build query task for region
-	dojo.connect(map, "onClick", getRegion);
 	queryTask = new esri.tasks.QueryTask("http://140.160.114.190/ArcGIS/rest/services/NWAC/RegionsBoth/MapServer/0");
 	dojo.connect(queryTask, "onError", function(){
 		zone=1;
 	});
 	query = new esri.tasks.Query();
 	query.spatialRelationship = esri.tasks.Query.SPATIAL_REL_INTERSECTS;
-	query.returnGeometry = true;
+	query.returnGeometry = false;
 	query.outFields = ["name", "region_num"];
 	query.outSpatialReference = {
 		"wkid" : 102100
