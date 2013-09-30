@@ -306,7 +306,7 @@ function formFail(error) {
  * Gets an observation from the NWAC API.  Can get observations from either the 
  * 'observation', or avalancheObservation endpoints'.  The api server does not support
  * cross-domain requests, so we use a jsonp callback.  The callback parses the data
- * and adds an appropriate point to the map using the addObservationToMap functoin
+ * and adds an appropriate point to the map using the addObservationToMap function
  */
 function getObservationById(endpoint, id, symbol, layerName) {
 	var url = NWAC_API + endpoint + '/' + id + '/';
