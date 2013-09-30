@@ -47,16 +47,6 @@ body
   position:fixed!important;
 }
 
-45%
-{
-  opacity:.20;
-}
-
-100%
-{
-  opacity:1.0;
-}
-
 #map_graphics_layer
 {
   overflow:hidden!important;
