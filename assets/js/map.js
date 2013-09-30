@@ -1301,13 +1301,13 @@ function init() {
 	map.addLayer(RegionsBoth);
 
 	// set date range for obs
-	//prevToDate = formatDate(today, 'display');
 	fromDate = new Date(today.getTime()); //Copy today's date
 	fromDate.setDate(fromDate.getDate() - 10); //Subtract 10 days
 	
 	//Set date selector labels
 	$('#from').html('From:  ' + formatDate(fromDate, 'display'));
 	$('#to').html('To:  ' + formatDate(today, 'display'));
+	
 
 	//Prevent the to date from being earlier than the from date
 	$('#fromDate').on('change', function() {
@@ -1328,6 +1328,12 @@ function init() {
 
 	//Load url parameters and set map defaults
 	checkForURLParams();
+	
+	
+	$("#options").page(); //Initialize the options page so the dateboxes are initialized and usable
+	$('#fromDate').datebox('setTheDate', fromDate);
+	getObservationsByLayer('snowpack');
+	getObservationsByLayer('avalanche');
 
 	// Look for stored user info and use it for forms
 	var userInfoJSON;
