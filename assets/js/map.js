@@ -809,26 +809,6 @@ function processStabilityTest(data) {
 }
 
 
-
-function changeSymbol(gr, val, id) {
-	var sym = new esri.symbol.SimpleMarkerSymbol();
-
-	if (val === 'highlight') {
-		gr.setSymbol(highlighted);
-	} else if (val === 'reset') {
-		if (id === "obsLayer_layer") {
-			sym.setColor(new dojo.Color(SNOWPACK_SYMBOL_COLOR));
-			gr.setSymbol(sym);
-		} else if (id === "avyObsLayer_layer") {
-			sym.setColor(new dojo.Color(AVALANCHE_SYMBOL_COLOR));
-			gr.setSymbol(sym);
-		}
-	}
-	prevGraphic = gr;
-	prevObsLayer = id;
-}
-
-
 /*
  * Takes the click attributes when an observation has been clicked on.  Stores the
  * graphic and symbology to a global variable to facilitate reseting that graphic to
@@ -857,8 +837,10 @@ function showAttributes(e) {
 	hideReportToggle();
 
 	$('#hideobservation-view-toggleButton').on('click', function() {
-		changeSymbol(gr, 'reset', id);
 		$('#observation-view-toggle').hide();
+		if (activeObservation){
+			activeObservation.setSymbol(activeObservationSymbol);
+		}
 	});
 
 	//If there is currently an activeObservation (an observation that is highlighted)
