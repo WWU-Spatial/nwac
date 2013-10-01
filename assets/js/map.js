@@ -616,6 +616,10 @@ function getLocation() {
 		maximumAge: 0
 	};
 	
+	//Make sure there are no current graphics on the map
+	//Does not include avalanche and snowpack layers
+	map.graphics.clear();
+	
 	if (navigator.geolocation) {
 		navigator.geolocation.getCurrentPosition(showCurrentLocation, locationError, options);
 	} else {
@@ -658,6 +662,7 @@ function showCurrentLocation(location) {
 	var pt = esri.geometry.geographicToWebMercator(new esri.geometry.Point(location.coords.longitude, location.coords.latitude));
 	var graphic = new esri.Graphic(pt, symbols['new-' + currentObservationType]);
 	map.graphics.show();
+	map.graphics.add(graphic);
 	zoomToLocation(location.coords.latitude, location.coords.longitude);
 }
 
