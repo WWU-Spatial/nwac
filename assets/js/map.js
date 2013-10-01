@@ -20,7 +20,7 @@
 	 */
 	function supports_local_storage() {
 		try {
-			return 'localStorage' in window && window['localStorage'] !== null;
+			return 'localStorage' in window && window.localStorage !== null;
 		} catch( e ) {
 			return false;
 		}
@@ -60,7 +60,6 @@
 	var queryTask, query;
 	var symbol;
 	var RegionsBoth;
-	var query, queryTask;
 	var initExtent;
 	var basemapGallery;
 	var today = new Date();
@@ -822,12 +821,12 @@
 		//this so the click-handler is only created upon creation of the observation layer
 		//(we can turn it off and back on when need-be)
 		//Why isn't the avalanche click-handler here too?'
-		if (observationClickHandles['snowpack']){
-			dojo.disconnect(observationClickHandles['snowpack']);
-		};
-		if (observationClickHandles['avalanche']){
-			dojo.disconnect(observationClickHandles['avalanche']);
-		};
+		if (observationClickHandles.snowpack){
+			dojo.disconnect(observationClickHandles.snowpack);
+		}
+		if (observationClickHandles.avalanche){
+			dojo.disconnect(observationClickHandles.avalanche);
+		}
 		
 		
 		//Remove any stability tests from previous views
@@ -848,7 +847,7 @@
 		activeObservation = gr;
 		
 		//Highlight the symbol
-		gr.setSymbol(symbols['highlight']);
+		gr.setSymbol(symbols.highlight);
 	
 		//Empty values from any previous observations
 		$(".observation-attribute").empty();
@@ -860,7 +859,7 @@
 		$.each(gr.attributes, recurseAttributes);
 			
 		function recurseAttributes(key, value) {
-			if(value==null || value===false){
+			if(value===null || value===false){
 				return;
 			}
 			if (value instanceof Object) {
@@ -978,7 +977,7 @@
 		
 		//Hide empty fields and their list-divider element from being displayed
 		$('.observation-attribute').each(function() {
-			if ($(this).html().trim() == '') {
+			if ($(this).html().trim() === '') {
 				$(this).prev().hide();
 				$(this).hide();
 			}		
@@ -1075,12 +1074,12 @@
 	 * Turns off the onClick handlers for the snowpack and avalanche observations
 	 */
 	function disconnectShowAttsHandles() {
-		if (observationClickHandles['snowpack']) {
-			dojo.disconnect(observationClickHandles['snowpack']);
-		};
-		if (observationClickHandles['avalanche']) {
-			dojo.disconnect(observationClickHandles['avalanche']);
-		};
+		if (observationClickHandles.snowpack) {
+			dojo.disconnect(observationClickHandles.snowpack);
+		}
+		if (observationClickHandles.avalanche) {
+			dojo.disconnect(observationClickHandles.avalanche);
+		}
 	}
 	
 	/*
@@ -1088,10 +1087,10 @@
 	 */
 	function updateGraphicHandles() {
 		if (map.getLayer('snowpack')) {
-			observationClickHandles['snowpack'] = dojo.connect(map.getLayer('snowpack'), "onClick", showAttributes);
-		};
+			observationClickHandles.snowpack = dojo.connect(map.getLayer('snowpack'), "onClick", showAttributes);
+		}
 		if (map.getLayer('avalanche')) {
-			observationClickHandles['avalanche'] = dojo.connect(map.getLayer('avalanche'), "onClick", showAttributes);
+			observationClickHandles.avalanche = dojo.connect(map.getLayer('avalanche'), "onClick", showAttributes);
 		}
 	}
 	
@@ -1100,7 +1099,7 @@
 	 * Gets the NWAC Region from a click event geometry by passing the geometry to a 
 	 * query task that queries the server for the correct geometry
 	 * (Currently this gets run on every click.  It only needs to be run when adding
-	 * 	a point (or when submitting a point to the NWAC API))
+	 * a point (or when submitting a point to the NWAC API))
 	 */
 	function getRegion(mapPoint) {
 		query.geometry = mapPoint;
@@ -1166,18 +1165,18 @@
 	 * and handle resizing ourselves by checking to see if the map is visible.
 	 */
 	function resizeMap() {
-	    if (map && $.mobile.activePage.data('url')==='mapPage') {
-	        
-	        $('#mapPage').css("height", $('body').height());
-	        $('#map').css("height", $('body').height());
-	        $('#map').css("width", "auto");
-	        
-	        map.reposition();
-	        map.resize();
-		
-	    }
+		if (map && $.mobile.activePage.data('url')==='mapPage') {
+
+			$('#mapPage').css("height", $('body').height());
+			$('#map').css("height", $('body').height());
+			$('#map').css("width", "auto");
+
+			map.reposition();
+			map.resize();
+
+		}
 	}
-	
+
 	/*
 	 * Opens the calendar widget when selecting dates
 	 */
@@ -1202,27 +1201,27 @@
 		var bookmarks = {};
 		
 		// Bookmarks
-		bookmarks['Full']				= {'extent' : new esri.geometry.Extent(-13937126, 5280024, -13154411, 6454097, SR), 'level' : 6};
-		bookmarks['Olympics'] 			= {'extent' : new esri.geometry.Extent(-13851000, 6045000, -13687000, 6050000, SR), 'level' : 9};
-		bookmarks['MtHood']				= {'extent' : new esri.geometry.Extent(-13592300, 5638300, -13510300, 5710600, SR), 'level' : 9};
-		bookmarks['StevensPass']		= {'extent' : new esri.geometry.Extent(-13503992, 6024773, -13455073, 6098152, SR), 'level' : 10};
-		bookmarks['SnoqualmiePass']		= {'extent' : new esri.geometry.Extent(-13542712, 5957299, -13493793, 6030678, SR), 'level' : 10};
-		bookmarks['WhitePass']			= {'extent' : new esri.geometry.Extent(-13536249, 5830776, -13487329, 5904155, SR), 'level' : 10};
-		bookmarks['WestStevensNorth']	= {'extent' : new esri.geometry.Extent(-13603953, 5988709, -13408275, 6282227, SR), 'level' : 8};
-		bookmarks['WestStevensToSnoq']	= {'extent' : new esri.geometry.Extent(-13655625, 5750225, -13459946, 6043743, SR), 'level' : 9};
-		bookmarks['WestStevensToWhite']	= {'extent' : new esri.geometry.Extent(-13655625, 5750225, -13459946, 6043743, SR), 'level' : 9};
-		bookmarks['WestStoqToWhite']	= {'extent' : new esri.geometry.Extent(-13576436, 5955535, -13478597, 6102294, SR), 'level' : 9};
-		bookmarks['WestWhiteSouth']		= {'extent' : new esri.geometry.Extent(-13674887, 5637557, -13479208, 5931075, SR), 'level' : 9};
-		bookmarks['EastStevensNorth']	= {'extent' : new esri.geometry.Extent(-13497247, 5986263, -13301569, 6279781, SR), 'level' : 8};
-		bookmarks['EastStevensToSnoq']	= {'extent' : new esri.geometry.Extent(-13542039, 5827732, -13346361, 6121250, SR), 'level' : 9};
-		bookmarks['EastSnoqToWhite']	= {'extent' : new esri.geometry.Extent(-13537501, 5846544, -13439662, 5993303, SR), 'level' : 9};
-		bookmarks['EastWhiteSouth']		= {'extent' : new esri.geometry.Extent(-13569842, 5648857, -13374163, 5942375, SR), 'level' : 9};
+		bookmarks.Full				= {'extent' : new esri.geometry.Extent(-13937126, 5280024, -13154411, 6454097, SR), 'level' : 6};
+		bookmarks.Olympics			= {'extent' : new esri.geometry.Extent(-13851000, 6045000, -13687000, 6050000, SR), 'level' : 9};
+		bookmarks.MtHood			= {'extent' : new esri.geometry.Extent(-13592300, 5638300, -13510300, 5710600, SR), 'level' : 9};
+		bookmarks.StevensPass		= {'extent' : new esri.geometry.Extent(-13503992, 6024773, -13455073, 6098152, SR), 'level' : 10};
+		bookmarks.SnoqualmiePass	= {'extent' : new esri.geometry.Extent(-13542712, 5957299, -13493793, 6030678, SR), 'level' : 10};
+		bookmarks.WhitePass			= {'extent' : new esri.geometry.Extent(-13536249, 5830776, -13487329, 5904155, SR), 'level' : 10};
+		bookmarks.WestStevensNorth	= {'extent' : new esri.geometry.Extent(-13603953, 5988709, -13408275, 6282227, SR), 'level' : 8};
+		bookmarks.WestStevensToSnoq	= {'extent' : new esri.geometry.Extent(-13655625, 5750225, -13459946, 6043743, SR), 'level' : 9};
+		bookmarks.WestStevensToWhite= {'extent' : new esri.geometry.Extent(-13655625, 5750225, -13459946, 6043743, SR), 'level' : 9};
+		bookmarks.WestStoqToWhite	= {'extent' : new esri.geometry.Extent(-13576436, 5955535, -13478597, 6102294, SR), 'level' : 9};
+		bookmarks.WestWhiteSouth	= {'extent' : new esri.geometry.Extent(-13674887, 5637557, -13479208, 5931075, SR), 'level' : 9};
+		bookmarks.EastStevensNorth	= {'extent' : new esri.geometry.Extent(-13497247, 5986263, -13301569, 6279781, SR), 'level' : 8};
+		bookmarks.EastStevensToSnoq	= {'extent' : new esri.geometry.Extent(-13542039, 5827732, -13346361, 6121250, SR), 'level' : 9};
+		bookmarks.EastSnoqToWhite	= {'extent' : new esri.geometry.Extent(-13537501, 5846544, -13439662, 5993303, SR), 'level' : 9};
+		bookmarks.EastWhiteSouth	= {'extent' : new esri.geometry.Extent(-13569842, 5648857, -13374163, 5942375, SR), 'level' : 9};
 		
 		// Symbols
 		symbols['current-location'] = new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 12, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([210, 150, 50, 0.5]), 8), new dojo.Color([210, 150, 50, 0.9]));
-		symbols['avalanche'] 		= new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 12, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color(AVALANCHE_SYMBOL_COLOR), 8), new dojo.Color([153, 51, 255, 0.9]));
-		symbols['snowpack'] 		= new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 12, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color(SNOWPACK_SYMBOL_COLOR), 8), new dojo.Color([0, 153, 255, 0.9]));
-		symbols['highlight'] 		= new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 20, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([0, 0, 0]), 2), new dojo.Color([245, 7, 189, 0.5]));
+		symbols.avalanche			= new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 12, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color(AVALANCHE_SYMBOL_COLOR), 8), new dojo.Color([153, 51, 255, 0.9]));
+		symbols.snowpack			= new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 12, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color(SNOWPACK_SYMBOL_COLOR), 8), new dojo.Color([0, 153, 255, 0.9]));
+		symbols.highlight			= new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 20, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([0, 0, 0]), 2), new dojo.Color([245, 7, 189, 0.5]));
 		symbols['new-snowpack']		= new esri.symbol.SimpleMarkerSymbol().setColor(new dojo.Color(SNOWPACK_SYMBOL_COLOR));
 		symbols['new-avalanche']	= new esri.symbol.SimpleMarkerSymbol().setColor(new dojo.Color(AVALANCHE_SYMBOL_COLOR));
 		
@@ -1248,16 +1247,16 @@
 		var timer;
 	
 		
-		  //We have overridden the default autoresize functionality of the map
-		  //and implemented are own that only fires when the map is visible
-		  dojo.connect(window, "resize", function() {
-		  	if ($.mobile.activePage.data('url')==='mapPage') {
-			    //clear any existing resize timer
-			    clearTimeout(timer);
-			    //create new resize timer with delay of 500 milliseconds
-			    timer = setTimeout(function() { resizeMap(); }, 500);
-		  	}
-		  });
+		//We have overridden the default autoresize functionality of the map
+		//and implemented are own that only fires when the map is visible
+		dojo.connect(window, "resize", function() {
+			if ($.mobile.activePage.data('url')==='mapPage') {
+				//clear any existing resize timer
+				clearTimeout(timer);
+				//create new resize timer with delay of 500 milliseconds
+				timer = setTimeout(function() { resizeMap(); }, 500);
+			}
+		});
 	
 		// disable map navigation until infoDiv is hidden
 		map.disableMapNavigation();
@@ -1371,22 +1370,22 @@
 			if (map.getLayer('snowpack')) {
 				toggleObservationLayer('snowpack', 'hide');
 				toggleObservationLayer('snowpack', 'show');
-			};
+			}
 			if (map.getLayer('avalanche')) {
 				toggleObservationLayer('avalanche', 'hide');
 				toggleObservationLayer('avalanche', 'show');
-			};
+			}
 		});
 		$("#toDate").on("change", function() {
 			$('#to').html('To: ' + $(this).val());
 			if (map.getLayer('snowpack')) {
 				toggleObservationLayer('snowpack', 'hide');
 				toggleObservationLayer('snowpack', 'show');
-			};
+			}
 			if (map.getLayer('avalanche')) {
 				toggleObservationLayer('avalanche', 'hide');
 				toggleObservationLayer('avalanche', 'show');
-			};
+			}
 		});
 		
 		//Hide obseravation-view-toggleButton listner
@@ -1561,10 +1560,10 @@
 		$(document).delegate('#mapPage', 'pageshow', function() {
 			
 			$('#mapPage').css("height", $('body').height());
-	        $('#map').css("height", $('body').height());
-	        $('#map').css("width", "auto");
-	        map.resize();
-	        map.reposition();
+			$('#map').css("height", $('body').height());
+			$('#map').css("width", "auto");
+			map.resize();
+			map.reposition();
 			$('circle').each(function() {
 				!$(this).attr('cx') ? $(this).attr('cx', 0) : null;
 				!$(this).attr('cx') ? $(this).attr('cy', 0) : null;
@@ -1595,8 +1594,9 @@
 					formArray.forEach(function(field) {
 						if (field.value) {
 							switch(field.value) {
-								case '':
+								case '': //fall through
 								case null:
+									break;
 								default:
 									empty = false;
 							}
