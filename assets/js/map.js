@@ -896,7 +896,7 @@
 							elem.html(value + " " + gr.attributes.runout_length_units);
 							break;
 						case 'crown_depth':
-							elem.html(value + " " + gr.attributes.crown_units);
+							elem.html(value + " " + gr.attributes.crown_depth_units);
 							break;
 						case 'air_temp':
 							elem.html(value + " " + gr.attributes.air_temp_units);
@@ -917,11 +917,14 @@
 						case "bed_surface" :
 							elem.html(bed_surface_lookup[value]);
 							break;
-						case "avalanche_side_destructive_force" :
+						case "avalanche_size_destructive_force" :
 							elem.html(destructive_force_lookup[value]);
 							break;
 						case "avalanche_size_relative" :
 							elem.html(relative_size_lookup[value]);
+							break;
+						case "weak_layer" :
+							elem.html(weak_layer_lookup[value]);
 							break;
 						case "rapid_warming" :
 							elem.html(true_false_lookup[value]);
@@ -1294,6 +1297,10 @@
 	
 		map.addLayer(RegionsBoth);
 	
+		//set observation form datetime field to current day
+		$("#avalanche-frm-select-date").html(formatDate(today, 'display'));
+		$("#snowpack-frm-select-date").html(formatDate(today, 'display'));
+		
 		// set date range for obs
 		fromDate = new Date(today.getTime()); //Copy today's date
 		fromDate.setDate(fromDate.getDate() - 10); //Subtract 10 days
@@ -1530,9 +1537,38 @@
 		$(document).ready(function() {
 			$.mobile.showPageLoadingMsg();
 	
-			$('#obsForm').validate();
+			$( "#obsForm" ).validate({
+				rules: {
+					"observer-email" : {
+						required: true,
+						email: true,
+						maxlength: 75
+					},
+					"observer-first_name" :{
+						required: true,
+						maxlength: 255
+					},
+					"observer-last_name" : {
+						required: true,
+						maxlength: 255
+					},
+					"location-latitude" : {
+						required: true,
+						number: true
+					},
+					"location-longitude" : {
+						required: true,
+						number: true
+					}
+						
+						
+				}
+			});
+			
 			$("#avyObsForm").validate();
 			$("#stabTestForm").validate();
+			
+			
 	
 			// Prevent typing in dates in the date fields.  Must use calendars
 			// Not sure this code is needed, but don't feel like checking right now

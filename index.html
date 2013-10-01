@@ -239,7 +239,7 @@
 				<ul data-role="listview" data-inset="true">	
 					<li data-role='list-divider'><h2>Observer</h2></li>
 					<li><h4>Datetime</h4></li>
-					<li><a id="avalanche-frm-select-date" data-role="button" href="#">Select date</a></li>
+					<li><a id="avalanche-frm-select-date" data-role="button" href="#"></a></li>
 				  	<input name="datetime" id="avalanche-frm-select-dateDate" type="date" data-role="datebox" data-options='{"mode": "calbox", "theme": "c", "beforeToday": true, "centerHoriz": true, "centerVert":true, "hideInput":true, "useHeader": false}'/>
 					<li><h4>Email</h4><em>*</em><input class="required email" id="id_avyObs_observer-email" type="text" name="observer-email" maxlength="75" /></li>
 					<li><h4>First name</h4><em>*</em><input class="required" id="id_avyObs_observer-first_name" type="text" name="observer-first_name" maxlength="255" /></li>
@@ -404,17 +404,17 @@
 				<ul data-role="listview" data-inset="true">	
 					<li data-role='list-divider'><h2>Observer</h2></li>
 					<li><h4>Datetime</h4></li>
-					<li><a id="snowpack-frm-select-date" data-role="button" href="#">Select date *</a></li>
+					<li><a id="snowpack-frm-select-date" data-role="button" href="#"></a></li>
 				  	<input name="datetime" id="snowpack-frm-select-dateDate" type="date" data-role="datebox" data-options='{"mode": "calbox", "theme": "c", "beforeToday": true, "centerHoriz": true, "centerVert":true, "hideInput":true, "useHeader": false, "dateFormat": "%m/%d/%Y"}'/>
 
-					<li><h4>Email</h4><em>*</em> <input class="required email" id="id_obs_observer-email" type="text" name="observer-email" maxlength="75" /></li>
-					<li><h4>First name</h4><em>*</em><input class="required" id="id_obs_observer-first_name" type="text" name="observer-first_name" maxlength="255" /></li>
-					<li><h4>Last name</h4><em>*</em><input class="required" id="id_obs_observer-last_name" type="text" name="observer-last_name" maxlength="255" /></li>
+					<li><h4>Email</h4><em>*</em> <input id="id_obs_observer-email" type="text" name="observer-email" /></li>
+					<li><h4>First name</h4><em>*</em><input id="id_obs_observer-first_name" type="text" name="observer-first_name" /></li>
+					<li><h4>Last name</h4><em>*</em><input id="id_obs_observer-last_name" type="text" name="observer-last_name" /></li>
 					
 					<li data-role='list-divider'><h2>Location</h2></li>
 					<li><h4>Descriptive Location</h4> <textarea id="id_location-description" rows="10" cols="40" name="location-description"></textarea></li>
-					<li><h4>Latitude</h4> <input type="text" class="required number"  name="location-latitude" id="obs_location-latitude" /></li>
-					<li><h4>Longitude</h4> <input type="text" class="required number"  name="location-longitude" id="obs_location-longitude" /></li>				
+					<li><h4>Latitude</h4> <input type="text" name="location-latitude" id="obs_location-latitude" /></li>
+					<li><h4>Longitude</h4> <input type="text" name="location-longitude" id="obs_location-longitude" /></li>				
 					<li><h4>Elevation</h4> <input type="text" class="number"  name="location-elevation" id="obs_location-elevation" /></li>
 					<li><h4>Elevation units</h4> 
 					<select name="location-elevation_units" id="obs_location-elevation_units"  href="#">
