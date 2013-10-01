@@ -1182,7 +1182,7 @@
 	 * Opens the calendar widget when selecting dates
 	 */
 	function showCalendar (el) {
-		$thisCalendar = $(el).attr('id');
+		var $thisCalendar = $(el).attr('id');
 		$('#'+$thisCalendar+'Date').datebox('open');
 	}
 	
