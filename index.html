@@ -44,15 +44,15 @@
     		
 		 <div id="footer"> 
 			<fieldset id="footerGroup" data-role="controlgroup" data-type="horizontal">
-				<a class="halfBTN" id="optionsBTN" data-role="button" onclick="$.mobile.changePage('#options');" data-icon="gear" data-inline="false">Options</a>
-				<a class="halfBTN" id="infoBTN" data-role="button" onclick="$.mobile.changePage('#info',{changeHash: false});" data-icon="info" data-inline="false">Info</a>
+				<a class="halfBTN" id="optionsBTN" data-role="button" data-icon="gear" data-inline="false">Options</a>
+				<a class="halfBTN" id="infoBTN" data-role="button" data-icon="info" data-inline="false">Info</a>
 			</fieldset>	
 		 </div>	
 			<div id="infoDiv" >	
 				<p>Enter observations by clicking the options button at the bottom of the page.</p>
 				<p>Tap or click on an observation point to view it's details.</p>
 				<p>Observations are shown by default for the past two weeks. You can change the date range on the options page.</p>
-				<button id="infoDivOKBtn" onclick="hideSplashScreen()">OK</button>
+				<button id="infoDivOKBtn">OK</button>
 	     </div> 
 		  
     	<div id="map"></div>
@@ -60,7 +60,7 @@
 		 <div id="observation-view-toggle">
 		 	<ul data-role="listview" data-inset="true">
 				<li style="text-align:center;">View information for this observation?</li>
-				<li><button id="goToObsAttsButton" data-role="button" data-icon="info" onclick="$.mobile.changePage('#obsAttsPage', {changeHash: false});">View</button></li>
+				<li><button id="goToObsAttsButton" data-role="button" data-icon="info">View</button></li>
 				<li><button id="hideobservation-view-toggleButton" data-role="button">No</button></li>
 	        </ul>
 		 </div>	
@@ -75,7 +75,7 @@
 					</select>
 				</li>
 				<li><button id="add-report-toggleButton" data-role="button" data-icon="plus">Add</button></li>
-				<li><button id="hideAskObsFormDivButton" data-role="button" onclick="hideReportToggle()" data-icon="delete">No</button></li>
+				<li><button id="hideAskObsFormDivButton" data-role="button" data-icon="delete">No</button></li>
 	        </ul>
 		 </div>	
 		 
@@ -84,8 +84,8 @@
 				<li data-role="fieldcontain">
 					<h4 id="stabTestDivLabel">Add stability test with observation?</h4>
 				</li>
-				<li><button id="askAddStabTestDivButton" data-role="button" data-icon="plus" onclick="$.mobile.changePage('#stabTest')" >Yes</button></li>
-				<li><button id="hideAskAddStabTestmDivButton" data-role="button" onclick="hideAskAddStabTestDiv()" data-icon="delete">No</button></li>
+				<li><button id="askAddStabTestDivButton" data-role="button" data-icon="plus" >Yes</button></li>
+				<li><button id="hideAskAddStabTestmDivButton" data-role="button" data-icon="delete">No</button></li>
 	        </ul>
 		 </div>			
 	</div>
@@ -94,7 +94,7 @@
 	<div  data-role="page" id="info" data-prefetch data-dom-cache="true">
       <div data-role="header" data-position="fixed">
         <h1>Info</h1>
-		<a onclick="$.mobile.changePage('#mapPage',{changeHash: false})" class="backToMapButton">Map</a>
+		<a class="backToMapButton">Map</a>
       </div>
       <div data-role="content">		
       	<ul data-role="listview" data-inset="true">
@@ -102,7 +102,7 @@
 			<li>Tap or click on an observation point to view it's details.</li>
 			<li>Observations are shown by default for the past two weeks. You can change the date range on the options page.</li>
         </ul>
-		<div><button onclick="$.mobile.changePage('#mapPage');">OK</button></div>
+		<div><button id="info-dialog-ok-btn">OK</button></div>
       </div>
     </div>
 	
@@ -110,7 +110,7 @@
 	<div  data-role="page" id="bookmarksPage" data-prefetch data-dom-cache="true">
       <div data-role="header" data-position="fixed">
         <h1>Zoom to:</h1>
-		<a onclick="$.mobile.changePage('#mapPage')" class="backToMapButton">Map</a>
+		<a class="backToMapButton">Map</a>
       </div>
       <div data-role="content">		
       	<ul id='bookmarks' data-role="listview" data-inset="true">
@@ -136,19 +136,19 @@
 	<div  data-role="page" id="addObsPage" data-prefetch data-dom-cache="true">
       <div data-role="header" data-position="fixed">
         <h1>Add observation</h1>
-		<a onclick="$.mobile.changePage('#mapPage')" class="backToMapButton">Map</a>
+		<a class="backToMapButton">Map</a>
       </div>
       <div data-role="content">		
       	<ul data-role="listview" data-inset="true">
 			<li><h3>Add Snowpack Report</h3></li>
-			<li><select id="addObSelect" name="addObSelect"  onchange="addObservation('snowpack', this.value)">
+			<li><select id="addObSelect" name="addObSelect">
 					<option value="" >-- Select one --</option>
 					<option value="Click">Tap or click to add</option>
 					<option value="GeoLocation">Add at current location</option>
 				</select>
 			</li>
       		<li><h3>Add Avalanche Report</h3></li>
-      		<li><select id="addAvyObSelect" name="addAvyObSelect"  onchange="addObservation('avalanche', this.value)">
+      		<li><select id="addAvyObSelect" name="addAvyObSelect" >
 					<option value="">-- Select one --</option>
 					<option value="Click">Tap or click to add</option>
 					<option value="GeoLocation">Add at current location</option>
@@ -162,7 +162,7 @@
 	<div  data-role="page" id="options" data-prefetch data-dom-cache="true">
       <div data-role="header" data-position="fixed">
         <h1>Options</h1>
-		<a onclick="$.mobile.changePage('#mapPage');" class="backToMapButton">Map</a>
+		<a class="backToMapButton">Map</a>
       </div>
       <div data-role="content">	
 	  <form action="#">	
@@ -172,8 +172,8 @@
 			<div data-role="fieldcontain">
 				<ul data-role="listview" data-inset="true">
 					<li><h3>Zoom to</h3></li>			
-					<li><a data-role="button" onclick="$.mobile.changePage('#bookmarksPage',{changeHash: false});">Select a region</a></li>					
-					<li><a data-role="button" onclick="getLocation(); $.mobile.changePage('#mapPage')">Current location</a></li>
+					<li><a id="select-region-btn" data-role="button">Select a region</a></li>					
+					<li><a id="get-geo-location-btn" data-role="button">Current location</a></li>
 				</ul>
 			</div>	
 			<!-- observations -->
@@ -183,7 +183,7 @@
 					<li data-role="fieldcontain">
 						<div data-role="fieldcontain">
 							<h4>Snow and Weather</h4>
-							<select id="obsFlip" data-theme="a" data-role="slider" data-native-menu="false" onchange="toggleObservationLayer('snowpack', this.value)">
+							<select id="obsFlip" data-theme="a" data-role="slider" data-native-menu="false">
 								<option value="hide">Show</option>
 								<option selected="true" value="show">Hide</option>
 							</select>
@@ -192,17 +192,17 @@
 					<li>
 						<div data-role="fieldcontain">
 							<h4>Avalanche</h4>
-							<select id="avyObsFlip" data-theme="a" data-role="slider" data-native-menu="false" onchange="toggleObservationLayer('avalanche', this.value)">
+							<select id="avyObsFlip" data-theme="a" data-role="slider" data-native-menu="false">
 								<option value="hide">Show</option>
 								<option selected="true" value="show">Hide</option>
 							</select>
 						</div>	
 					</li>
-					<li><a class="calButton" id="from" data-role="button" href="#" onclick="showCalendar($(this));">Select date from...</a></li>
-					<li><a class="calButton" id="to" data-role="button" href="#" onclick="showCalendar($(this));">Select date to...</a></li>
+					<li><a class="calButton" id="from" data-role="button" href="#">Select from date...</a></li>
+					<li><a class="calButton" id="to" data-role="button" href="#">Select to date...</a></li>
 						<input name="fromDate" id="fromDate" type="date" data-role="datebox" data-options='{"mode": "calbox", "theme": "c", "beforeToday": true, "centerHoriz": true, "centerVert":true, "hideInput":true, "useHeader": false}'/>
 						<input name="toDate" id="toDate" type="date" data-role="datebox" data-options='{"mode": "calbox", "theme": "c", "beforeToday": true, "centerHoriz": true, "centerVert":true, "hideInput":true, "useHeader": false}'/>				
-					<li><a onClick="$.mobile.changePage('#addObsPage',{changeHash: false})" data-role="button">Add an observation</a></li>
+					<li><a id="add-observation-btn" data-role="button">Add an observation</a></li>
 				</ul>
 			</div>	
 			<!-- basemaps -->
@@ -210,7 +210,7 @@
 				<ul data-role="listview" data-inset="true">			
 					<li><h3>Change basemap</h3></li>
 					<li>	
-						<select id="basemapSelect" data-native-menu="true"  onchange="changeBasemap(this.value)">
+						<select id="basemapSelect" data-native-menu="true">
 							<option value="">-- Select one --</option>
 							<option value="topo">Topo</option>
 							<option value="streets">Streets</option>
@@ -221,7 +221,7 @@
 	        </div>
 	
 			<a data-role="button" href="http://m.nwac.us/" target="_blank">Go to NWAC mobile for detailed forecasts</a>		
-	 		<a data-role="button" onclick="$.mobile.changePage('#mapPage')">Back to map</a>
+	 		<a id="back-to-map-btn" data-role="button">Back to map</a>
 	  </form>
       </div>
     </div>
@@ -230,7 +230,7 @@
 	<div data-role="page" id="avyReport" data-prefetch data-dom-cache="true">
       <div data-role="header" data-position="fixed">
         <h1>Avalanche Observation</h1>
-		<a onclick="$.mobile.changePage('#mapPage')" class="backToMapButton">Map</a>
+		<a class="backToMapButton">Map</a>
       </div>
       <div data-role="content">
       	<div data-role="controlgroup">
@@ -239,16 +239,16 @@
 				<ul data-role="listview" data-inset="true">	
 					<li data-role='list-divider'><h2>Observer</h2></li>
 					<li><h4>Datetime</h4></li>
-					<li><a id="avy_" data-role="button" href="#" onclick="showCalendar($(this));">Select date</a></li>
-				  	<input name="datetime" id="avy_Date" type="date" data-role="datebox" data-options='{"mode": "calbox", "pickPageButtonTheme": "c", "pickPageTodayButtonTheme": "e", "pickPageHighButtonTheme": "b", "dateFormat": "%m/%d/%Y", "centerWindow": true, "themeDatePick": "b", "hideInput": true, "maxDays": 0}' onchange="$('#avy_').html($(this).val() )"/>
+					<li><a id="avalanche-frm-select-date-btn" data-role="button" href="#">Select date</a></li>
+				  	<input name="datetime" id="avy_Date" type="date" data-role="datebox" data-options='{"mode": "calbox", "pickPageButtonTheme": "c", "pickPageTodayButtonTheme": "e", "pickPageHighButtonTheme": "b", "dateFormat": "%m/%d/%Y", "centerWindow": true, "themeDatePick": "b", "hideInput": true, "maxDays": 0}'/>
 					<li><h4>Email</h4><em>*</em><input class="required email" id="id_avyObs_observer-email" type="text" name="observer-email" maxlength="75" /></li>
 					<li><h4>First name</h4><em>*</em><input class="required" id="id_avyObs_observer-first_name" type="text" name="observer-first_name" maxlength="255" /></li>
 					<li><h4>Last name</h4><em>*</em><input class="required" id="id_avyObs_observer-last_name" type="text" name="observer-last_name" maxlength="255" /></li>
 					
 					<li data-role='list-divider'><h2>Location</h2></li>
 					<li><h4>Descriptive Location</h4> <textarea id="id_location-description" rows="10" cols="40" name="location-description"></textarea></li>
-					<li><h4>Latitude</h4> <input type="text" class="required number" name="location-latitude" id="avy_location-latitude" onchange="upDatePoint(this.value,$('#avy_location-longitude').val())"/></li>
-					<li><h4>Longitude</h4> <input type="text" class="required number" name="location-longitude" id="avy_location-longitude" onchange="upDatePoint($('#avy_location-latitude').val(), this.value)"/></li>				
+					<li><h4>Latitude</h4> <input type="text" class="required number" name="location-latitude" id="avy_location-latitude" /></li>
+					<li><h4>Longitude</h4> <input type="text" class="required number" name="location-longitude" id="avy_location-longitude"/></li>				
 					<li><h4>Elevation</h4> <input type="text" class="number" name="location-elevation" id="avy_location-elevation" /></li>
 					<li><h4>Elevation units</h4> 
 					<select name="location-elevation_units" id="avy_location-elevation_units"  >
@@ -396,7 +396,7 @@
 	<div data-role="page" id="obsReport" data-prefetch data-dom-cache="true">
       <div data-role="header" data-position="fixed">
         <h1>Snow/Weather Observation</h1>
-		<a onclick="$.mobile.changePage('#mapPage')" class="backToMapButton">Map</a>
+		<a class="backToMapButton">Map</a>
       </div>
       <div data-role="content">
 		<form id="obsForm" name="obsForm" enctype="multipart/form-data" method="post" data-ajax="false" action="http://dev.nwac.us/api/v1/observation/create/">
@@ -404,8 +404,8 @@
 				<ul data-role="listview" data-inset="true">	
 					<li data-role='list-divider'><h2>Observer</h2></li>
 					<li><h4>Datetime</h4></li>
-					<li><a id="obs_" data-role="button" href="#" onclick="showCalendar($(this));">* Select date</a></li>
-				  	<input name="datetime" id="obs_Date" type="date" data-role="datebox" data-options='{"mode": "calbox", "pickPageButtonTheme": "c", "pickPageTodayButtonTheme": "e", "pickPageHighButtonTheme": "b", "dateFormat": "%m/%d/%Y", "centerWindow": true, "themeDatePick": "b", "hideInput": true, "maxDays": 0}' onchange="$('#obs_').html($(this).val() )"/>
+					<li><a id="snowpack-frm-select-date-btn" data-role="button" href="#">* Select date</a></li>
+				  	<input name="datetime" id="obs_Date" type="date" data-role="datebox" data-options='{"mode": "calbox", "pickPageButtonTheme": "c", "pickPageTodayButtonTheme": "e", "pickPageHighButtonTheme": "b", "dateFormat": "%m/%d/%Y", "centerWindow": true, "themeDatePick": "b", "hideInput": true, "maxDays": 0}'/>
 
 					<li><h4>Email</h4><em>*</em> <input class="required email" id="id_obs_observer-email" type="text" name="observer-email" maxlength="75" /></li>
 					<li><h4>First name</h4><em>*</em><input class="required" id="id_obs_observer-first_name" type="text" name="observer-first_name" maxlength="255" /></li>
@@ -522,7 +522,7 @@
 	<div data-role="page" id="stabTest" data-prefetch data-dom-cache="true">
       <div data-role="header" data-position="fixed">
         <h1>Stability Test</h1>
-		<a onclick="hideAskAddStabTestDiv(); $.mobile.changePage('#mapPage');" class="backToMapButton">Map</a>
+		<a id="add-stability-test-no-btn" class="backToMapButton">Map</a>
       </div>
       <div data-role="content">
       	<div data-role="controlgroup">
@@ -567,7 +567,7 @@
 	<div id="obsAttsPage" data-role="page">
 	  <div data-role="header" data-position="fixed">
 	  	<h1>Observation info</h1>
-		<a onclick="$.mobile.changePage('#mapPage')" class="backToMapButton">Map</a>
+		<a class="backToMapButton">Map</a>
 	  </div>
 		  <div id="obsAttsContent" data-role="content">
 		  	<ul id="obsAtts" data-role="listview" data-inset="true">

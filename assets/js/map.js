@@ -1389,6 +1389,129 @@ function init() {
 		}
 	});
 	
+	//Options button listener
+	$('#optionsBTN').on('click', function(){
+		$.mobile.changePage('#options');
+	});
+	
+	//Info button Listner
+	$('#infoBTN').on('click', function(){
+		$.mobile.changePage('#info',{
+			changeHash: false
+		});
+	});
+	
+	//Okay button on the info popup listner
+	$('#infoDivOKBtn').on('click', function(){
+		hideSplashScreen();
+	});
+	
+	//Open Attributes button listner
+	$('#goToObsAttsButton').on('click', function(){
+		$.mobile.changePage('#obsAttsPage', {changeHash: false});
+	});
+	
+	//"add observation" confirmation no button listener
+	$('#hideAskObsFormDivButton').on('click', function(){
+		hideReportToggle();
+	});
+	
+	//Add stability test yes button listner
+	$('#askAddStabTestDivButton').on('click', function(){
+		$.mobile.changePage('#stabTest');
+	});
+	
+	//Add stability test no button listner
+	$('#hideAskAddStabTestmDivButton').on('click', function(){
+		hideAskAddStabTestDiv();
+	});
+	
+	//Return to map button listener (note this is applied to a class, not id)
+	$('.backToMapButton').on('click', function(){
+		$.mobile.changePage('#mapPage',{changeHash: false});
+	});
+	
+	//Info dialog ok button listener
+	$('#info-dialog-ok-btn').on('click', function(){
+		$.mobile.changePage('#mapPage');
+	});
+	
+	//Add snowpack observation select list listener
+	$('#addObSelect').on('change', function(){
+		addObservation('snowpack', this.value);
+	});
+	
+	//Add avalanche observation select list listener
+	$('#addAvyObSelect').on('change', function(){
+		addObservation('avalanche', this.value);
+	});
+	
+	//Select bookmark button listner
+	$('#select-region-btn').on('click', function(){
+		$.mobile.changePage('#bookmarksPage',{changeHash: false});
+	});
+	
+	//Get current location button
+	$('#get-geo-location-btn').on('click', function(){
+		getLocation(); 
+		$.mobile.changePage('#mapPage');
+	});
+	
+	//Activation snowpack observation select switch listner
+	$('#obsFlip').on('change', function(){
+		toggleObservationLayer('snowpack', this.value);
+	});
+	
+	//Activation avalanche observation select switch listner
+	$('#avyObsFlip').on('change', function(){
+		toggleObservationLayer('avalanche', this.value);
+	});
+	
+	//Select new date on calendar listener (note this is applied to a class, not id)
+	$('.calButton').on('click', function(){
+		showCalendar($(this));
+	});
+		
+	//Add an observation button listener
+	$('#add-observation-btn').on('click', function(){
+		$.mobile.changePage('#addObsPage',{changeHash: false});
+	});
+	
+	//Change basemap select listner
+	$('#basemapSelect').on('change', function(){
+		changeBasemap(this.value);
+	});
+	
+	//Return to map from options screen button listner
+	$('#back-to-map-btn').on('click', function(){
+		$.mobile.changePage('#mapPage');
+	});
+	
+	//Avalanche form select date button listener
+	$('#avalanche-frm-select-date-btn').on('click', function(){
+		showCalendar($(this));
+	});
+	
+	//Avalanche form calendar date change listner
+	$('#avy_Date').on('change', function(){
+		$('avalanche-frm-select-date-btn').html($(this).val());
+	});
+	
+	//Snowpack form select date button listener
+	$('#snowpack-frm-select-date-btn').on('click', function(){
+		showCalendar($(this));
+	});
+	
+	//Snowpack form calendar date change listner
+	$('#avy_Date').on('change', function(){
+		$('#snowpack-frm-select-date-btn').html($(this).val());
+	});
+
+	//Add Stability test form no button listner
+	$('#add-stability-test-no-btn').on('click', function(){
+		hideAskAddStabTestDiv();
+	});
+	
 }
 
 
