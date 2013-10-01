@@ -1498,8 +1498,8 @@ function init() {
 	});
 	
 	//Avalanche form calendar date change listner
-	$('#avy_Date').on('change', function(){
-		$('avalanche-frm-select-date-btn').html($(this).val());
+	$('#avalanche-frm-select-dateDate').on('change', function(){
+		$('avalanche-frm-select-date').html($(this).val());
 	});
 	
 	//Snowpack form select date button listener
@@ -1508,8 +1508,8 @@ function init() {
 	});
 	
 	//Snowpack form calendar date change listner
-	$('#avy_Date').on('change', function(){
-		$('#snowpack-frm-select-date-btn').html($(this).val());
+	$('#snowpack-frm-select-dateDate').on('change', function(){
+		$('#snowpack-frm-select-date').html($(this).val());
 	});
 
 	//Add Stability test form no button listner
