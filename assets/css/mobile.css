@@ -58,6 +58,10 @@ body
   font-weight:700;
 }
 
+.error {
+	color: red;
+}
+
 .centered
 {
   align:center;
