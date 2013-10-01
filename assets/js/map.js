@@ -145,7 +145,7 @@
 		"AM" : "Snowmobile",
 		"AB" : "An explosive detonated above the snow surface (air blast)",
 		"AO" : "Unclassified artificial trigger (specify in comments)",
-		"AI" : "Unknown artificial trigger",
+		"AU" : "Unknown artificial trigger",
 		"N" : "Natural trigger",
 		"NC" : "Cornice fall",
 		"NE" : "Earthquake",
