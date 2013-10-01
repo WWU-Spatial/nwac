@@ -1493,7 +1493,7 @@ function init() {
 	});
 	
 	//Avalanche form select date button listener
-	$('#avalanche-frm-select-date-btn').on('click', function(){
+	$('#avalanche-frm-select-date').on('click', function(){
 		showCalendar($(this));
 	});
 	
@@ -1503,7 +1503,7 @@ function init() {
 	});
 	
 	//Snowpack form select date button listener
-	$('#snowpack-frm-select-date-btn').on('click', function(){
+	$('#snowpack-frm-select-date').on('click', function(){
 		showCalendar($(this));
 	});
 	
