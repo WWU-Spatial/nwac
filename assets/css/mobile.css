@@ -6,29 +6,26 @@ body
 
 #map
 {
-  z-index:1;
   position: absolute;
   top: 0;
   bottom:0;
   left: 0;
   right: 0;
+  z-index:1;
 }
 
-;
-#map_zoom_slider
-{
-  top:80px!important;
-  visibility:hidden;
-  z-index:2!important;
-  position:fixed!important;
+#banner {
+	display:none;
 }
+
 
 .esriSimpleSlider
 {
-  top:80px!important;
+  position:absolute;
+  top:95px;
   visibility:hidden;
-  z-index:2!important;
-  position:fixed!important;
+  z-index:2
+  
 }
 
 #map_graphics_layer
@@ -40,12 +37,6 @@ body
   -moz-animation-duration:3s;
   -moz-animation-iteration-count:infinite;
   -moz-animation-name:pulse;
-}
-
-.hidden
-{
-  display:none!important;
-  visibility:hidden;
 }
 
 .backToMapButton
@@ -141,42 +132,6 @@ body
   right: 50%;
 }
 
-
-
-
-
-
-#dateLabel
-{
-  font-size:20px;
-  text-align:center;
-  font-weight:bold;
-  position:relative;
-  top:28px;
-  width:140px;
-  margin:0 auto;
-  background-color:rgba(255,255,255,0.5);
-  text-shadow:3px 2px 6px white;
-}
-
-#minusDayBtn
-{
-  visibility:hidden;
-  position:fixed;
-  left:5px;
-  top:10px;
-}
-
-#plusDayBtn
-{
-  visibility:hidden;
-  position:fixed;
-  right:5px;
-  top:10px;
-}
-
-
-
 #footerGroup
 {
   bottom:0;
@@ -228,6 +183,77 @@ p.ui-li-desc
   white-space:normal!important;
 }
 
+@media (min-width: 721px) {
+
+	#banner {
+		position: absolute;
+		top:0;
+		left: 0;
+		right: 0;
+		height: 86px;
+		background-color: #fff;
+		z-index: 10;
+		display:block;
+	}
+	#logo {
+		background: url("../images/nwacLogoBanner.gif") no-repeat;
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 500px;
+		height: 86px;
+	}
+	
+	#footer{
+		display: none;
+	}
+	
+	#desktop-options {
+		position: absolute;
+		top: 10px;
+		left: 520px;
+		height: 64px;
+		width: 64px;
+		background: url("../images/options.png") no-repeat;
+		cursor: pointer;
+	}
+	
+	#desktop-info {
+		position: absolute;
+		top: 10px;
+		left: 600px;
+		height: 64px;
+		width: 64px;
+		background: url("../images/info.png") no-repeat;
+		cursor: pointer;
+	}
+	
+	#desktop-legend{
+		position: absolute;
+		top: 10px;
+		left: 690px;
+		height: 66px;
+		width: 166px;
+	}
+	
+	#snowpack-icon, #avalanche-icon {
+		cursor: pointer;
+	}
+	
+	#add-report-toggle, #observation-view-toggle, #askAddStabTestDiv {
+		top: 95px;
+	}
+	
+	#hsi-logo {
+		position: absolute;
+		background: url("../images/HSI.png") no-repeat;
+		bottom: 10px;
+		right: 10px;
+		z-index: 5;
+		width: 206px;
+		height: 44px;
+	}
+}
 
 
 @media only screen and max-width 721px {

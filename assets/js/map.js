@@ -739,9 +739,11 @@
 		// Reset select menus on the add observation page to the default "Select One" option
 		$('#addAvyObSelect option')[0].selected = true;
 		$('#addObSelect option')[0].selected = true;
-		$('#addObSelect').selectmenu("refresh", true);
-		$('#addAvyObSelect').selectmenu("refresh", true);
-	
+		try {
+			$('#addObSelect').selectmenu("refresh", true);
+			$('#addAvyObSelect').selectmenu("refresh", true);
+		} catch(ignore){};
+		
 		//set value of slider in askFormDiv
 		if (type === 'snowpack') {
 			$('#changeReportSlider')[0].selectedIndex = 0;
@@ -1409,12 +1411,24 @@
 			$.mobile.changePage('#options');
 		});
 		
+		$('#desktop-options').on('click', function(){
+			$.mobile.changePage('#options');
+		});
+		
+		
 		//Info button Listner
 		$('#infoBTN').on('click', function(){
 			$.mobile.changePage('#info',{
 				changeHash: false
 			});
 		});
+		
+		$('#desktop-info').on('click', function(){
+			$.mobile.changePage('#info',{
+				changeHash: false
+			});
+		});
+		
 		
 		//Okay button on the info popup listner
 		$('#infoDivOKBtn').on('click', function(){
@@ -1456,10 +1470,34 @@
 			addObservation('snowpack', this.value);
 		});
 		
+		//Desktop snowpack icon on click adds observation.
+		//Changes cursor and on first click resets to default cursor
+		$('#snowpack-icon').on('click', function(){
+			addObservation('snowpack', 'Click');
+			$("#map_layers").css("cursor","crosshair");
+				$("#map_layers").on('click.add', function(){
+					$("#map_layers").css("cursor","default");
+					$("#map_layers").off('click.add');
+				});
+		});
+		
 		//Add avalanche observation select list listener
 		$('#addAvyObSelect').on('change', function(){
 			addObservation('avalanche', this.value);
+			
 		});
+		
+		//Desktop avalanche icon on click adds observation.
+		//Changes cursor and on first click resets to default cursor
+		$('#avalanche-icon').on('click', function(){
+			addObservation('avalanche', 'Click');
+			$("#map_layers").css("cursor","crosshair");
+			$("#map_layers").on('click.add', function(){
+				$("#map_layers").css("cursor","default");
+				$("#map_layers").off('click.add');
+			});
+		});
+		
 		
 		//Select bookmark button listner
 		$('#select-region-btn').on('click', function(){
