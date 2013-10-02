@@ -1308,7 +1308,7 @@
 		$('#snowpack-frm-select-dateDate').val(formatDate(today));
 		$('#avalanche-frm-select-dateDate').val(formatDate(today));
 		$('#snowpack-frm-select-date').html(formatDate(today, 'display'));
-		$('#snowpack-frm-select-date').html(formatDate(today, 'display'));
+		$('#avalanche-frm-select-date').html(formatDate(today, 'display'));
 		
 		//Set date selector labels
 		$('#from').html('From:  ' + formatDate(fromDate, 'display'));
