@@ -1043,14 +1043,8 @@
 		$('#add-report-toggleButton').on('click', function() {
 			if ($('#changeReportSlider').val() === 'snowpack') {
 				$.mobile.changePage('#obsReport');
-				if ($('#obs_Date').val()) {
-					setDate('#obs_Date');
-				}
 			} else {
 				$.mobile.changePage('#avyReport');
-				if ($('#avy_Date').val()) {
-					setDate('#avy_Date');
-				}
 			}
 		});
 	
@@ -1297,13 +1291,19 @@
 	
 		map.addLayer(RegionsBoth);
 	
-		//set observation form datetime field to current day
-		$("#avalanche-frm-select-date").html(formatDate(today, 'display'));
-		$("#snowpack-frm-select-date").html(formatDate(today, 'display'));
+
 		
 		// set date range for obs
 		fromDate = new Date(today.getTime()); //Copy today's date
 		fromDate.setDate(fromDate.getDate() - 10); //Subtract 10 days
+		
+		//Set datetime fields on the observation forms to today's date.  These fields couldn't
+		//easily be validated with jQurey validate tools and would fail submission if these
+		//fields weren't set
+		$('#snowpack-frm-select-dateDate').val(formatDate(today));
+		$('#avalanche-frm-select-dateDate').val(formatDate(today));
+		$('#snowpack-frm-select-date').html(formatDate(today, 'display'));
+		$('#snowpack-frm-select-date').html(formatDate(today, 'display'));
 		
 		//Set date selector labels
 		$('#from').html('From:  ' + formatDate(fromDate, 'display'));
@@ -1335,7 +1335,7 @@
 		$('#fromDate').datebox('setTheDate', fromDate);
 		getObservationsByLayer('snowpack');
 		getObservationsByLayer('avalanche');
-	
+		
 		// Look for stored user info and use it for forms
 		var userInfoJSON;
 		if (useLocalStorage) {
@@ -1442,7 +1442,7 @@
 		
 		//Return to map button listener (note this is applied to a class, not id)
 		$('.backToMapButton').on('click', function(){
-			$.mobile.changePage('#mapPage',{changeHash: false});
+			$.mobile.changePage('#mapPage');
 		});
 		
 		//Info dialog ok button listener
