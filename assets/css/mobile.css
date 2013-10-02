@@ -133,7 +133,6 @@ body
   position:fixed;
   text-align:center;
   display:none;
-  visibility:hidden;
   top:17px;
   z-index:5;
   position:absolute;
