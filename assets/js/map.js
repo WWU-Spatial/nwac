@@ -398,11 +398,7 @@
 	 */
 	function submitForm(formName) {
 		var form = $('[name="' + formName + '"]');
-		//Append 12:00 to the date to match the NWAC format 
-		var dateField = form.find(':input[name=datetime]');
-		var date = formatDate(new Date(dateField.val())) + " 12:00";
-		dateField.val(date);
-		
+
 		var options = {
 			url : proxyUrl + '?' + form.attr('action'),
 			data : {
