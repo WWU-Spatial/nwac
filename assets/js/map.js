@@ -1437,7 +1437,7 @@
 		
 		//Add stability test no button listner
 		$('#hideAskAddStabTestmDivButton').on('click', function(){
-			askAddStabTestDiv.hide();
+			$("#askAddStabTestDiv").hide();
 		});
 		
 		//Return to map button listener (note this is applied to a class, not id)
@@ -1523,7 +1523,7 @@
 	
 		//Add Stability test form no button listner
 		$('#add-stability-test-no-btn').on('click', function(){
-			askAddStabTestDiv.hide();
+			$('#askAddStabTestDiv).hide();
 		});
 		
 	}
