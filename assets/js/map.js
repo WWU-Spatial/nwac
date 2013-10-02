@@ -953,6 +953,11 @@
 						case "observation_comments" :
 							elem.html(replaceURL(value));
 							break;
+						case "snowpit_profile_image" :
+							if(value){
+								elem.html('<a href="' + value + '" target="_blank" >View photo in new window</a>');
+							}
+							break;
 						case "snowpit_profile_image_url" :
 							if(value){
 								elem.html('<a href="' + value + '" target="_blank" >View photo in new window</a>');
@@ -1523,7 +1528,7 @@
 	
 		//Add Stability test form no button listner
 		$('#add-stability-test-no-btn').on('click', function(){
-			$('#askAddStabTestDiv).hide();
+			$('#askAddStabTestDiv').hide();
 		});
 		
 	}
