@@ -46,7 +46,7 @@
 	var NWAC_SNOWPACK_API = NWAC_API + 'observation/';
 	var NWAC_AVALANCHE_API = NWAC_API + 'avalancheObservation/';
 	var NWAC_STABILITY_API = NWAC_API + 'stabilityTest/';
-	var MAPQUEST_ELEVATION_API = 'http://open.mapquestapi.com/elevation/v1/profile?shapeFormat=raw&unit=f&latLngCollection=';
+	var MAPQUEST_ELEVATION_API = 'http://open.mapquestapi.com/elevation/v1/profile?key=Fmjtd%7Cluubnu0ynl%2C8w%3Do5-9u1wgf&shapeFormat=raw&unit=f&latLngCollection=';
 	
 	
 	/******************************** GLOBAL VARIABLES ********************************/
