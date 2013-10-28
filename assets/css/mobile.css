@@ -14,6 +14,10 @@ body
   z-index:1;
 }
 
+#mapPage {
+	display: block !important;
+}
+
 #banner {
 	display:none;
 }

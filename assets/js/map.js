@@ -1577,6 +1577,17 @@
 	function onDOMLoad() {
 		$(document).ready(function() {
 			$.mobile.showPageLoadingMsg();
+			
+			
+			$(document).on( "pagebeforehide", function( event ) { 
+				console.log(event.target.id);
+				if (event.target.id === "mapPage") {
+					$('#mapPage').css("opacity", "0.01");
+	
+				}
+			} );
+			
+			
 	
 			$( "#obsForm" ).validate({
 				rules: {
@@ -1635,16 +1646,13 @@
 	
 		//resize map on pagechange to mapPage - to handle error...
 		$(document).delegate('#mapPage', 'pageshow', function() {
-			
-			$('#mapPage').css("height", $('body').height());
-			$('#map').css("height", $('body').height());
-			$('#map').css("width", "auto");
+			$('#mapPage').css("opacity", "1");
 			map.resize();
 			map.reposition();
-			$('circle').each(function() {
+			/*$('circle').each(function() {
 				!$(this).attr('cx') ? $(this).attr('cx', 0) : null;
 				!$(this).attr('cx') ? $(this).attr('cy', 0) : null;
-			});
+			});*/
 		});
 	
 		//add event handler to your form's submit event
