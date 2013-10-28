@@ -528,9 +528,11 @@
 			url: url,
 			dataType: 'json',
 			success: function(data){
-				var elevation = data.elevationProfile[0].height.toFixed(0);
-				$('#obs_location-elevation').val(elevation);
-				$('#avy_location-elevation').val(elevation);
+				if (data.elevationProfile) {
+					var elevation = data.elevationProfile[0].height.toFixed(0);
+					$('#obs_location-elevation').val(elevation);
+					$('#avy_location-elevation').val(elevation);
+				}
 			}
 		});
 	}
