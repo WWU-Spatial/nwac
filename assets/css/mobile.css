@@ -4,6 +4,15 @@ body
   top:0;
 }
 
+.ui-content {
+    position: absolute;
+    top: 40px;
+    right: 0;
+    bottom: 40px;
+    left: 0;
+    padding: 0 !important;
+}
+
 #map
 {
   position: absolute;
@@ -12,6 +21,7 @@ body
   left: 0;
   right: 0;
   z-index:1;
+  height: 100%;
 }
 
 #mapPage {
