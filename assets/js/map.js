@@ -13,6 +13,9 @@
 	dojo.require("esri.tasks.query");
 	dojo.require("esri.tasks.geometry");
 	
+	//Prevents older browsers from breaking if a console.log() function is left in the code.
+	if(!window.console){ window.console = {log: function(){} }; } 
+	
 	/**************************** CHECK FOR BROWSER SUPPORT ***************************/
 	
 	/*
