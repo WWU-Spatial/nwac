@@ -409,9 +409,9 @@
 			success : function(response) {
 				formResponse(response, formName);
 			},
-			error : function(error) {
-				console.log('error', error);
+			error : function(error) {	
 				formFail(error);
+				console.log('error', error);
 			}
 		};
 		form.ajaxSubmit(options);
@@ -1576,7 +1576,6 @@
 			
 			
 			$(document).on( "pagebeforehide", function( event ) { 
-				console.log(event.target.id);
 				if (event.target.id === "mapPage") {
 					$('#mapPage').css("opacity", "0.01");
 	
