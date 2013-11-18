@@ -6,6 +6,10 @@
 	/*global esri: true, dojo: true/*
 	/* END JSHINT*/
 	
+	$(window).on('hashchange', function(event) {
+	  console.log(event);
+	});
+		
 	//initialize dojo
 	dojo.require("esri.map");
 	dojo.require("esri.dijit.BasemapGallery");
@@ -1261,9 +1265,7 @@
 				timer = setTimeout(function() { resizeMap(); }, 500);
 			}
 		});
-	
-		// disable map navigation until infoDiv is hidden
-		map.disableMapNavigation();
+
 	
 		//add the world topomap from arcgis online
 		var basemap = new esri.layers.ArcGISTiledMapServiceLayer("http://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer");
@@ -1438,7 +1440,7 @@
 		
 		//Open Attributes button listner
 		$('#goToObsAttsButton').on('click', function(){
-			$.mobile.changePage('#obsAttsPage', {changeHash: false});
+			$.mobile.changePage('#obsAttsPage');
 		});
 		
 		//"add observation" confirmation no button listener
