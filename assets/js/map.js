@@ -589,7 +589,6 @@
 	 * the splash screen.
 	 */
 	function hideSplashScreen() {
-		clearTimeout(infoTimeout);
 		$('#infoDiv').fadeOut(1000);
 		$('.esriSimpleSlider').css({
 			visibility : "visible"
@@ -1273,9 +1272,6 @@
 		// On the map load, hide the splash screen after 5 seconds and
 		// fade in the controls toolbar
 		dojo.connect(map, "onLoad", function() {
-			infoTimeout = setTimeout(function() {
-				hideSplashScreen();
-			}, 5000);
 			$.mobile.hidePageLoadingMsg();
 			$('#infoDiv div:first').fadeIn(500);
 		});
