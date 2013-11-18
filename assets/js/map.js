@@ -523,7 +523,7 @@
 	 * field in both observation forms.  The returned elevation value is in feet.
 	 */
 	function getElevation(latitude, longitude) {
-		var url = proxyUrl + "?" + MAPQUEST_ELEVATION_API + latitude + ',' + longitude;
+		var url = MAPQUEST_ELEVATION_API + latitude + ',' + longitude;
 		$.ajax({
 			url: url,
 			dataType: 'json',
