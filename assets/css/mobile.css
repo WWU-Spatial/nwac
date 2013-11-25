@@ -197,6 +197,9 @@ p.ui-li-desc
   white-space:normal!important;
 }
 
+.options_text_desktop {display: none;}
+.options_text_mobile {display: inline;}
+
 @media (min-width: 721px) {
 
 	#banner {
@@ -267,6 +270,9 @@ p.ui-li-desc
 		width: 206px;
 		height: 44px;
 	}
+	
+	.options_text_desktop {display: inline;}
+	.options_text_mobile {display: none;}
 }
 
 
@@ -292,4 +298,5 @@ p.ui-li-desc
     margin:0 auto;
     margin:10px;
   }
+ 
 }

@@ -28,14 +28,7 @@
     <script type="text/javascript">var dojoConfig = {parseOnLoad : true};</script>	
 	<script type="text/javascript" src="assets/js/map.js"></script>
 	
-	<script type="text/javascript">
-			(function(){
-			$(document).bind("mobileinit", function(){
-				// load on start page
-				document.location.hash="";
-			});
-		})();
-	</script>	
+
 
   </head>
   
@@ -70,9 +63,11 @@
 			</fieldset>	
 		 </div>	
 			<div id="infoDiv" >	
-				<p>Enter observations by clicking the options button.</p>
+				<p>Enter observations by clicking the 
+					<span class="options_text_mobile">options button and clicking "add observation."</span>
+					<span class="options_text_desktop">blue circle icon to add snowpack observations or the purple circle to add avalanche observations</span></p>
 				<p>Tap or click on an observation point to view it's details.</p>
-				<p>Observations are shown by default for the past two weeks. You can change the date range on the options page.</p>
+				<p>Observations are shown by default for the past two weeks. You can change the date range on the options <span class="options_text_desktop">(plus icon)</span> page.</p>
 				<button id="infoDivOKBtn">OK</button>
 	     </div> 
 		  
@@ -119,9 +114,9 @@
       </div>
       <div data-role="content">		
       	<ul data-role="listview" data-inset="true">
-			<li>Enter observations by clicking the options button.</li>
+			<li>Enter observations by clicking the <span class="options_text_mobile">options button and clicking "add observation."</span><span class="options_text_desktop">blue circle icon to add snowpack observations or the purple circle to add avalanche observations</span></li>
 			<li>Tap or click on an observation point to view it's details.</li>
-			<li>Observations are shown by default for the past two weeks. You can change the date range on the options page.</li>
+			<li>Observations are shown by default for the past two weeks. You can change the date range on the options <span class="options_text_desktop">(plus icon)</span> page.</li>
         </ul>
 		<div><button id="info-dialog-ok-btn">OK</button></div>
       </div>
