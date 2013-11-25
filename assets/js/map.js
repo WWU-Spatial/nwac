@@ -42,13 +42,13 @@
 	/************************************* APIS ***************************************/
 	
 	/*
-	 * Use http://www.nwac.us/api/v1/ for production
-	 * Use http://dev.nwac.us/api/v1/ for development and debugging
+	 * Use http://www.nwac.us/api/v2/ for production
+	 * Use http://dev2.nwac.us/api/v2/ for development and debugging
 	 * NOTE: the nwac api does not support cross-domain requests.  For get requests
 	 * you can use a jsonp callback which is supported.  For posts, the proxy server
 	 * will need to be used.
 	 */
-	var NWAC_API = "http://dev.nwac.us/api/v1/";
+	var NWAC_API = "http://dev2.nwac.us/api/v2/";
 	var NWAC_SNOWPACK_API = NWAC_API + 'observation/';
 	var NWAC_AVALANCHE_API = NWAC_API + 'avalancheObservation/';
 	var NWAC_STABILITY_API = NWAC_API + 'stabilityTest/';
