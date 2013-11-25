@@ -6,16 +6,15 @@
 	/*global esri: true, dojo: true/*
 	/* END JSHINT*/
 	
-	$(window).on('hashchange', function(event) {
-	  console.log(event);
-	});
-		
 	//initialize dojo
 	dojo.require("esri.map");
 	dojo.require("esri.dijit.BasemapGallery");
 	dojo.require("dijit.form.Slider");
 	dojo.require("esri.tasks.query");
 	dojo.require("esri.tasks.geometry");
+	dojo.require("esri.symbols.SimpleFillSymbol");
+	dojo.require("esri.symbols.SimpleLineSymbol");
+	dojo.require("esri.geometry.Polygon");
 	
 	//Prevents older browsers from breaking if a console.log() function is left in the code.
 	if(!window.console){ window.console = {log: function(){} }; } 
@@ -66,7 +65,6 @@
 	var proxyUrl;
 	var queryTask, query;
 	var symbol;
-	var RegionsBoth;
 	var initExtent;
 	var basemapGallery;
 	var today = new Date();
@@ -706,7 +704,6 @@
 		var latitude = coords[0];
 		var longitude = coords[1];
 		getElevation(latitude, longitude);
-		getRegion(e.mapPoint);
 		//Put get zone function here
 		
 		//Set latitude and longitude in form fields
@@ -1104,26 +1101,6 @@
 	
 	
 	/*
-	 * Gets the NWAC Region from a click event geometry by passing the geometry to a 
-	 * query task that queries the server for the correct geometry
-	 * (Currently this gets run on every click.  It only needs to be run when adding
-	 * a point (or when submitting a point to the NWAC API))
-	 */
-	function getRegion(mapPoint) {
-		query.geometry = mapPoint;
-		queryTask.execute(query, function updateRegion(result) {
-			if (result.features[0]) {
-				zone = result.features[0].attributes.region_num;
-			} else {
-				zone = 1;
-			}
-		});
-	}
-	
-	
-	
-	
-	/*
 	 * Stores the email, first and last name of the user between browser sessions
 	 * to speed the data entry process by pre-populating those fields.  The function
 	 * preferably stores the data in local storage when supported, otherwise the data
@@ -1280,23 +1257,51 @@
 			$.mobile.hidePageLoadingMsg();
 			$('#infoDiv div:first').fadeIn(500);
 		});
-	
-		RegionsBoth = new esri.layers.ArcGISTiledMapServiceLayer("http://140.160.114.190/ArcGIS/rest/services/NWAC/RegionsBoth/MapServer", {
-			"opacity" : 0.55
+		
+		//Download the region outline from geometry and add as a new graphics layer
+		$.getJSON('regions.json', function(data){
+			var regions = new esri.layers.GraphicsLayer({"id" : "regions", "opacity": 0.3});
+			var regionsThin = new esri.layers.GraphicsLayer({"id" : "regionsThin", "opacity": 0.2});
+			
+			var regionSymbol = 	new esri.symbol.SimpleFillSymbol({"outline":{"color":[130,130,130,255],"width":3,"type":"esriSLS","style":"esriSLSolid"}, "type":"esriSFS","style":"esriSFSNull"});
+			var regionThinSymbol = new esri.symbol.SimpleFillSymbol({"outline":{"color":[78,78,78,255],"width":0.3,"type":"esriSLS","style":"esriSLSolid"}, "color":[255,255,255,1],"type":"esriSFS","style":"esriSFSSolid"});
+			
+			for (var i=0; i < data.features.length; i++) {
+				var polygon = new esri.geometry.Polygon({"rings":
+		            [
+		            	data.features[i].geometry.coordinates[0]
+		            ],
+		            "spatialReference":{"wkid":102100}
+		          });
+		          
+				regions.add(new esri.Graphic(polygon, regionSymbol));
+				regionsThin.add(new esri.Graphic(polygon, regionThinSymbol, data.features[i].properties));
+			
+			}
+			
+			//Change thickness of region outline at different zoom levels
+			dojo.connect(map, "onZoomEnd", function(extent, zoomFactor, anchor, level) {
+				var zoom_levels = [0.5,0.75,1,1.5,2,3,4,5,8,15,30,72,100,220,450,500,550,700,800];
+				for (var i=0; i<regions.graphics.length; i++) {
+					regions.graphics[i].setSymbol(new esri.symbol.SimpleFillSymbol({"outline":{"color":[130,130,130,255],"width":zoom_levels[level],"type":"esriSLS","style":"esriSLSolid"},"type":"esriSFS","style":"esriSFSNull"}));
+					regionsThin.graphics[i].setSymbol(new esri.symbol.SimpleFillSymbol({"outline":{"color":[78,78,78,255],"width":(zoom_levels[level] / 10),"type":"esriSLS","style":"esriSLSolid"}, "color":[255,255,255,1],"type":"esriSFS","style":"esriSFSSolid"}));
+				}
+			});
+			
+			dojo.connect(regionsThin, "onClick", function(e) {
+				//console.log(e.graphic.attributes.region_num);
+				if (e.graphic.attributes.region_num) {
+					zone = e.graphic.attributes.region_num;
+				} else {
+					zone = 1;
+				}
+			});
+				
+			map.addLayer(regions);
+			map.addLayer(regionsThin);
+			
+			
 		});
-	
-		//build query task for region
-		queryTask = new esri.tasks.QueryTask("http://140.160.114.190/ArcGIS/rest/services/NWAC/RegionsBoth/MapServer/0");
-		dojo.connect(queryTask, "onError", function(){
-			zone=1;
-		});
-		query = new esri.tasks.Query();
-		query.spatialRelationship = esri.tasks.Query.SPATIAL_REL_INTERSECTS;
-		query.returnGeometry = false;
-		query.outFields = ["name", "region_num"];
-	
-		map.addLayer(RegionsBoth);
-	
 
 		
 		// set date range for obs
