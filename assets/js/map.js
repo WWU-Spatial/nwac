@@ -1289,7 +1289,6 @@
 			});
 			
 			dojo.connect(regionsThin, "onClick", function(e) {
-				//console.log(e.graphic.attributes.region_num);
 				if (e.graphic.attributes.region_num) {
 					zone = e.graphic.attributes.region_num;
 				} else {
