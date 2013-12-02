@@ -201,7 +201,7 @@
 							<h4>Snow and Weather</h4>
 							<select id="obsFlip" data-theme="a" data-role="slider" data-native-menu="false">
 								<option value="hide">Hidden</option>
-								<option selected="true" value="show">Shown</option>
+								<option value="show" selected>Shown</option>
 							</select>
 						</div>	
 					</li>
@@ -210,7 +210,7 @@
 							<h4>Avalanche</h4>
 							<select id="avyObsFlip" data-theme="a" data-role="slider" data-native-menu="false">
 								<option value="hide">Hidden</option>
-								<option selected="true" value="show">Shown</option>
+								<option value="show" selected>Shown</option>
 							</select>
 						</div>	
 					</li>
@@ -269,12 +269,12 @@
 					<li><h4>Elevation units</h4> 
 					<select name="location-elevation_units" id="avy_location-elevation_units"  >
 						<option value="">--Select units--</option>
-						<option selected="selected" value="feet">Feet</option>
+						<option value="feet" selected>Feet</option>
 						<option value="meters">Meters</option>
 					</select></li>
 					<li><h4>Slope aspect</h4> 
 					<select name="location-slope_aspect" id="id_location-slope_aspect"  >
-						<option value="" selected="selected">--Select aspect--</option>
+						<option value="" selected>--Select aspect--</option>
 						<option value="northwest">Northwest</option>
 						<option value="north">North</option>
 						<option value="northeast">Northeast</option>
@@ -289,7 +289,7 @@
 					<li data-role='list-divider'><h2>Observation</h2></li>
 					<li><h4>Cause</h4> 
 						<select name="cause" id="id_cause"  >
-							<option value="" selected="selected">-- Select one --</option>
+							<option value="" selected>-- Select one --</option>
 							<option value="AS">Skier</option>
 							<option value="AR">Snowboarder</option>
 							<option value="AI">Snowshoer</option>
@@ -320,7 +320,7 @@
 						</select></li>
 					<li><h4>Slide type</h4> 
 						<select name="slide_type" id="id_slide_type"  >
-							<option value="" selected="selected">-- Select one --</option>
+							<option value="" selected>-- Select one --</option>
 							<option value="L">Loose-snow avalanche</option>
 							<option value="WL">Wet loose-snow avalanche</option>
 							<option value="SS">Soft slab avalanche</option>
@@ -335,7 +335,7 @@
 					<li><h4>Depth of Crown</h4> <input type="text" class="number" name="crown_depth" id="id_crown_depth" /></li>
 					<li><h4>Crown depth units</h4> 
 						<select name="crown_depth_units" id="id_crown_depth_units"  >
-							<option value="" selected="selected">-- Select one --</option>
+							<option value="" selected>-- Select one --</option>
 							<option value="inches">Inches</option>
 							<option value="feet">Feet</option>
 							<option value="centimeters">Centimeters</option>
@@ -344,14 +344,14 @@
 					<li><h4>Width of Slide</h4> <input type="text" class="number"  name="slide_width" id="id_slide_width" /></li>
 					<li><h4>Slide width units:</h4> 
 						<select name="slide_width_units" id="id_slide_width_units"  >
-							<option value="" selected="selected">-- Select one --</option>
+							<option value="" selected>-- Select one --</option>
 							<option value="feet">Feet</option>
 							<option value="meters">Meters</option>
 						</select></li>
 					<li><h4>Length of Runout</h4> <input type="text" class="number"  name="runout_length" id="id_runout_length" /></li>
 					<li><h4>Runout length units:</h4>
 						<select name="runout_length_units" id="id_runout_length_units"  >
-							<option value="" selected="selected">-- Select one --</option>
+							<option value="" selected>-- Select one --</option>
 							<option value="feet">Feet</option>
 							<option value="meters">Meters</option>
 						</select></li>
@@ -363,7 +363,7 @@
 					<li><h4>Number killed</h4> <input type="text" class="number"  name="number_killed" id="id_number_killed" /></li>
 					<li><h4>Bed surface</h4> 
 						<select name="bed_surface" id="id_bed_surface"  >
-							<option value="" selected="selected">-- Select one --</option>
+							<option value="" selected>-- Select one --</option>
 							<option value="S">The avalanche released within a layer of recent storm snow.</option>
 							<option value="I">The avalanche released at the new snow/old snow interface.</option>
 							<option value="O">The avalanche released within the old snow.</option>
@@ -372,7 +372,7 @@
 						</select></li>
 					<li><h4>Weak layer</h4> 
 						<select name="weak_layer" id="id_weak_layer"  >
-							<option value="" selected="selected">-- Select one --</option>
+							<option value="" selected>-- Select one --</option>
 							<option value="PP">Precipitation Particles (New Snow)</option>
 							<option value="MM">Machine Made snow</option>
 							<option value="DF">Decomposing and Fragmented Particles</option>
@@ -385,7 +385,7 @@
 						</select></li>
 					<li><h4>Avalanche Size - Relative to Path:</h4> 
 						<select name="avalanche_size_relative" id="id_avalanche_size_relative"  >
-							<option value="" selected="selected">-- Select one --</option>
+							<option value="" selected>-- Select one --</option>
 							<option value="R1">(R1) Very small, relative to the path</option>
 							<option value="R2">(R2) Small, relative to the path</option>
 							<option value="R3">(R3) Medium, relative to the path</option>
@@ -394,7 +394,7 @@
 						</select></li>
 					<li><h4>Avalanche Size - Destructive Force:</h4> 
 						<select name="avalanche_size_destructive_force" id="id_avalanche_size_destructive_force"  >
-							<option value="" selected="selected">-- Select one --</option>
+							<option value="" selected>-- Select one --</option>
 							<option value="D1">(D1) Relatively harmless to people</option>
 							<option value="D2">(D2) Could bury, injure, or kill a person.</option>
 							<option value="D3">(D3) Could bury and destroy a car, damage a truck, destroy a wood frame house, or break a few trees.</option>
@@ -438,12 +438,12 @@
 					<li><h4>Elevation units</h4> 
 					<select name="location-elevation_units" id="obs_location-elevation_units"  href="#">
 						<option value="">--Select units--</option>
-						<option selected="selected" value="feet">Feet</option>
+						<option selected value="feet">Feet</option>
 						<option value="meters">Meters</option>
 					</select></li>
 					<li><h4>Slope aspect</h4> 
 					<select name="location-slope_aspect" id="id_location-slope_aspect"  >
-						<option value="" selected="selected">--Select aspect--</option>
+						<option value="" selected>--Select aspect--</option>
 						<option value="northwest">Northwest</option>
 						<option value="north">North</option>
 						<option value="northeast">Northeast</option>
@@ -458,7 +458,7 @@
 					<li data-role='list-divider'><h2>Observation</h2></li>
 					<li><h4>Cloud cover</h4> 
 					<select name="cloud_cover" id="id_cloud_cover" >
-						<option value="" selected="selected">--Select one--</option>
+						<option value="" selected>--Select one--</option>
 						<option value="clear">Clear</option>
 						<option value="few">Few</option>
 						<option value="scattered">Scattered</option>
@@ -469,13 +469,13 @@
 					<li><h4>Air temp</h4> <input type="text" class="number"  name="air_temp" id="id_air_temp" /></li>
 					<li><h4>Air temp units</h4> 
 					<select name="air_temp_units" id="id_air_temp_units" >
-						<option value="" selected="selected">--Select units--</option>
+						<option value="" selected>--Select units--</option>
 						<option value="fahrenheit">Fahrenheit</option>
 						<option value="celsius">Celsius</option>
 					</select></li>
 					<li><h4>Precipitation type</h4> 
 					<select name="precipitation_type" id="id_precipitation_type" >
-						<option value="" selected="selected">--Select type--</option>
+						<option value="" selected>--Select type--</option>
 						<option value="none">None</option>
 						<option value="snow">Snow</option>
 						<option value="rain">Rain</option>
@@ -484,14 +484,14 @@
 					</select></li>
 					<li><h4>Precipitation intensity</h4> 
 					<select name="precipitation_intensity" id="id_precipitation_intensity" >
-						<option value="" selected="selected">--Select one--</option>
+						<option value="" selected>--Select one--</option>
 						<option value="light">Light</option>
 						<option value="moderate">Moderate</option>
 						<option value="heavy">Heavy</option>
 					</select></li>
 					<li><h4>Wind speed</h4> 
 					<select name="wind_speed" id="id_wind_speed" >
-						<option value="" selected="selected">--Select one--</option>
+						<option value="" selected>--Select one--</option>
 						<option value="calm">Calm</option>
 						<option value="light">Light</option>
 						<option value="moderate">Moderate</option>
@@ -500,7 +500,7 @@
 					</select></li>
 					<li><h4>Wind direction</h4> 
 					<select name="wind_direction" id="id_wind_direction"  >
-						<option value="" selected="selected">--Select one--</option>
+						<option value="" selected>--Select one--</option>
 						<option value="northwest">Northwest</option>
 						<option value="north">North</option>
 						<option value="northeast">Northeast</option>
@@ -550,7 +550,7 @@
 				<ul data-role="listview" data-inset="true">	
 					<li><h4>Test type</h4> 
 					<select id="test_type" name="test_type"  >
-						<option selected="selected" value="">--Select one--</option>
+						<option value="" selected >--Select one--</option>
 						<option value="rutschblock">Rutschblock</option>
 						<option value="shovel-shear">Shovel hear</option>
 						<option value="compression">Compression</option>
@@ -561,14 +561,14 @@
 					<li><h4>Shear depth</h4> <input class="number" id="shear_depth" name="shear_depth" type="text" maxlength="255" /></li>
 					<li><h4>Shear depth units</h4> 
 					<select name="shear_depth_units" id="shear_depth_units"  >
-						<option selected="selected" value="">--Select units--</option>
+						<option value="" selected>--Select units--</option>
 						<option value="inches">Inches</option>
 						<option value="centimeters">Centimeters</option>
 					</select></li>
 					<li><h4>Load at failure</h4> <input id="failure_load" type="text" name="failure_load" maxlength="10000" /></li>
 					<li><h4>Shear quality</h4> 
 					<select name="shear_quality" id="shear_quality"  >
-						<option selected="selected" value="">--Select one--</option>
+						<option value="" selected>--Select one--</option>
 						<option value="1">Q1</option>
 						<option value="2">Q2</option>
 						<option value="3">Q3</option>
