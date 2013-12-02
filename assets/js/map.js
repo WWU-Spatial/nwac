@@ -45,8 +45,7 @@
 	 * Use http://www.nwac.us/api/v2/ for production
 	 * Use http://dev2.nwac.us/api/v2/ for development and debugging
 	 * NOTE: the nwac api does not support cross-domain requests.  For get requests
-	 * you can use a jsonp callback which is supported.  For posts, the proxy server
-	 * will need to be used.
+	 * you can use a jsonp callback which is supported.
 	 */
 	var NWAC_API = "http://dev2.nwac.us/api/v2/";
 	var NWAC_SNOWPACK_API = NWAC_API + 'observation/';
@@ -62,7 +61,6 @@
 	var fromDate, prevToDate;
 	var storeUser = 'NWACMobileUserInfo';
 	var useLocalStorage = supports_local_storage();
-	var proxyUrl;
 	var queryTask, query;
 	var symbol;
 	var initExtent;
@@ -273,7 +271,6 @@
 		
 		//set for stabTest adds
 		lastObsAdded = response.id;
-	
 		// add the graphic to correct graphicsLayer if layer already populated
 		switch (currentObservationType) {
 			case 'snowpack':
@@ -405,7 +402,7 @@
 		var form = $('[name="' + formName + '"]');
 
 		var options = {
-			url : proxyUrl + '?' + form.attr('action'),
+			url : form.attr('action'),
 			data : {
 				'location-region' : zone
 			},
@@ -451,9 +448,7 @@
 	 * depending on the layerName) between dates from the date-select controls.  Because the
 	 * date returned from the date selectors contains a time unit, we set the datetime to
 	 * mignight the following day to be sure all requests from the last day selected are 
-	 * returned.  The ESRI request function is used to make the ajax request.  The Huxley
-	 * proxy server is used for this request because the NWAC server does not allow cross-
-	 * domain requests.
+	 * returned.  The ESRI request function is used to make the ajax request.
 	 */
 	function getObservationsByLayer(layerName) {
 		var url;
@@ -463,7 +458,6 @@
 		} else if (layerName === 'avalanche') {
 			url = NWAC_AVALANCHE_API;
 		}
-		
 		// add day so obs request contains the last day in range
 		var request = esri.request({
 			url : url,
@@ -523,7 +517,7 @@
 	
 	/*
 	 * Gets the elevation at a given latitude and longitude using the MapQuest
-	 * Elevation Profile API.  This function no longer uses a proxy server.  The
+	 * Elevation Profile API.  The
 	 * elevation value is truncated at the decimal point and added to the elevation
 	 * field in both observation forms.  The returned elevation value is in feet.
 	 */
@@ -763,8 +757,7 @@
 	
 	/*
 	 * Gets a stability test from the NWAC API given the id number of the associated
-	 * observation.  This function uses the esri.request and is routed through the
-	 * proxy server since the NWAC api does not support CORS
+	 * observation.
 	 */
 	function getStabilityTest(id) {
 		var request = esri.request({
@@ -1211,10 +1204,8 @@
 		symbols['new-avalanche']	= new esri.symbol.SimpleMarkerSymbol().setColor(new dojo.Color(AVALANCHE_SYMBOL_COLOR));
 		
 		//ESRI Configurations
-		esri.config.defaults.io.proxyUrl = proxyUrl = "http://140.160.114.190/proxy/proxy.ashx";
-		esri.config.defaults.io.alwaysUseProxy = false;
 		esri.config.defaults.map.slider = {top : "100px"};
-	
+		esriConfig.defaults.io.corsEnabledServers.push("dev2.nwac.us");
 		
 		
 		// Create the map object
@@ -1706,12 +1697,12 @@
 								//							data += '"'+field.name+'": "'+field.value+'",';
 							}
 						});
-						data += '"observation": "/api/v1/observation/' + obsID + '/"}';
+						data += '"observation": "/api/v2/observation/' + obsID + '/"}';
 	
 						$.ajax({
-							url : proxyUrl + '?' + $this.attr('action'),
+							url : $this.attr('action'),
 							data : data,
-							contentType : 'application/json',
+							contentType : 'application/javascript',
 							dataType : "json",
 							type : 'POST',
 							complete : function(response) {
