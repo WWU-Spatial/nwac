@@ -1702,7 +1702,7 @@
 						$.ajax({
 							url : $this.attr('action'),
 							data : data,
-							contentType : 'application/javascript',
+							contentType : 'application/json',
 							dataType : "json",
 							type : 'POST',
 							complete : function(response) {
