@@ -802,11 +802,11 @@
 		if (data.objects) {
 			$.each(data.objects, function(num, obj) {
 				html += "<li class='stability-attribute' data-role='list-divider' data-theme='a'>" + 'Stability Test ' + (num + 1) + "</li>";
-				html += "<li class='stability-attribute' data-role='list-divider'>Test Type</li><li class='observation-attribute stability-attribute' id='datetime'>" + obj.test_type + "</li>";
-				html += "<li class='stability-attribute' data-role='list-divider'>Shear quality</li><li class='observation-attribute stability-attribute' id='datetime'>" + obj.failure_load + "</li>";
-				html += "<li class='stability-attribute' data-role='list-divider'>Depth of shear</li><li class='observation-attribute stability-attribute' id='datetime'>" + obj.shear_depth + " " + obj.shear_depth_units + "</li>";
-				html += "<li class='stability-attribute' data-role='list-divider'>Shear quality</li><li class='observation-attribute stability-attribute' id='datetime'>" + obj.shear_quality + "</li>";
-				html += "<li class='stability-attribute' data-role='list-divider'>Test comments</li><li class='observation-attribute stability-attribute' id='datetime'>" + obj.observations_comments + "</li>";
+				html += "<li class='stability-attribute' data-role='list-divider'>Test Type</li><li class='observation-attribute stability-attribute'>" + obj.test_type + "</li>";
+				html += "<li class='stability-attribute' data-role='list-divider'>Shear quality</li><li class='observation-attribute stability-attribute'>" + obj.failure_load + "</li>";
+				html += "<li class='stability-attribute' data-role='list-divider'>Depth of shear</li><li class='observation-attribute stability-attribute'>" + obj.shear_depth + " " + obj.shear_depth_units + "</li>";
+				html += "<li class='stability-attribute' data-role='list-divider'>Shear quality</li><li class='observation-attribute stability-attribute'>" + obj.shear_quality + "</li>";
+				html += "<li class='stability-attribute' data-role='list-divider'>Test comments</li><li class='observation-attribute stability-attribute'>" + obj.observations_comments + "</li>";
 			});
 		}
 		$("#obsAtts").append(html);
