@@ -346,7 +346,7 @@
 		var pt = esri.geometry.geographicToWebMercator(new esri.geometry.Point(data.location.longitude, data.location.latitude));
 		var graphic = new esri.Graphic(pt, symbol, data);
 		layer.add(graphic);
-		map.reorderLayer(layerName,1);
+		map.reorderLayer(layerName,4);
 	}
 	
 	
