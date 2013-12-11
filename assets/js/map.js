@@ -345,6 +345,7 @@
 		var pt = esri.geometry.geographicToWebMercator(new esri.geometry.Point(data.location.longitude, data.location.latitude));
 		var graphic = new esri.Graphic(pt, symbol, data);
 		layer.add(graphic);
+		map.reorderLayer(layerName,1);
 	}
 	
 	
@@ -409,7 +410,22 @@
 			type : 'POST',
 			dataType: 'json',
 			success : function(response) {
-				formResponse(response, formName);
+				if (response.errors){
+					var errors = 'Please fix the following errors:\n\n';
+					$.mobile.hidePageLoadingMsg();
+					for (var i in response.errors){
+						if (response.errors.hasOwnProperty(i)) {
+							if (Object.keys(response.errors[i])[0] !== "location") {
+								errors += Object.keys(response.errors[i])[0] + ": " + response.errors[i][Object.keys(response.errors[i])[0]][0] + "\n";
+							}
+							
+						}						
+					}
+					alert(errors);
+					
+				} else {
+					formResponse(response, formName);
+				}
 			},
 			error : function(error) {	
 				formFail(error);
