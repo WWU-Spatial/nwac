@@ -1600,7 +1600,7 @@
 			} );
 			
 			jQuery.validator.addMethod('integer', function(value, element, param) {
-	            return (value == parseInt(value, 10));
+	            return (value == "" || value == parseInt(value, 10));
 	        }, 'Please enter a whole number!');
 	
 			$( "#obsForm" ).validate({
@@ -1627,6 +1627,7 @@
 						number: true
 					},
 					"location-slope_angle" : {
+						required: false,
 						integer: true
 					}
 						
