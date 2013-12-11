@@ -245,8 +245,9 @@
 	 * completion of either a snowpack or avalanche observation form submittal
 	 */
 	function stabFormReturn(response) {
+		console.log(response);
 		$.mobile.hidePageLoadingMsg();
-		if (response.statusText === 'OK') {
+		if (response.statusText === 'OK' || response.statusText === 'CREATED') {
 			$('#stabTestDivLabel').html('Add another stability test?');
 			resetForm('stabTestForm');
 			$.mobile.changePage('#mapPage');
