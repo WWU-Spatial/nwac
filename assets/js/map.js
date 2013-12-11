@@ -1709,19 +1709,17 @@
 						formArray.forEach(function(field) {
 							if (field.name === "shear_depth") {
 								//don't add the N/V pair if no field.value
-								if (field.value) {
+								if (field.value && field.value != null) {
 									data += '"' + field.name + '": ' + field.value + ',';
 								}
-								//							data += '"'+field.name+'": '+field.value+',';
 							} else if (field.name === "shear_quality") {
-								if (field.value) {
+								if (field.value && field.value != null) {
 									data += '"' + field.name + '": ' + field.value + ',';
 								}
 							} else {
-								if (field.value) {
+								if (field.value && field.value != null) {
 									data += '"' + field.name + '": "' + field.value + '",';
 								}
-								//							data += '"'+field.name+'": "'+field.value+'",';
 							}
 						});
 						data += '"observation": "/api/v2/observation/' + obsID + '/"}';
